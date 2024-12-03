@@ -1,4 +1,4 @@
-package tera;
+package command;
 
 import dao.AbstractDaoFactory;
 import dao.ProductsDao;
@@ -11,11 +11,11 @@ public class AddMessageCommand extends AbstractCommand {
         RequestContext reqc = getRequestContext();
 
         // リクエストからパラメータを取得
-        String[] r_id = reqc.getParameter("r_id");
-        String relation_id =  r_id[0];  
+        String[] relational_ids = reqc.getParameter("relation_id");
+        String relation_id =  relational_ids[0];  
 
-        String[] u_id = reqc.getParameter("u_id");
-        String user_id = u_id[0];
+        String[] users_ids = reqc.getParameter("user_id");
+        String user_id = users_ids[0];
 
         String[] messages = reqc.getParameter("message");
         String message = messages[0];
