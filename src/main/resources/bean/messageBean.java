@@ -4,48 +4,48 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 
 public class messageBean implements Serializable{
-	private int MESSAGE_ID;
-	private int RELATION_ID;
-	private String USER_ID;
-	private Timestamp SEND_TIME;
-	private String SEND_MESSAGE;
+	private int messageId;
+	private int relationId;
+	private String userId;
+	private Timestamp sendTime;
+	private String sendMessage;
 	
 	public messageBean() {}
-	public messageBean(int MESSAGE_ID, int RELATION_ID, String USER_ID, Timestamp SEND_TIME, String SEND_MESSAGE){
-		this.MESSAGE_ID=MESSAGE_ID;
-		this.RELATION_ID=RELATION_ID;
-		this.USER_ID=USER_ID;
-		this.SEND_TIME=SEND_TIME;
-		this.SEND_MESSAGE=SEND_MESSAGE;
+	public messageBean(int messageId, int relationId, String userId, Timestamp sendTime, String sendMessage){
+		this.messageId=messageId;
+		this.relationId=relationId;
+		this.userId=userId;
+		this.sendTime=sendTime;
+		this.sendMessage=sendMessage;
 	}
-	public int getMESSAGE_ID() {
-		return MESSAGE_ID;
+	public int getMessageId() {
+		return messageId;
 	}
-	public void setMESSAGE_ID(int MESSAGE_ID) {
-		this.MESSAGE_ID=MESSAGE_ID;
+	public void setMessageId(int messageId) {
+		this.messageId=messageId;
 	}
-	public int getRELATION_ID() {
-		return RELATION_ID;
+	public int getRelationId() {
+		return relationId;
 	}
-	public void setRELATION_ID(int RELATION_ID) {
-		this.RELATION_ID=RELATION_ID;
+	public void setRelationId(int relationId) {
+		this.relationId=relationId;
 	}
-	public String getUSER_ID() {
-		return USER_ID;
+	public String getUserId() {
+		return userId;
 	}
-	public void setUSER_ID(String USER_ID) {
-		this.USER_ID=USER_ID;
+	public void setUserId(String userId) {
+		this.userId=userId;
 	}
-	public Timestamp getSEND_TIME() {
-		return SEND_TIME;
+	public Timestamp getSendTime() {
+		return sendTime;
 	}
-	public void setSEND_TIME(Timestamp SEND_TIME) {
-		this.SEND_TIME=SEND_TIME;
+	public void setSendTime(Timestamp sendTime) {
+		this.sendTime=sendTime;
 	}
-	public String getSEND_MESSAGE() {
-		return SEND_MESSAGE;
+	public String getSendMessage() {
+		return sendMessage;
 	}
-	public void setSEND_MESSAGE(String SEND_MESSAGE) {
-		this.SEND_MESSAGE=SEND_MESSAGE;
+	public void setSendMessage(String sendMessage) {
+		this.sendMessage=sendMessage;
 	}
 }
