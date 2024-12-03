@@ -1,7 +1,8 @@
 package command;
 
 import dao.AbstractDaoFactory;
-import dao.ProductsDao;
+import dao.MessageDao;
+import bean.MessageBean;
 
 public class AddMessageCommand extends AbstractCommand {
 
@@ -11,20 +12,20 @@ public class AddMessageCommand extends AbstractCommand {
         RequestContext reqc = getRequestContext();
 
         // リクエストからパラメータを取得
-        String[] relational_ids = reqc.getParameter("relation_id");
-        String relation_id =  relational_ids[0];  
+        String[] relationalIds = reqc.getParameter("relationId");
+        String relationId =  relationalIds[0];  
 
-        String[] users_ids = reqc.getParameter("user_id");
-        String user_id = users_ids[0];
+        String[] usersIds = reqc.getParameter("userId");
+        String userId = usersIds[0];
 
         String[] messages = reqc.getParameter("message");
         String message = messages[0];
 
         // MessageBeanオブジェクトの作成とデータの設定
-        MessageBean p = new MessageBean();
-        p.setRelation_Id(relation_id);         
-        p.setuser_Id(user_id);      
-        p.setMessage(message);  
+        MessageBean mb = new MessageBean();
+        mb.setRelationId(relationId);         
+        mb.setUserId(userId);      
+        mb.setMessage(message);  
         
         // MessageDAOを使ってデータベースに保存
         MessageDAO ms = new MessageDAO();
