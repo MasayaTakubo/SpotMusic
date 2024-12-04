@@ -1,4 +1,3 @@
-import dao.MessageDAO;
 import java.util.List;
 import dao.MessageDAO;
 import bean.messageBean;
