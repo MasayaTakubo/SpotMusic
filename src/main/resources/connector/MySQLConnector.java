@@ -1,10 +1,12 @@
 package connector;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class MySQLConnecter {
+public class MySQLConnector {
     public static Connection getConn() {
         Connection conn = null;
         try{
