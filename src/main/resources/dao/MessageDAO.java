@@ -52,7 +52,7 @@ public class MessageDAO {
             ps.executeUpdate();
         }
     }
-    public boolean deleteMessage(MessageBean message) throws SQLException {
+    public boolean removeMessage(MessageBean message) throws SQLException {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(DELETE_MESSAGE_SQL)) {
             ps.setInt(1, message.getMessageId());
@@ -60,3 +60,4 @@ public class MessageDAO {
         }
     }
 }
+
