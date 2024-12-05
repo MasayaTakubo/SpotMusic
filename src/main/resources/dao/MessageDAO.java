@@ -24,12 +24,12 @@ public class MessageDAO {
             ps.executeUpdate();
         }
     }
-    public List<MessageBean> getMessages(MessageBean filter) throws SQLException {
+    public List<MessageBean> getMessages(MessageBean message) throws SQLException {
         List<MessageBean> messages = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(SELECT_MESSAGES_SQL)) {
-            ps.setInt(1, filter.getRelationId());
-            ps.setString(2, filter.getUserId());
+            ps.setInt(1, message.getRelationId());
+            ps.setString(2, message.getUserId());
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     MessageBean message = new MessageBean();
@@ -56,7 +56,7 @@ public class MessageDAO {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(DELETE_MESSAGE_SQL)) {
             ps.setInt(1, message.getMessageId());
-            return ps.executeUpdate() > 0;
+            return ps.executeUpdate();
         }
     }
 }
