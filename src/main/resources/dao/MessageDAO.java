@@ -3,7 +3,7 @@ package dao;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import bean.messageBean;
+import bean.MessageBean;
 
 public class MessageDAO {
     private static final String INSERT_MESSAGE_SQL = 
@@ -15,7 +15,7 @@ public class MessageDAO {
     private static final String DELETE_MESSAGE_SQL = 
         "DELETE FROM MESSAGE WHERE MESSAGE_ID = ?";
 
-    public void addMessage(messageBean message) throws SQLException {
+    public void addMessage(MessageBean message) throws SQLException {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(INSERT_MESSAGE_SQL)) {
             ps.setInt(1, message.getRelationId());
@@ -24,16 +24,15 @@ public class MessageDAO {
             ps.executeUpdate();
         }
     }
-    
-    public List<messageBean> getMessagesByRelationId(int relationId, String userId) throws SQLException {
-        List<messageBean> messages = new ArrayList<>();
+    public List<MessageBean> getMessages(MessageBean filter) throws SQLException {
+        List<MessageBean> messages = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(SELECT_MESSAGES_SQL)) {
-            ps.setInt(1, relationId);
-            ps.setString(2, userId);
+            ps.setInt(1, filter.getRelationId());
+            ps.setString(2, filter.getUserId());
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    messageBean message = new messageBean();
+                    MessageBean message = new MessageBean();
                     message.setMessageId(rs.getInt("MESSAGE_ID"));
                     message.setRelationId(rs.getInt("RELATION_ID"));
                     message.setUserId(rs.getString("USER_ID"));
@@ -45,20 +44,18 @@ public class MessageDAO {
         }
         return messages;
     }
-    
-    public void updateMessage(int messageId, String newMessage) throws SQLException {
+    public void updateMessage(MessageBean message) throws SQLException {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(UPDATE_MESSAGE_SQL)) {
-            ps.setString(1, newMessage);
-            ps.setInt(2, messageId);
+            ps.setString(1, message.getSendMessage());
+            ps.setInt(2, message.getMessageId());
             ps.executeUpdate();
         }
     }
-    
-    public boolean deleteMessageById(int messageId) throws SQLException {
+    public boolean deleteMessage(MessageBean message) throws SQLException {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(DELETE_MESSAGE_SQL)) {
-            ps.setInt(1, messageId);
+            ps.setInt(1, message.getMessageId());
             return ps.executeUpdate() > 0;
         }
     }

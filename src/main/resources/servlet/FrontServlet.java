@@ -1,39 +1,23 @@
 package servlet;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
 import java.io.IOException;
 
-public class FrontServlet extends HttpServlet {
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {        // 获取命令参数，例如 AddMessageCommand, ListMessageCommand 等
-        String command = request.getParameter("command");
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-        if (command != null) {
-            switch (command) {
-                case "AddMessageCommand":
-                    new AddMessageCommand().execute(request, response);
-                    break;
-                case "ListMessageCommand":
-                    new ListMessageCommand().execute(request, response);
-                    break;
-                case "UpdateMessageCommand":
-                    new UpdateMessageCommand().execute(request, response);
-                    break;
-                case "RemoveMessageCommand":
-                    new RemoveMessageCommand().execute(request, response);
-                    break;
-                default:
-                    response.sendRedirect("error.jsp");
-                    break;
-            }
-        } else {
-            response.sendRedirect("main.jsp");
-        }
-    }
+public class FrontServlet extends javax.servlet.http.HttpServlet {
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        req.setCharacterEncoding("Windows-31J");
+        
+        ApplicationController app = new WebApplicationController();
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        doGet(request, response);
+        RequestContext reqc = app.getRequest(req);
+
+        ResponseContext resc = app.handleRequest(reqc);
+
+        resc.setResponse(res);
+
+        app.handleResponse(reqc, resc);
     }
 }
