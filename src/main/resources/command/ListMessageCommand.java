@@ -12,12 +12,16 @@ public class ListMessageCommand extends AbstractCommand {
         int relationId = Integer.parseInt(resc.getParameter("relationId")); 
         String userId = resc.getParameter("userId");  
         
+        MessageBean mb = new MessageBean();
+        mb.setRelationId(relationId);
+        mb.setUserId(userId);
         // Commandファクトリを使ってMessageDAOを取得
         CommandFactory factory = CommandFactory.getFactory();
         MessageDAO messageDAO = factory.getMessageDao();
         
+        
         // relationIdとuserIdを使ってメッセージリストを取得
-        List<messageBean> messages = messageDAO.getMessagesByRelationId(relationId, userId);
+        List<messageBean> messages = messageDAO.getMessages(mb);
         
         // レスポンスコンテキストにメッセージリストを設定
         resc.setResult(messages);

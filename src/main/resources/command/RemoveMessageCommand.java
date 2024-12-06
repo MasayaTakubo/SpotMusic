@@ -21,10 +21,10 @@ public class RemoveMessageCommand extends AbstractCommand {
         if (messageIdOpt.isPresent()) {
             long messageId = messageIdOpt.get();
             // メッセージを削除
-            boolean isDeleted = dao.deleteMessageById(messageId);　//メソッド名は仮
+            boolean isRemoved =dao.removeMessageById(messageId);　//メソッド名は仮
 
             // 結果を設定　setResultの引数は仮
-            if (isDeleted) {
+            if (isRemoved) {
                 resc.setResult("Message with ID " + messageId + " was successfully deleted.");
             } else {
                 resc.setResult("Failed to delete message with ID " + messageId + ".");

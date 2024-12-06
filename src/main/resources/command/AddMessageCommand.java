@@ -29,7 +29,7 @@ public class AddMessageCommand extends AbstractCommand {
         
         // MessageDAOを使ってデータベースに保存
         MessageDAO ms = new MessageDAO();
-        ms.execute(p);
+        ms.addMessage(mb);
 
         // リストを更新後、適切なページにリダイレクト
         res.setTarget("chat"); // 成功ページにリダイレクト

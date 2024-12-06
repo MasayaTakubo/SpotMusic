@@ -12,7 +12,7 @@ public class UpdateMessageCommand extends AbstractCommand {
         messageBean.setMessageId(messageId);//タンチヤウと相談
         messageBean.setSendMessage(sendMessage);//タンチヤウと相談
         MessageDAO messageDAO= new MessageDAO();//チヨウと相談
-        messageDAO.UpdateMessage(sendMessages);//チヨウと相談
+        messageDAO.updateMessage(sendMessages);//チヨウと相談
         resc.setTarget("chat");//多分メッセージ画面に戻すので仮に設定
         return resc;
     }
