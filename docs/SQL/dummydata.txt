@@ -1,0 +1,12 @@
+users表にユーザー追加
+
+INSERT INTO USERS (USER_ID) 
+VALUES 
+    ('tanaka'),
+    ('katou');
+
+
+relation表に関係追加
+
+INSERT INTO RELATION (USER1_ID, USER2_ID, STATUS)
+VALUES ('tanaka', 'katou', 'ACCEPT');
