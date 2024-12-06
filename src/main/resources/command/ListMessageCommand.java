@@ -1,4 +1,5 @@
-import dao.MessageDAO;
+package command;
+
 import java.util.List;
 import dao.MessageDAO;
 import bean.messageBean;
