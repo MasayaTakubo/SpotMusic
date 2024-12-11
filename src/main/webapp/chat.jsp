@@ -16,7 +16,7 @@
             </div>
         </c:forEach>
     </div>
-    <form action="ControllerServlet" method="post" class="chat-input">
+    <form action="FrontServlet" method="post" class="chat-input">
         <input type="hidden" name="command" value="AddMessageCommand" />
         <input type="hidden" name="relationId" value="${relationId}" />
         <input type="hidden" name="userId" value="${userId}" />

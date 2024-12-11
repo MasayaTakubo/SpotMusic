@@ -11,13 +11,13 @@ public abstract class CommandFactory {
         Properties prop = new Properties();
 
         try {
-            prop.load(new FileInputStream("c:/j2ee4/commands.properties"));
+            prop.load(new FileInputStream("c:/SpotMusic/webapp/commands.properties"));
 
             String name = prop.getProperty(rc.getCommandPath());
 
             Class c = Class.forName(name);
 
-            command = (AbstractCommand) c.newInstance();
+            command = (AbstractCommand) c.getDeclaredConstructor().newInstance();
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e.getMessage(), e);
         } catch (IOException e) {
