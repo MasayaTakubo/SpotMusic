@@ -28,9 +28,9 @@ public class WebApplicationController implements ApplicationController {
 		try {
 			rd.forward(req, res);
 		}catch(ServletException e) {
-			
+			e.printStackTrace();
 		}catch(IOException e) {
-			
+			e.printStackTrace();
 		}
 	}
 }

@@ -32,7 +32,7 @@ public class AddMessageCommand extends AbstractCommand {
         ms.addMessage(mb);
 
         // リストを更新後、適切なページにリダイレクト
-        res.setTarget("chat"); // 成功ページにリダイレクト
+        res.setTarget("chat.jsp"); // 成功ページにリダイレクト
 
         return res;
     }
