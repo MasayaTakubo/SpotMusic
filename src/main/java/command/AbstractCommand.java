@@ -1,4 +1,6 @@
 package command;
+import context.RequestContext;
+import context.ResponseContext;
 
 public abstract class AbstractCommand {
 	
@@ -11,4 +13,6 @@ public abstract class AbstractCommand {
     public RequestContext getRequsetContext() {
         return reqContext;
     }
+    
+    public abstract ResponseContext execute(ResponseContext resc);
 }

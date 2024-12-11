@@ -3,7 +3,10 @@ package command;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;
+
+import context.RequestContext;
 
 public abstract class CommandFactory {
     public static AbstractCommand getCommand(RequestContext rc) {
@@ -11,7 +14,7 @@ public abstract class CommandFactory {
         Properties prop = new Properties();
 
         try {
-            prop.load(new FileInputStream("c:/SpotMusic/webapp/commands.properties"));
+            prop.load(new FileInputStream("../../webapp/command.properties"));
 
             String name = prop.getProperty(rc.getCommandPath());
 
@@ -27,6 +30,10 @@ public abstract class CommandFactory {
         } catch (InstantiationException e) {
             throw new RuntimeException(e.getMessage(), e);
         } catch (IllegalAccessException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        } catch (InvocationTargetException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
 

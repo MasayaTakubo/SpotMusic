@@ -17,7 +17,7 @@
         </c:forEach>
     </div>
     <form action="FrontServlet" method="post" class="chat-input">
-        <input type="hidden" name="command" value="AddMessageCommand" />
+        <input type="hidden" name="command" value="AddMessage" />
         <input type="hidden" name="relationId" value="${relationId}" />
         <input type="hidden" name="userId" value="${userId}" />
         <textarea name="message" placeholder="Type your message here" required></textarea>
