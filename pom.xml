@@ -51,5 +51,6 @@
 
   <build>
     <finalName>SpotMusic</finalName>
+    <!-- sourceDirectory の指定は不要です。 -->
   </build>
 </project>
