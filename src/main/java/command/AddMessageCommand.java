@@ -19,7 +19,7 @@ public class AddMessageCommand extends AbstractCommand {
         int relationId = Integer.parseInt(relationIdStr);
 
         // ダミーデータとして userId を固定
-        String userId = reqc.getParameter("userId");
+        String userId = reqc.getParameter("userId")[0];
         
         
         
