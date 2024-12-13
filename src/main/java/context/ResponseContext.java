@@ -1,7 +1,6 @@
 package context;
 
 public interface ResponseContext {
-	
     public Object getResult();
     public String getTarget();
     public void setResult(Object bean);
