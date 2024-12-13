@@ -6,6 +6,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import context.RequestContext;
 import context.ResponseContext;
@@ -24,6 +25,14 @@ public class FrontServlet extends HttpServlet{
         
         ApplicationController app = new WebApplicationController();
 
+        HttpSession session = req.getSession();
+
+        String userId = req.getParameter("userId");
+
+        if (userId != null && !userId.isEmpty()) {
+            session.setAttribute("userId", userId);
+        }
+        
         // リクエストデータをログ出力
         System.out.println("Request Received:");
         System.out.println("Request URI: " + req.getRequestURI());
