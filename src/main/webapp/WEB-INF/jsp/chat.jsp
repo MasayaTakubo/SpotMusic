@@ -74,13 +74,16 @@
             </div>
         </c:forEach>
     </div>
-
+	<%
+	    // セッションから"userId"を取得
+	    String userId = (String) session.getAttribute("userId");
+	%>
     <!-- メッセージ送信フォーム -->
     <div class="message-input">
         <form action="FrontServlet" method="POST">
             <textarea name="message" placeholder="Type your message here..." required></textarea>
             <input type="hidden" name="relationId" value="1"> <!-- ダミーデータ -->
-            <input type="hidden" name="userId" value="user1"> <!-- ダミーデータ -->
+            <input type="hidden" name="userId" value="<%= userId != null ? userId : "" %>"> <!-- ダミーデータ -->
             <input type="hidden" name="command" value="AddMessage">
             <button type="submit">Send</button>
         </form>
