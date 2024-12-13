@@ -1,18 +1,26 @@
 package connector;
-import java.sql.ResultSet;
-import java.sql.Statement;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class MySQLConnector {
+    static {
+        try {
+            // JDBCドライバのクラスを手動でロード
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
     public static Connection getConn() {
         Connection conn = null;
         try{
+            // 接続URLに文字エンコーディングの設定を追加
             conn = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/world?characterEncoding=UTF-8&serverTimezone=JST",
-                "info","pro");
+                "jdbc:mysql://localhost:3306/spotmusic?useSSL=false&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8", 
+                "info", "pro");
         }catch(SQLException e){
             e.printStackTrace();
         }

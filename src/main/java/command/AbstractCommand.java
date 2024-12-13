@@ -3,14 +3,14 @@ import context.RequestContext;
 import context.ResponseContext;
 
 public abstract class AbstractCommand {
-	
     private RequestContext reqContext;
 
     public void init(RequestContext reqc) {
-        reqContext=reqc;
+        reqContext = reqc;
     }
 
-    public RequestContext getRequsetContext() {
+    // 修正: スペルミスを直す
+    public RequestContext getRequestContext() {
         return reqContext;
     }
     
