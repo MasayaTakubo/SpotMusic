@@ -18,7 +18,7 @@
     <form action="FrontServlet" method="POST">
         <!-- ユーザーID入力 -->
         <input type="text" name="userId" placeholder="Enter your user ID" required><br><br>
-
+		<input type="hidden" name="command" value="ChatCommand">
         <!-- 送信ボタン -->
         <button type="submit">login</button>
     </form>
