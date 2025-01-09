@@ -1,0 +1,154 @@
+package dao;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import connector.MySQLConnector;
+
+public class PlayListDAO {
+	//MySQLに保存するメソッド
+	public void savePlaylistReview(String playlistId, String userId) throws SQLException {
+	    // プレイリストIDとユーザーIDを保存するSQL文
+	    String sql = "INSERT INTO PLAYLIST_REVIEW (PLAYLIST_ID, USER_ID) VALUES (?, ?)";
+	    
+	    try (Connection conn = MySQLConnector.getConn();
+	         PreparedStatement stmt = conn.prepareStatement(sql)) {
+	        stmt.setString(1, playlistId); // プレイリストID
+	        stmt.setString(2, userId); // ユーザーID
+	        stmt.executeUpdate();
+	    }
+	}
+	
+	//Spotifyから取得するコード達
+	public JSONObject getSpotifyPlaylists(String accessToken) throws Exception {
+	    // Spotifyのプレイリスト情報を取得するURL
+	    URL url = new URL("https://api.spotify.com/v1/me/playlists");
+	    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+	    connection.setRequestMethod("GET");
+	    connection.setRequestProperty("Authorization", "Bearer " + accessToken);
+
+	    BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+	    String inputLine;
+	    StringBuilder response = new StringBuilder();
+	    while ((inputLine = in.readLine()) != null) {
+	        response.append(inputLine);
+	    }
+	    in.close();
+
+	    // レスポンスをJSONObjectに変換して返す
+	    return new JSONObject(response.toString());
+	}
+	
+	public List<String> getPlaylistNames(String accessToken) throws Exception {
+        JSONObject playlists = getSpotifyPlaylists(accessToken);
+        List<String> playlistNames = new ArrayList<>();
+        if (playlists.has("items")) {
+            JSONArray items = playlists.getJSONArray("items");
+            for (int i = 0; i < items.length(); i++) {
+                String name = items.getJSONObject(i).getString("name");
+                playlistNames.add(name);
+            }
+        }
+        return playlistNames;
+    }
+
+    /**
+     * プレイリストの説明を取得するメソッド
+     */
+    public List<String> getPlaylistDescriptions(String accessToken) throws Exception {
+        JSONObject playlists = getSpotifyPlaylists(accessToken);
+        List<String> playlistDescriptions = new ArrayList<>();
+        if (playlists.has("items")) {
+            JSONArray items = playlists.getJSONArray("items");
+            for (int i = 0; i < items.length(); i++) {
+                String description = items.getJSONObject(i).optString("description", "説明なし");
+                playlistDescriptions.add(description);
+            }
+        }
+        return playlistDescriptions;
+    }
+
+    /**
+     * プレイリスト内のトラック情報を取得するメソッド
+     */
+    public Map<String, List<String>> getPlaylistTracks(String accessToken) throws Exception {
+        JSONObject playlists = getSpotifyPlaylists(accessToken);
+        Map<String, List<String>> playlistTracks = new HashMap<>();
+        if (playlists.has("items")) {
+            JSONArray items = playlists.getJSONArray("items");
+            for (int i = 0; i < items.length(); i++) {
+                JSONObject playlist = items.getJSONObject(i);
+                String playlistName = playlist.getString("name");
+                String tracksUrl = playlist.getJSONObject("tracks").getString("href");
+
+                // トラック情報を取得
+                JSONObject tracksResponse = getSpotifyAPIResponse(tracksUrl, accessToken);
+                List<String> trackNames = new ArrayList<>();
+                if (tracksResponse.has("items")) {
+                    JSONArray tracks = tracksResponse.getJSONArray("items");
+                    for (int j = 0; j < tracks.length(); j++) {
+                        JSONObject track = tracks.getJSONObject(j).getJSONObject("track");
+                        trackNames.add(track.getString("name"));
+                    }
+                }
+                playlistTracks.put(playlistName, trackNames);
+            }
+        }
+        return playlistTracks;
+    }
+
+    /**
+     * プレイリストのカバー画像情報を取得するメソッド
+     */
+    public Map<String, String> getPlaylistCovers(String accessToken) throws Exception {
+        JSONObject playlists = getSpotifyPlaylists(accessToken);
+        Map<String, String> playlistCovers = new HashMap<>();
+        if (playlists.has("items")) {
+            JSONArray items = playlists.getJSONArray("items");
+            for (int i = 0; i < items.length(); i++) {
+                JSONObject playlist = items.getJSONObject(i);
+                String playlistName = playlist.getString("name");
+                JSONArray images = playlist.getJSONArray("images");
+                String coverUrl = images.length() > 0 ? images.getJSONObject(0).getString("url") : "カバー画像なし";
+                playlistCovers.put(playlistName, coverUrl);
+            }
+        }
+        return playlistCovers;
+    }
+
+    /**
+     * Spotify APIへのGETリクエストを送信してレスポンスを取得
+     */
+    private JSONObject getSpotifyAPIResponse(String urlString, String accessToken) throws IOException {
+        URL url = new URL(urlString);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Authorization", "Bearer " + accessToken);
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        String inputLine;
+        StringBuilder response = new StringBuilder();
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        return new JSONObject(response.toString());
+    }
+}
+
+
+
