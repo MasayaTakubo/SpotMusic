@@ -20,11 +20,10 @@ public class FrontServlet extends HttpServlet{
         }       
     public void doPost(HttpServletRequest req, HttpServletResponse res)
             throws IOException, ServletException {
-        req.setCharacterEncoding("Windows-31J");
-        
-        
-        ApplicationController app = new WebApplicationController();
+    	res.setContentType("application/json");
+        req.setCharacterEncoding("UTF-8");
 
+        ApplicationController app = new WebApplicationController();	
         HttpSession session = req.getSession();
 
         String userId = req.getParameter("userId");

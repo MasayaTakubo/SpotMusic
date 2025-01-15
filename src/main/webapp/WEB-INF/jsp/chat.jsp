@@ -1,6 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=Windows-31J" pageEncoding="UTF-8"%>
+<%@ page language="java" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
@@ -34,184 +33,118 @@
             width: 100%;
             height: 50px;
         }
-        .edit-box, .delete-box {
-            margin-top: 10px;
-        }
     </style>
 </head>
 <body>
     <%
         // セッションから"userId"を取得
         String userId = (String) session.getAttribute("userId");
+        // リクエストからレスポンスに渡されたメッセージリスト（JSON形式）を取得
+        String jsonResponse = (String) request.getAttribute("messages");
     %>
     <h1>Chat Room</h1>
     <h1>${sessionScope.userId }</h1>
-    <div class="chat-box" id="chat-box">
-        <!-- メッセージをループで表示 -->
-        <c:forEach var="message" items="${requestScope.messages}">
-            <div class="chat-message" id="message-${message.messageId}">
-                <div>
-                    <span class="user">${message.userId}:</span>
-                    <span class="time">${message.sendTime}</span>
-                </div>
-                <div class="content">${message.sendMessage}</div>
-                
-                <!-- 編集ボックス -->
-                <div class="edit-box">
-                    <form action="FrontServlet" method="POST" onsubmit="return editMessage(event, ${message.messageId});">
-                        <input type="hidden" name="command" value="UpdateMessage">
-                        <input type="hidden" name="messageId" value="${message.messageId}">
-                        <input type="hidden" name="relationId" value="1"> <!-- ダミーデータ -->
-                        <textarea name="message" placeholder="Edit your message" required>${message.sendMessage}</textarea>
-                        <button type="submit">Update</button>
-                    </form>
-                </div>
-
-                <!-- 削除ボックス -->
-                <div class="delete-box">
-                    <form action="FrontServlet" method="POST" onsubmit="return deleteMessage(event, ${message.messageId});">
-                        <input type="hidden" name="command" value="RemoveMessage">
-                        <input type="hidden" name="messageId" value="${message.messageId}">
-                        <input type="hidden" name="relationId" value="1"> <!-- ダミーデータ -->
-                        <button type="submit">Delete</button>
-                    </form>
-                </div>
-            </div>
-        </c:forEach>
-    </div>
-    
+    <div id="chat-box" class="chat-box"></div>
     <!-- メッセージ送信フォーム -->
-    <div class="message-input">
-        <form action="FrontServlet" method="POST"  onsubmit="return reloadMessage(event);">
-            <textarea name="message" id="message" placeholder="Type your message here..." required></textarea>
+    <div class="chatWindow">
+        <form action="FrontServlet" method="POST" id="chatForm" onsubmit="return false;">
+            <textarea name="message" id="messageInput" placeholder="Type your message here..." required></textarea>
             <input type="hidden" name="relationId" value="1"> <!-- ダミーデータ -->
-            <input type="hidden" name="userId" value="${sessionScope.userId }"> <!-- ダミーデータ -->
+            <input type="hidden" name="userId" id="userId" value="${sessionScope.userId }"> <!-- セッションからuserIdをセット -->
             <input type="hidden" name="command" value="AddMessage">
-            <button type="submit" id="send">Send</button>
+            <button id="sendButton" type="button">Send</button> <!-- IDとタイプ修正 -->
         </form>
     </div>
 
     <script>
-        const chatBox = document.getElementById('chat-box');
-        const messageInput = document.getElementById('message');
-        const sendButton = document.getElementById('send');
-        
-        // チャットボックスを常にスクロールダウン
-        chatBox.scrollTop = chatBox.scrollHeight;
-
-        // 編集メッセージ（非同期）
-        function editMessage(event, messageId) {
-            event.preventDefault();
-            const form = event.target;
-            const message = form.message.value;
-
-            fetch('FrontServlet', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({
-                    command: 'UpdateMessage',
-                    messageId: messageId,
-                    message: message,
-                    relationId: 1
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                const messageDiv = document.getElementById(`message-${messageId}`);
-                messageDiv.querySelector('.content').innerText = message;
-            })
-            .catch(error => console.error('Error:', error));
-        }
-
-        // 削除メッセージ（非同期）
-        function deleteMessage(event, messageId) {
-            event.preventDefault();
-
-            fetch('FrontServlet', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({
-                    command: 'RemoveMessage',
-                    messageId: messageId,
-                    relationId: 1
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                const messageDiv = document.getElementById(`message-${messageId}`);
-                messageDiv.remove();
-            })
-            .catch(error => console.error('Error:', error));
-        }
-
-        // BroadcastChannelの初期化
+        // サーバーから受け取ったJSONメッセージをパースして表示
+        //ChatCommandからのデータ
+        const messages = <%= jsonResponse != null ? jsonResponse : "[]" %>;
+        // チャットウィンドウにメッセージを表示
+	    const chatBox = document.getElementById('chat-box');
+		messages.forEach(message => {
+	        addMessageToBox(message);
+	    });
+        // BroadcastChannelの作成
         const channel = new BroadcastChannel('chat_channel');
-
-        document.querySelector('form').addEventListener('submit', (event) => {
-            event.preventDefault();
-            const message = messageInput.value;
-            if (message) {
-                const data = {
-                    user: '${sessionScope.userId}', // ユーザー名を動的に挿入
-                    text: message,
-                    time: new Date().toLocaleTimeString()
-                };
-                channel.postMessage(data); // メッセージを送信
-                addMessageToBox(data); // 自分の画面にも表示
-                messageInput.value = ''; // 入力欄をクリア
-            }
-        });
-
-        //送信処理
-        sendButton.addEventListener('click', (event) => {
-	    event.preventDefault();
-	    const message = messageInput.value;
-	    if (message) {
-	        fetch('FrontServlet', {
-	            method: 'POST',
-	            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-	            body: new URLSearchParams({
-	                command: 'AddMessage',
-	                message: message,
-	                userId: '${sessionScope.userId}'
-	            })
-	        })
-	        .then(response => response.json())
-	        .then(data => {
-	            channel.postMessage(data); // 他のブラウザにメッセージを送信
-	            addMessageToBox(data); // 自分の画面にも表示
-	            messageInput.value = ''; // 入力欄をクリア
-	        })
-	        .catch(error => console.error('Error:', error));
-	    }
-	});
-
-                
-
-
-        // メッセージ受信処理
-        channel.onmessage = (event) => {
-            addMessageToBox(event.data);
-        };
-
-        // チャットボックスにメッセージを追加
-        function addMessageToBox(message) {
-            const newMessage = document.createElement('div');
-            newMessage.classList.add('chat-message');
-            newMessage.innerHTML = `
-                <div>
-                    <span class="user"><strong>${message.user}</strong></span>
-                    <span class="time">[${message.time}]</span>
-                </div>
-                <div class="content">${message.text}</div>
-            `;
-            chatBox.appendChild(newMessage);
-            chatBox.scrollTop = chatBox.scrollHeight; // スクロールを下に
-        }
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const userId = document.getElementById('userId').value; // セッションから渡されたuserIdを取得
+        // メッセージ送信イベント
+		sendButton.addEventListener('click', function () {
+		    const message = messageInput.value;
+		    if (message.trim()) {
+		    	fetch('FrontServlet', {
+		    	    method: 'POST',
+		    	    headers: {
+			    	    'Accept': 'application/json',
+		    	        'Content-Type': 'application/x-www-form-urlencoded'
+			    	},
+		    	    body: new URLSearchParams({
+		    	        command: 'AddMessage',
+		    	        message: message,
+		    	        userId: userId
+		    	    })
+		    	})
+		    	.then(response => {
+		    	    if (!response.ok) {
+		    	        throw new Error('Network response was not ok');
+		    	    }
+		    	    return response.json();
+		    	})
+		    	.then(data => {
+		    	    messageInput.value = '';
+		    	    channel.postMessage(data);
+		    	    data.forEach(message => addMessageToBox(message));
+		    	})
+		    	.catch(error => console.error('Error:', error));
+		    }
+		});
+        // 他タブからのメッセージ受信イベント
+		channel.onmessage = function (event) {
+		    if (typeof event.data === 'object') {
+		    	event.data.forEach(message => addMessageToBox(message));
+		    } else {
+		        console.error('Received data is not an object:', event.data);
+		    }
+		};
+        // 画面にメッセージを追加
+        /*
+		function addMessageToBox(message) {
+	        const messageElement = document.createElement('div');
+	        messageElement.classList.add('chat-message');
+	        messageElement.innerHTML = `
+	            <span class="user">${message.userId}</span> <br>
+	            <span class="message">${message.sendMessage}</span><br>
+	            <span class="time">${message.sendTime}</span><br>
+	        `;
+	        chatBox.appendChild(messageElement);
+	        chatBox.scrollTop = chatBox.scrollHeight;
+	        console.log('UserId:', message.userId);
+	        console.log('Message:', message.sendMessage);
+	        console.log('Time:', message.sendTime);
+	    }*/
+	    function addMessageToBox(message) {
+	        const messageContainer = document.createElement('div');
+	        messageContainer.classList.add('chat-message');
+	        const userSpan = document.createElement('span');
+	        userSpan.classList.add('user');
+	        userSpan.textContent = message.userId;
+	        const messageSpan = document.createElement('span');
+	        messageSpan.classList.add('message');
+	        messageSpan.textContent = message.sendMessage;
+	        const timeSpan = document.createElement('span');
+	        timeSpan.classList.add('time');
+	        timeSpan.textContent = message.sendTime;
+	        messageContainer.appendChild(userSpan);
+	        messageContainer.appendChild(document.createElement('br'));
+	        messageContainer.appendChild(messageSpan);
+	        messageContainer.appendChild(document.createElement('br'));
+	        messageContainer.appendChild(timeSpan);
+	        messageContainer.appendChild(document.createElement('br'));
+	        chatBox.appendChild(messageContainer);
+	        chatBox.scrollTop = chatBox.scrollHeight;
+		}
     </script>
 </body>
 </html>

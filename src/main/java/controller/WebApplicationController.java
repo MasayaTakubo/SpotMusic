@@ -1,11 +1,13 @@
 package controller;
 import java.io.IOException;
-import java.util.List;
+import java.io.PrintWriter;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.google.gson.Gson;
 
 import command.AbstractCommand;
 import command.CommandFactory;
@@ -30,28 +32,39 @@ public class WebApplicationController implements ApplicationController {
 	public void handleResponse(RequestContext reqc, ResponseContext resc) {
 	    HttpServletRequest req = (HttpServletRequest)reqc.getRequest();
 	    HttpServletResponse res = (HttpServletResponse)resc.getResponse();
-	    
-	    // コマンドの結果（メッセージリストなど）をリクエストにセット
 	    Object result = resc.getResult();
-	    
-	    // チャットメッセージリストの場合は "messages" という属性名でセット
-	    //chat機能以外を作る時、修正が必要
-	    if (result instanceof List) {
-	        req.setAttribute("messages", result);
-	    } else {
-	        // その他の結果を処理（必要に応じて）
-	        req.setAttribute("result", result);
-	    }
-	    
-	    // ターゲットにリダイレクト
-	    RequestDispatcher rd = req.getRequestDispatcher(resc.getTarget());
+	    String command = req.getParameter("command");
 	    try {
-	        rd.forward(req, res);
+		    if ("AddMessage".equals(command)) {
+		        res.setContentType("application/json");
+		        PrintWriter out = res.getWriter();
+		        String jsonResponse = new Gson().toJson(result);
+		        out.write(jsonResponse);
+		        out.flush();
+		    }else if( "ChatCommand".equals(command)){
+		        res.setContentType("application/json");
+		        PrintWriter out = res.getWriter();
+		        String jsonResponse = new Gson().toJson(result);
+		        req.setAttribute("messages", jsonResponse);
+			    req.getRequestDispatcher(resc.getTarget()).forward(req, res);
+		    }else {
+		    	System.out.println(res);
+		    	req.setAttribute("messages", result);
+			    // ターゲットにリダイレクト
+			    RequestDispatcher rd = req.getRequestDispatcher(resc.getTarget());
+			    try {
+			        rd.forward(req, res);
+			    } catch (ServletException e) {
+			        e.printStackTrace();
+			    } catch (IOException e) {
+			        e.printStackTrace();
+			    }
+		    }
+	    }catch(IOException e) {
+	    	e.printStackTrace();
 	    } catch (ServletException e) {
-	        e.printStackTrace();
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	    }
+			e.printStackTrace();
+		}
 	}
 
 }

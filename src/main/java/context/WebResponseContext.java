@@ -51,7 +51,10 @@ public class WebResponseContext implements ResponseContext {
 
     @Override
     public void setResponse(Object obj) {
-        _response = (HttpServletResponse) obj;
+    	 _response = (HttpServletResponse) obj;
+    	    // JSON形式で返すためのContent-Typeを設定
+    	    _response.setContentType("application/json");
+    	    _response.setCharacterEncoding("UTF-8");
     }
 
     @Override
@@ -63,6 +66,7 @@ public class WebResponseContext implements ResponseContext {
     public Map<String, Object> getResultMap() {
         return resultMap;
     }
+    
 }
 
 
