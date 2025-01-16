@@ -20,14 +20,20 @@ public class FrontServlet extends HttpServlet{
         }       
     public void doPost(HttpServletRequest req, HttpServletResponse res)
             throws IOException, ServletException {
-        req.setCharacterEncoding("Windows-31J");
+
+    	res.setContentType("application/json");
+        req.setCharacterEncoding("UTF-8");
         System.out.println("FrontServletに処理が来ました。");
         
-        ApplicationController app = new WebApplicationController();
-        
+
+        ApplicationController app = new WebApplicationController();	
         HttpSession session = req.getSession();
-
-
+        
+        String userId = req.getParameter("userId");
+        if(userId != null && !userId.isEmpty()) {
+        	session.setAttribute("userId", userId);
+        	
+        }
         // リクエストデータをログ出力
         System.out.println("Request Received:");
         System.out.println("Request URI: " + req.getRequestURI());

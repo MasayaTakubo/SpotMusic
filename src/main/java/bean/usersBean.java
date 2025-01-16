@@ -2,7 +2,7 @@ package bean;
 
 import java.io.Serializable;
 
-public class UsersBean implements Serializable {
+public class usersBean implements Serializable {
     private String userId;
     private String accessToken;
     private String refreshToken;
@@ -10,10 +10,10 @@ public class UsersBean implements Serializable {
     private String spotifyId;
 
     // デフォルトコンストラクタ
-    public UsersBean() {}
+    public usersBean() {}
 
     // コンストラクタ（すべてのフィールドを初期化）
-    public UsersBean(String userId, String accessToken, String refreshToken, int expiresIn, String spotifyId) {
+    public usersBean(String userId, String accessToken, String refreshToken, int expiresIn, String spotifyId) {
         this.userId = userId;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
