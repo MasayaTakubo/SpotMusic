@@ -65,8 +65,14 @@
     <a href="/auth">プレイリストを再取得</a> |
 
     <!-- ログアウトボタン -->
-    <form action="/logout" method="post">
-        <button type="submit">ログアウト</button>
-    </form>
+    <button onclick="logout()">ログアウト</button>
+
+    <script>
+        function logout() {
+            // サーバー側のログアウト処理を呼び出し、Spotifyのログアウト画面をポップアップで表示
+            window.location.href = '/SpotMusic/logout';
+        }
+    </script>
+
 </body>
 </html>
