@@ -9,7 +9,7 @@ public abstract class AbstractCommand {
         reqContext = reqc;
     }
 
-    // 修正: スペルミスを直す
+ 
     public RequestContext getRequestContext() {
         return reqContext;
     }
