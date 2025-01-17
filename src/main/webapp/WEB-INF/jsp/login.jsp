@@ -17,6 +17,13 @@
         <button type="submit">Spotifyアカウントでログイン</button>
     </form>
     <br><br>
+    
+    <!-- Spotifyアカウント登録へのボタン -->
+    <p>
+        アカウント登録<br>
+        <button type="button" onclick="window.open('https://www.spotify.com/signup/', '_blank')">サインアップ</button>
+    </p>
+    <br>
 
     <!-- ユーザーIDでログイン -->
     <h2>ユーザーIDでログイン</h2>
