@@ -1,131 +1,131 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ page import="java.util.List"%>
-<%@ page import="bean.SpotifyPlayListBean"%>
-<%@ page import="bean.TrackBean"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page import="java.util.List" %>
+<%@ page import="bean.SpotifyPlayListBean" %>
+<%@ page import="bean.TrackBean" %>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spotify情報表示</title>
-<style>
-body {
-	margin: 0;
-	display: flex;
-	height: 100vh;
-	font-family: Arial, sans-serif;
-}
-
-.sidebar, .content, .property-panel {
-	padding: 20px;
-	overflow-y: auto;
-}
-
-.sidebar {
-	width: 25%;
-	background-color: #f4f4f4;
-	border-right: 1px solid #ddd;
-}
-
-.content {
-	width: 50%;
-	background-color: #ffffff;
-	text-align: center;
-}
-
-.property-panel {
-	width: 25%;
-	background-color: #f9f9f9;
-	border-left: 1px solid #ddd;
-	display: none; /* デフォルトでは非表示 */
-}
-
-.property-panel.active {
-	display: block; /* 音楽再生時に表示 */
-}
-
-h2 {
-	border-bottom: 2px solid #ddd;
-	padding-bottom: 10px;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify情報表示</title>
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        .sidebar, .content, .property-panel {
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .sidebar {
+            width: 25%;
+            background-color: #f4f4f4;
+            border-right: 1px solid #ddd;
+        }
+        .content {
+            width: 50%;
+            background-color: #ffffff;
+            text-align: center;
+        }
+        .property-panel {
+            width: 25%;
+            background-color: #f9f9f9;
+            border-left: 1px solid #ddd;
+            display: none; /* デフォルトでは非表示 */
+        }
+        .property-panel.active {
+            display: block; /* 音楽再生時に表示 */
+        }
+        h2 {
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
-	<!-- 左側: プレイリスト -->
-	<div class="sidebar">
-		<h2>プレイリスト</h2>
-		<%
+    <!-- 左側: プレイリスト -->
+    <div class="sidebar">
+    <h2>プレイリスト</h2>
+    <%
         // セッションスコープからプレイリストBeansを取得
         List<SpotifyPlayListBean> playlistBeans = (List<SpotifyPlayListBean>) session.getAttribute("playlistBeans");
     %>
 
-		<!-- プレイリスト情報を表示 -->
-		<ul>
-			<c:forEach var="playlist" items="${playlistBeans}">
-				<li><strong>プレイリスト名:</strong> ${playlist.playlistName}<br>
-					<strong>プレイリストID:</strong> ${playlist.playlistId}<br> <strong>トラック一覧:</strong>
-					<ul>
-						<c:forEach var="track" items="${playlist.trackList}">
-							<li><strong>トラック名:</strong> ${track.trackName} <br> <strong>アーティスト名:</strong>
-								${track.artistName}<br> <strong>トラックID:</strong>
-								${track.trackId}<br> <!-- トラック再生ボタン -->
-								<button onclick="playTrack('${track.trackId}')">再生</button></li>
-						</c:forEach>
-					</ul></li>
-			</c:forEach>
-		</ul>
+    <!-- プレイリスト情報を表示 -->
+    <ul>
+        <c:forEach var="playlist" items="${playlistBeans}">
+            <li>
+                <strong>プレイリスト名:</strong> ${playlist.playlistName}<br>
+                <strong>プレイリストID:</strong> ${playlist.playlistId}<br>
+                <strong>トラック一覧:</strong>
+                <ul>
+                    <c:forEach var="track" items="${playlist.trackList}">
+                        <li>
+                            <strong>トラック名:</strong> ${track.trackName} <br>
+                            <strong>アーティスト名:</strong> ${track.artistName}<br>
+                            <strong>トラックID:</strong> ${track.trackId}<br>
+                            
+                            <!-- トラック再生ボタン -->
+                            <button onclick="playTrack('${track.trackId}')">再生</button>
+                        </li>
+                    </c:forEach>
+                </ul>
+            </li>
+        </c:forEach>
+    </ul>
+    
+    <!-- プレイヤー -->
+        <div id="player">
+        <h2>再生プレイヤー</h2>
+        <p id="now-playing">現在再生中: <span id="current-track">なし</span></p>
+        <div id="controls">
+            <button id="prev">前の曲</button>
+            <button id="play-pause">再生/停止</button>
+            <button id="next">次の曲</button>
+        </div>
+        <div>
+ <!--            <label for="volume-slider">音量調整:</label> -->
+            <input type="range" id="progress-bar" value="50" min="0" max="100">
 
+        </div>
+    </div>
 
-		<!-- 中央: 人気のアーティスト -->
-		<div class="content">
-			<h2>人気のアーティスト</h2>
-			<%
+    <!-- 中央: 人気のアーティスト -->
+    <div class="content">
+        <h2>人気のアーティスト</h2>
+        <%
             List<String> followedArtistNames = (List<String>) session.getAttribute("followedArtistNames");
             if (followedArtistNames == null) {
                 followedArtistNames = new java.util.ArrayList<>();
             }
         %>
-			<ul>
-				<c:forEach var="artistName" items="${followedArtistNames}">
-					<li><strong>${artistName}</strong></li>
-				</c:forEach>
-			</ul>
-			<h1>Spotify API情報取得結果</h1>
+        <ul>
+            <c:forEach var="artistName" items="${followedArtistNames}">
+                <li><strong>${artistName}</strong></li>
+            </c:forEach>
+        </ul>
+	    <h1>Spotify API情報取得結果</h1>
+	
+	    <c:if test="${not empty error}">
+	        <p style="color: red;">エラー: ${error}</p>
+	    </c:if>
+	
+	    <c:if test="${empty error}">
+	        <p>Spotify APIの情報取得に成功しました。</p>
+	    </c:if>
+	
+	    <br>
+	    <a href="/auth">プレイリストを再取得</a> |
+	 </div>
 
-			<c:if test="${not empty error}">
-				<p style="color: red;">エラー: ${error}</p>
-			</c:if>
+    <!-- ログアウトボタン -->
+    <button onclick="logout()">ログアウト</button>
 
-			<c:if test="${empty error}">
-				<p>Spotify APIの情報取得に成功しました。</p>
-			</c:if>
-
-			<br> <a href="/auth">プレイリストを再取得</a> |
-		</div>
-
-		<div id="player">
-			<h2>再生プレイヤー</h2>
-			<p id="now-playing">
-				現在再生中: <span id="current-track">なし</span>
-			</p>
-			<div id="controls">
-				<button id="prev">前の曲</button>
-				<button id="play-pause">再生/停止</button>
-				<button id="next">次の曲</button>
-			</div>
-			<div>
-				<!--            <label for="volume-slider">音量調整:</label> -->
-				<input type="range" id="progress-bar" value="50" min="0" max="100">
-
-			</div>
-		</div>
-		<!-- ログアウトボタン -->
-		<button onclick="logout()">ログアウト</button>
-
-		<script>
-    //再生
+    <script>
     window.onSpotifyWebPlaybackSDKReady = () => {
     const token = '<%= session.getAttribute("access_token") %>';
 
@@ -258,7 +258,10 @@ function setupDevice(deviceId) {
 function pausePlayback() {
     controlSpotify("pause");
 }
-//ここまで
+
+function logout() {
+    window.location.href = '/SpotMusic/logout';
+}
         function logout() {
             // サーバー側のログアウト処理を呼び出し、Spotifyのログアウト画面をポップアップで表示
             window.location.href = '/SpotMusic/logout';
@@ -266,27 +269,21 @@ function pausePlayback() {
     </script>
 
 
-		<!-- 右側: 音楽プロパティ -->
-		<div
-			class="property-panel <c:if test='${not empty currentTrack}'>active</c:if>'">
-			<h2>音楽プロパティ</h2>
-			<c:if test="${not empty currentTrack}">
-				<%
+    <!-- 右側: 音楽プロパティ -->
+    <div class="property-panel <c:if test='${not empty currentTrack}'>active</c:if>'">
+        <h2>音楽プロパティ</h2>
+        <c:if test="${not empty currentTrack}">
+            <%
                 TrackBean currentTrack = (TrackBean) session.getAttribute("currentTrack");
             %>
-				<p>
-					<strong>曲名:</strong> ${currentTrack.trackName}
-				</p>
-				<p>
-					<strong>アーティスト:</strong> ${currentTrack.artistName}
-				</p>
-				<p>
-					<strong>アルバム:</strong> ${currentTrack.albumName}
-				</p>
-			</c:if>
-			<c:if test="${empty currentTrack}">
-				<p>現在再生中の音楽はありません。</p>
-			</c:if>
-		</div>
+            <p><strong>曲名:</strong> ${currentTrack.trackName}</p>
+            <p><strong>アーティスト:</strong> ${currentTrack.artistName}</p>
+            <p><strong>アルバム:</strong> ${currentTrack.albumName}</p>
+        </c:if>
+        <c:if test="${empty currentTrack}">
+            <p>現在再生中の音楽はありません。</p>
+        </c:if>
+    </div>
+
 </body>
 </html>
