@@ -3,6 +3,7 @@ package service;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -219,6 +220,124 @@ public class SpotifyAuthService {
         }
 
         return allTracks;
+    }
+    
+    public void playTrack(String accessToken, String trackUri) throws Exception {
+        if (accessToken == null || accessToken.isEmpty()) {
+            throw new IllegalArgumentException("アクセストークンが指定されていません");
+        }
+        if (trackUri == null || trackUri.isEmpty()) {
+            throw new IllegalArgumentException("トラック URI が指定されていません");
+        }
+
+        URL url = new URL("https://api.spotify.com/v1/me/player/play");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("PUT");
+        conn.setRequestProperty("Authorization", "Bearer " + accessToken);
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setDoOutput(true);
+
+        String jsonPayload = "{\"uris\": [\"" + trackUri + "\"]}";
+        System.out.println("送信する JSON ペイロード: " + jsonPayload); // デバッグ用
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonPayload.getBytes(StandardCharsets.UTF_8));
+        }
+
+        int responseCode = conn.getResponseCode();
+        if (responseCode != HttpURLConnection.HTTP_NO_CONTENT) {
+            String errorResponse = new BufferedReader(new InputStreamReader(conn.getErrorStream()))
+                .lines().reduce("", String::concat);
+            throw new IOException("Spotify API エラー: HTTP " + responseCode + " - " + errorResponse);
+        }
+    }
+
+
+    public static String refreshAccessToken(String refreshToken) throws IOException {
+        HttpPost httpPost = new HttpPost(TOKEN_URL);
+
+        String auth = CLIENT_ID + ":" + CLIENT_SECRET;
+        String encodedAuth = java.util.Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
+        httpPost.setHeader("Authorization", "Basic " + encodedAuth);
+
+        List<BasicNameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("grant_type", "refresh_token"));
+        params.add(new BasicNameValuePair("refresh_token", refreshToken));  
+        httpPost.setEntity(new UrlEncodedFormEntity(params));
+
+        try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
+            int statusCode = response.getCode();
+            String jsonResponse = new String(response.getEntity().getContent().readAllBytes(), StandardCharsets.UTF_8);
+
+            if (statusCode == 200) {
+                JSONObject json = new JSONObject(jsonResponse);
+                return json.getString("access_token");
+            } else {
+                throw new IOException("HTTP Error: " + statusCode + ", Response: " + jsonResponse);
+            }
+        }
+    }
+
+    public Map<String, String> getRefreshToken(String authorizationCode) throws IOException {
+        HttpPost httpPost = new HttpPost(TOKEN_URL);
+
+        String auth = CLIENT_ID + ":" + CLIENT_SECRET;
+        String encodedAuth = java.util.Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
+        httpPost.setHeader("Authorization", "Basic " + encodedAuth);
+
+        List<BasicNameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("grant_type", "authorization_code"));
+        params.add(new BasicNameValuePair("code", authorizationCode));
+        params.add(new BasicNameValuePair("redirect_uri", REDIRECT_URI));
+        httpPost.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
+
+        try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
+            int statusCode = response.getCode();
+            String jsonResponse = new String(response.getEntity().getContent().readAllBytes(), StandardCharsets.UTF_8);
+
+            if (statusCode == 200) {
+                JSONObject json = new JSONObject(jsonResponse);
+                Map<String, String> tokens = new HashMap<>();
+                tokens.put("access_token", json.getString("access_token"));
+                if (json.has("refresh_token")) {
+                    tokens.put("refresh_token", json.getString("refresh_token"));
+                }
+                return tokens;
+            } else {
+                throw new IOException("Spotify APIエラー: HTTP " + statusCode + " - " + jsonResponse);
+            }
+        }
+    }
+    public void setupDevice(String accessToken, String deviceId) throws IOException {
+        URL url = new URL("https://api.spotify.com/v1/me/player");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("PUT");
+        conn.setRequestProperty("Authorization", "Bearer " + accessToken);
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setDoOutput(true);
+
+        String jsonPayload = String.format("{\"device_ids\": [\"%s\"], \"play\": false}", deviceId);
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(jsonPayload.getBytes(StandardCharsets.UTF_8));
+        }
+
+        int responseCode = conn.getResponseCode();
+        if (responseCode != HttpURLConnection.HTTP_NO_CONTENT) {
+            throw new IOException("Device setup failed with HTTP code " + responseCode);
+        }
+    }
+
+    public void pausePlayback(String accessToken) throws IOException {
+        URL url = new URL("https://api.spotify.com/v1/me/player/pause");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("PUT");
+        conn.setRequestProperty("Authorization", "Bearer " + accessToken);
+
+        int responseCode = conn.getResponseCode();
+        if (responseCode != HttpURLConnection.HTTP_NO_CONTENT) {
+            throw new IOException("Pause playback failed with HTTP code " + responseCode);
+        }
     }
 
 }

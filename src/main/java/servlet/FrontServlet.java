@@ -57,6 +57,10 @@ public class FrontServlet extends HttpServlet{
 
         // ターゲットの確認
         System.out.println("Target URI: " + resc.getTarget());
+        
+        //トラックデバッグ
+        System.out.println("Command: " + req.getParameter("command"));
+        System.out.println("Track ID: " + req.getParameter("trackId"));
 
         // レスポンス処理
         app.handleResponse(reqc, resc);
