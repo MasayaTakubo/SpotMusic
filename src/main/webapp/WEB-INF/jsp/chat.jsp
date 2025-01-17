@@ -49,8 +49,8 @@
     <div class="chatWindow">
         <form action="FrontServlet" method="POST" id="chatForm" onsubmit="return false;">
             <textarea name="message" id="messageInput" placeholder="Type your message here..." required></textarea>
-            <input type="hidden" name="relationId" value="1"> <!-- ダミーデータ -->
-            <input type="hidden" name="userId" id="userId" value="${sessionScope.userId }"> <!-- セッションからuserIdをセット -->
+            <input type="hidden" name="relationId" value="${requestScope.relationId}">
+            <input type="hidden" name="userId" id="userId" value="${sessionScope.userId }">
             <input type="hidden" name="command" value="AddMessage">
             <button id="sendButton" type="button">Send</button> <!-- IDとタイプ修正 -->
         </form>
@@ -83,7 +83,8 @@
 		    	    body: new URLSearchParams({
 		    	        command: 'AddMessage',
 		    	        message: message,
-		    	        userId: userId
+		    	        userId: userId,
+		    	        relationId: relationId
 		    	    })
 		    	})
 		    	.then(response => {

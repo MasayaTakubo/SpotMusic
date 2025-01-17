@@ -18,8 +18,6 @@ public class RemoveMessageCommand extends AbstractCommand {
         messageDAO.removeMessage(messageId);
 
         int relationId = Integer.parseInt(reqc.getParameter("relationId")[0]);
-        //ダミー
-        relationId=1;
         List<MessageBean> messages = messageDAO.getMessages(relationId);
         
         resc.setResult(messages);
