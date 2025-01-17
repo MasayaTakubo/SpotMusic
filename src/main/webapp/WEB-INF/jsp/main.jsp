@@ -9,60 +9,102 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spotify情報表示</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        .sidebar, .content, .property-panel {
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .sidebar {
+            width: 25%;
+            background-color: #f4f4f4;
+            border-right: 1px solid #ddd;
+        }
+        .content {
+            width: 50%;
+            background-color: #ffffff;
+            text-align: center;
+        }
+        .property-panel {
+            width: 25%;
+            background-color: #f9f9f9;
+            border-left: 1px solid #ddd;
+            display: none; /* デフォルトでは非表示 */
+        }
+        .property-panel.active {
+            display: block; /* 音楽再生時に表示 */
+        }
+        h2 {
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h2>プレイリスト</h2>
-    <%
-        // セッションスコープからプレイリストBeansを取得
-        List<SpotifyPlayListBean> playlistBeans = (List<SpotifyPlayListBean>) session.getAttribute("playlistBeans");
-    %>
+    <!-- 左側: プレイリスト -->
+    <div class="sidebar">
+        <h2>プレイリスト</h2>
+        <%
+            List<SpotifyPlayListBean> playlistBeans = (List<SpotifyPlayListBean>) session.getAttribute("playlistBeans");
+            if (playlistBeans == null) {
+                playlistBeans = new java.util.ArrayList<>();
+            }
+        %>
+        <ul>
+            <c:forEach var="playlist" items="${playlistBeans}">
+                <li>
+                    <strong>プレイリスト名:</strong>
+                    <a href="/SpotMusic/FrontServlet?command=PlayListDetails&playlistId=${playlist.playlistId}">${playlist.playlistName}</a><br>
+                    <strong>トラック一覧:</strong>
+                    <ul>
+                        <c:forEach var="track" items="${playlist.trackList}">
+                            <li>
+                                <strong>トラック名:</strong> ${track.trackName} <br>
+                                <strong>アーティスト名:</strong> ${track.artistName} <br>
+                                <form method="post" action="/SpotMusic/PlayTrack">
+                                    <input type="hidden" name="trackId" value="${track.trackId}">
+                                    <button type="submit">再生</button>
+                                </form>
+                            </li>
+                        </c:forEach>
+                    </ul>
+                </li>
+            </c:forEach>
+        </ul>
+    </div>
 
-    <!-- プレイリスト情報を表示 -->
-    <ul>
-        <c:forEach var="playlist" items="${playlistBeans}">
-            <li>
-                <strong>プレイリスト名:</strong>  <a href="/SpotMusic/FrontServlet?command=PlayListDetails&playlistId=${playlist.playlistId}">${playlist.playlistName}</a><br>
-                
-                <strong>プレイリストID:</strong> ${playlist.playlistId}<br>
-                <strong>トラック一覧:</strong>
-                <ul>
-                    <!-- トラックリストを表示 -->
-                   <!--  <c:forEach var="track" items="${playlist.trackList}">
-                        <li>
-                            <strong>トラック名:</strong> ${track.trackName} <br>
-                            <strong>アーティスト名:</strong> ${track.artistName}
-                        </li>
-                    </c:forEach>-->
-                </ul>
-            </li>
-        </c:forEach>
-    </ul>
-
-    <h2>フォロー中のアーティスト</h2>
-    <%
-        // セッションスコープからフォロー中のアーティスト名リストを取得
-        List<String> followedArtistNames = (List<String>) session.getAttribute("followedArtistNames");
-    %>
-
-    <!-- フォロー中のアーティスト情報を表示 -->
-    <ul>
-        <c:forEach var="artistName" items="${followedArtistNames}">
-            <li><strong>名前:</strong> ${artistName}</li>
-        </c:forEach>
-    </ul>
-
-    <h1>Spotify API情報取得結果</h1>
-
-    <c:if test="${not empty error}">
-        <p style="color: red;">エラー: ${error}</p>
-    </c:if>
-
-    <c:if test="${empty error}">
-        <p>Spotify APIの情報取得に成功しました。</p>
-    </c:if>
-
-    <br>
-    <a href="/auth">プレイリストを再取得</a> |
+    <!-- 中央: 人気のアーティスト -->
+    <div class="content">
+        <h2>人気のアーティスト</h2>
+        <%
+            List<String> followedArtistNames = (List<String>) session.getAttribute("followedArtistNames");
+            if (followedArtistNames == null) {
+                followedArtistNames = new java.util.ArrayList<>();
+            }
+        %>
+        <ul>
+            <c:forEach var="artistName" items="${followedArtistNames}">
+                <li><strong>${artistName}</strong></li>
+            </c:forEach>
+        </ul>
+	    <h1>Spotify API情報取得結果</h1>
+	
+	    <c:if test="${not empty error}">
+	        <p style="color: red;">エラー: ${error}</p>
+	    </c:if>
+	
+	    <c:if test="${empty error}">
+	        <p>Spotify APIの情報取得に成功しました。</p>
+	    </c:if>
+	
+	    <br>
+	    <a href="/auth">プレイリストを再取得</a> |
+	 </div>
 
     <!-- ログアウトボタン -->
     <button onclick="logout()">ログアウト</button>
@@ -73,6 +115,23 @@
             window.location.href = '/SpotMusic/logout';
         }
     </script>
+
+
+    <!-- 右側: 音楽プロパティ -->
+    <div class="property-panel <c:if test='${not empty currentTrack}'>active</c:if>'">
+        <h2>音楽プロパティ</h2>
+        <c:if test="${not empty currentTrack}">
+            <%
+                TrackBean currentTrack = (TrackBean) session.getAttribute("currentTrack");
+            %>
+            <p><strong>曲名:</strong> ${currentTrack.trackName}</p>
+            <p><strong>アーティスト:</strong> ${currentTrack.artistName}</p>
+            <p><strong>アルバム:</strong> ${currentTrack.albumName}</p>
+        </c:if>
+        <c:if test="${empty currentTrack}">
+            <p>現在再生中の音楽はありません。</p>
+        </c:if>
+    </div>
 
 </body>
 </html>

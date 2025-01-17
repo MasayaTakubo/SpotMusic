@@ -1,0 +1,120 @@
+■要件
+
+rerationがAcceptでメッセージあり（メッセージできる）
+rerationがAcceptでメッセージなし
+rerationがAcceptでメッセージありでブロック状態（追加メッセージはできない）
+
+rerationがPending
+rerationがPendingでブロック
+
+rerationがCancel
+rerationがCancelでブロック
+
+・手動オペレーション（Webアプリ上で作業）
+
+rerationがAcceptで手動（実際のオペレーション）でブロック（メッセージはどっちでもいい？）
+手動でAccept（許可オペレーション）
+rerationがPendingで手動ブロック
+手動でPending（申請オペレーション）
+rerationがCancelで手動ブロック
+手動でCancel（キャンセルオペレーション）
+
+
+
+
+■データ
+INSERT INTO USERS (USER_ID, ACCESS_TOKEN, REFRESH_TOKEN, EXPIRES_IN) VALUES
+('31rqkz3mglwnl47b2g4thwqfih4a', NULL, NULL, NULL), -- satou
+('31iu3d27fuexgadotnfmmv3knrhu', NULL, NULL, NULL), -- saino
+('31psxtlyvyd6jh2bypyeg7zd4hym', NULL, NULL, NULL), -- chou
+('31gqpyn64ycd6uq37qkbmtngl26q', NULL, NULL, NULL), -- thau
+('31wkx6w4l6ijxbqwg5hugipeeazi', NULL, NULL, NULL), -- takubo
+('l3t4fygmdhchwz9yh3lpgkqhf', NULL, NULL, NULL);    -- koike
+
+
+
+-- ------------------------
+-- 1. ACCEPT 状態のリレーション
+-- ------------------------
+
+-- メッセージあり（メッセージできる）
+INSERT INTO relation (USER1_ID, USER2_ID, STATUS) 
+VALUES ('31rqkz3mglwnl47b2g4thwqfih4a', '31iu3d27fuexgadotnfmmv3knrhu', 'ACCEPT'); -- satou <=> saino
+
+-- メッセージの送信
+INSERT INTO message (RELATION_ID, USER_ID, SEND_TIME, SEND_MESSAGE) 
+VALUES (1, '31rqkz3mglwnl47b2g4thwqfih4a', CURRENT_TIMESTAMP, 'こんにちは、元気ですか？'); -- satou -> saino
+INSERT INTO message (RELATION_ID, USER_ID, SEND_TIME, SEND_MESSAGE) 
+VALUES (1, '31iu3d27fuexgadotnfmmv3knrhu', CURRENT_TIMESTAMP, '元気だよ、ありがとう！'); -- saino -> satou
+
+-- メッセージなし
+INSERT INTO relation (USER1_ID, USER2_ID, STATUS) 
+VALUES ('31psxtlyvyd6jh2bypyeg7zd4hym', '31gqpyn64ycd6uq37qkbmtngl26q', 'ACCEPT'); -- chou <=> thau
+
+-- メッセージありでブロック状態（追加メッセージはできない）
+INSERT INTO relation (USER1_ID, USER2_ID, STATUS) 
+VALUES ('31rqkz3mglwnl47b2g4thwqfih4a', '31psxtlyvyd6jh2bypyeg7zd4hym', 'ACCEPT'); -- satou <=> chou
+INSERT INTO message (RELATION_ID, USER_ID, SEND_TIME, SEND_MESSAGE) 
+VALUES (1, '31rqkz3mglwnl47b2g4thwqfih4a', CURRENT_TIMESTAMP, 'こんにちは、調子はどうですか？'); -- satou -> chou
+INSERT INTO message (RELATION_ID, USER_ID, SEND_TIME, SEND_MESSAGE) 
+VALUES (1, '31psxtlyvyd6jh2bypyeg7zd4hym', CURRENT_TIMESTAMP, '元気です！こちらこそよろしく！'); -- chou -> satou
+
+-- satou が chou をブロック
+INSERT INTO blocked_user (BLOCKER_ID, BLOCKED_ID) 
+VALUES ('31rqkz3mglwnl47b2g4thwqfih4a', '31psxtlyvyd6jh2bypyeg7zd4hym'); -- satou ブロック chou
+
+-- ------------------------
+-- 2. PENDING 状態のリレーション
+-- ------------------------
+
+-- PENDING 状態
+INSERT INTO relation (USER1_ID, USER2_ID, STATUS) 
+VALUES ('31rqkz3mglwnl47b2g4thwqfih4a', 'l3t4fygmdhchwz9yh3lpgkqhf', 'PENDING'); -- satou <=> takubo
+
+-- PENDING 状態でブロック
+INSERT INTO relation (USER1_ID, USER2_ID, STATUS) 
+VALUES ('31rqkz3mglwnl47b2g4thwqfih4a', 'l3t4fygmdhchwz9yh3lpgkqhf', 'PENDING'); -- satou <=> takubo
+INSERT INTO blocked_user (BLOCKER_ID, BLOCKED_ID) 
+VALUES ('31rqkz3mglwnl47b2g4thwqfih4a', 'l3t4fygmdhchwz9yh3lpgkqhf'); -- satou ブロック takubo
+
+-- ------------------------
+-- 3. CANCEL 状態のリレーション
+-- ------------------------
+
+-- CANCEL 状態
+INSERT INTO relation (USER1_ID, USER2_ID, STATUS) 
+VALUES ('31iu3d27fuexgadotnfmmv3knrhu', '31gqpyn64ycd6uq37qkbmtngl26q', 'CANCEL'); -- saino <=> thau
+
+-- CANCEL 状態でブロック
+INSERT INTO relation (USER1_ID, USER2_ID, STATUS) 
+VALUES ('31iu3d27fuexgadotnfmmv3knrhu', '31gqpyn64ycd6uq37qkbmtngl26q', 'CANCEL'); -- saino <=> thau
+INSERT INTO blocked_user (BLOCKER_ID, BLOCKED_ID) 
+VALUES ('31iu3d27fuexgadotnfmmv3knrhu', '31gqpyn64ycd6uq37qkbmtngl26q'); -- saino ブロック thau
+
+-- ------------------------
+-- 4. 手動オペレーション（Webアプリ上で作業）
+これはUPDATEしない。実際のWebアプリ上で操作する
+-- ------------------------
+
+-- 手動で Accept（許可オペレーション）
+-- satou が takubo に対して手動でAccept操作を行う
+UPDATE relation 
+SET STATUS = 'ACCEPT' 
+WHERE USER1_ID = '31rqkz3mglwnl47b2g4thwqfih4a' AND USER2_ID = 'l3t4fygmdhchwz9yh3lpgkqhf';
+
+-- 手動で Pending（申請オペレーション）
+-- satou が takubo に対して手動で申請操作を行う
+UPDATE relation 
+SET STATUS = 'PENDING' 
+WHERE USER1_ID = '31rqkz3mglwnl47b2g4thwqfih4a' AND USER2_ID = 'l3t4fygmdhchwz9yh3lpgkqhf';
+
+-- 手動で Cancel（キャンセルオペレーション）
+-- satou が takubo に対して手動でキャンセル操作を行う
+UPDATE relation 
+SET STATUS = 'CANCEL' 
+WHERE USER1_ID = '31rqkz3mglwnl47b2g4thwqfih4a' AND USER2_ID = 'l3t4fygmdhchwz9yh3lpgkqhf';
+
+-- 手動でブロック（ACCEPT 状態）
+-- satou が takubo に対して手動でブロック操作を行う
+INSERT INTO blocked_user (BLOCKER_ID, BLOCKED_ID) 
+VALUES ('31rqkz3mglwnl47b2g4thwqfih4a', 'l3t4fygmdhchwz9yh3lpgkqhf'); -- satou ブロック takubo
