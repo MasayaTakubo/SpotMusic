@@ -32,5 +32,21 @@
         <input type="hidden" name="command" value="ChatCommand">
         <button type="submit">ログイン</button>
     </form>
+    <br><br>
+    
+    <h2>フレンドリスト</h2>
+    <form action="FrontServlet" method="POST">
+        <input type="text" name="userId" placeholder="Enter your user ID" required><br><br>
+        <input type="hidden" name="command" value="FriendList">
+        <button type="submit">フレンドリストへ</button>
+    </form>
+    <br><br>
+    
+    
+    <h2>ユーザーリスト</h2>  
+    <form action="FrontServlet" method="POST">
+        <input type="text" name="userId" placeholder="Enter your user ID" required><br><br>
+        <input type="hidden" name="command" value="UsersList">
+        <button type="submit">ログイン</button>
 </body>
 </html>

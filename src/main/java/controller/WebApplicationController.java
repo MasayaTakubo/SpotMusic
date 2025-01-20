@@ -2,7 +2,6 @@ package controller;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,17 +47,8 @@ public class WebApplicationController implements ApplicationController {
 		        req.setAttribute("messages", jsonResponse);
 			    req.getRequestDispatcher(resc.getTarget()).forward(req, res);
 		    }else {
-		    	System.out.println(res);
 		    	req.setAttribute("messages", result);
-			    // ターゲットにリダイレクト
-			    RequestDispatcher rd = req.getRequestDispatcher(resc.getTarget());
-			    try {
-			        rd.forward(req, res);
-			    } catch (ServletException e) {
-			        e.printStackTrace();
-			    } catch (IOException e) {
-			        e.printStackTrace();
-			    }
+			    req.getRequestDispatcher(resc.getTarget()).forward(req, res);
 		    }
 	    }catch(IOException e) {
 	    	e.printStackTrace();

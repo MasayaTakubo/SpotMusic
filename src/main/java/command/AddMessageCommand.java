@@ -14,9 +14,7 @@ public class AddMessageCommand extends AbstractCommand {
     public ResponseContext execute(ResponseContext resc) {
         RequestContext reqc = getRequestContext();
         
-        // ダミーデータを使用（relationId = 1を固定）
-        String relationIdStr = "1"; // relationIdを固定
-        int relationId = Integer.parseInt(relationIdStr);
+        int relationId = Integer.parseInt(reqc.getParameter("relationId")[0]);
 
         // ダミーデータとして userId を固定
         String userId = reqc.getParameter("userId")[0];
