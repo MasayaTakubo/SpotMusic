@@ -38,26 +38,31 @@ INSERT INTO USERS (USER_ID, ACCESS_TOKEN, REFRESH_TOKEN, EXPIRES_IN) VALUES
 -- ------------------------
 
 -- メッセージあり（メッセージできる）
+-- リレーションIDを動的に設定
 INSERT INTO relation (USER1_ID, USER2_ID, STATUS) 
 VALUES ('31rqkz3mglwnl47b2g4thwqfih4a', '31iu3d27fuexgadotnfmmv3knrhu', 'ACCEPT'); -- satou <=> saino
 
 -- メッセージの送信
+-- メッセージIDを動的に設定
 INSERT INTO message (RELATION_ID, USER_ID, SEND_TIME, SEND_MESSAGE) 
-VALUES (1, '31rqkz3mglwnl47b2g4thwqfih4a', CURRENT_TIMESTAMP, 'こんにちは、元気ですか？'); -- satou -> saino
+VALUES (LAST_INSERT_ID(), '31rqkz3mglwnl47b2g4thwqfih4a', CURRENT_TIMESTAMP, 'こんにちは、元気ですか？'); -- satou -> saino
 INSERT INTO message (RELATION_ID, USER_ID, SEND_TIME, SEND_MESSAGE) 
-VALUES (1, '31iu3d27fuexgadotnfmmv3knrhu', CURRENT_TIMESTAMP, '元気だよ、ありがとう！'); -- saino -> satou
+VALUES (LAST_INSERT_ID(), '31iu3d27fuexgadotnfmmv3knrhu', CURRENT_TIMESTAMP, '元気だよ、ありがとう！'); -- saino -> satou
 
 -- メッセージなし
+-- リレーションIDを動的に設定
 INSERT INTO relation (USER1_ID, USER2_ID, STATUS) 
 VALUES ('31psxtlyvyd6jh2bypyeg7zd4hym', '31gqpyn64ycd6uq37qkbmtngl26q', 'ACCEPT'); -- chou <=> thau
 
 -- メッセージありでブロック状態（追加メッセージはできない）
+-- リレーションIDを動的に設定
 INSERT INTO relation (USER1_ID, USER2_ID, STATUS) 
 VALUES ('31rqkz3mglwnl47b2g4thwqfih4a', '31psxtlyvyd6jh2bypyeg7zd4hym', 'ACCEPT'); -- satou <=> chou
+-- メッセージの送信
 INSERT INTO message (RELATION_ID, USER_ID, SEND_TIME, SEND_MESSAGE) 
-VALUES (1, '31rqkz3mglwnl47b2g4thwqfih4a', CURRENT_TIMESTAMP, 'こんにちは、調子はどうですか？'); -- satou -> chou
+VALUES (LAST_INSERT_ID(), '31rqkz3mglwnl47b2g4thwqfih4a', CURRENT_TIMESTAMP, 'こんにちは、調子はどうですか？'); -- satou -> chou
 INSERT INTO message (RELATION_ID, USER_ID, SEND_TIME, SEND_MESSAGE) 
-VALUES (1, '31psxtlyvyd6jh2bypyeg7zd4hym', CURRENT_TIMESTAMP, '元気です！こちらこそよろしく！'); -- chou -> satou
+VALUES (LAST_INSERT_ID(), '31psxtlyvyd6jh2bypyeg7zd4hym', CURRENT_TIMESTAMP, '元気です！こちらこそよろしく！'); -- chou -> satou
 
 -- satou が chou をブロック
 INSERT INTO blocked_user (BLOCKER_ID, BLOCKED_ID) 
@@ -68,10 +73,12 @@ VALUES ('31rqkz3mglwnl47b2g4thwqfih4a', '31psxtlyvyd6jh2bypyeg7zd4hym'); -- sato
 -- ------------------------
 
 -- PENDING 状態
+-- リレーションIDを動的に設定
 INSERT INTO relation (USER1_ID, USER2_ID, STATUS) 
 VALUES ('31rqkz3mglwnl47b2g4thwqfih4a', 'l3t4fygmdhchwz9yh3lpgkqhf', 'PENDING'); -- satou <=> takubo
 
 -- PENDING 状態でブロック
+-- リレーションIDを動的に設定
 INSERT INTO relation (USER1_ID, USER2_ID, STATUS) 
 VALUES ('31rqkz3mglwnl47b2g4thwqfih4a', 'l3t4fygmdhchwz9yh3lpgkqhf', 'PENDING'); -- satou <=> takubo
 INSERT INTO blocked_user (BLOCKER_ID, BLOCKED_ID) 
@@ -82,10 +89,12 @@ VALUES ('31rqkz3mglwnl47b2g4thwqfih4a', 'l3t4fygmdhchwz9yh3lpgkqhf'); -- satou �
 -- ------------------------
 
 -- CANCEL 状態
+-- リレーションIDを動的に設定
 INSERT INTO relation (USER1_ID, USER2_ID, STATUS) 
 VALUES ('31iu3d27fuexgadotnfmmv3knrhu', '31gqpyn64ycd6uq37qkbmtngl26q', 'CANCEL'); -- saino <=> thau
 
 -- CANCEL 状態でブロック
+-- リレーションIDを動的に設定
 INSERT INTO relation (USER1_ID, USER2_ID, STATUS) 
 VALUES ('31iu3d27fuexgadotnfmmv3knrhu', '31gqpyn64ycd6uq37qkbmtngl26q', 'CANCEL'); -- saino <=> thau
 INSERT INTO blocked_user (BLOCKER_ID, BLOCKED_ID) 
@@ -93,7 +102,7 @@ VALUES ('31iu3d27fuexgadotnfmmv3knrhu', '31gqpyn64ycd6uq37qkbmtngl26q'); -- sain
 
 -- ------------------------
 -- 4. 手動オペレーション（Webアプリ上で作業）
-これはUPDATEしない。実際のWebアプリ上で操作する
+-- これはUPDATEしない。実際のWebアプリ上で操作する
 -- ------------------------
 
 -- 手動で Accept（許可オペレーション）
@@ -118,3 +127,6 @@ WHERE USER1_ID = '31rqkz3mglwnl47b2g4thwqfih4a' AND USER2_ID = 'l3t4fygmdhchwz9y
 -- satou が takubo に対して手動でブロック操作を行う
 INSERT INTO blocked_user (BLOCKER_ID, BLOCKED_ID) 
 VALUES ('31rqkz3mglwnl47b2g4thwqfih4a', 'l3t4fygmdhchwz9yh3lpgkqhf'); -- satou ブロック takubo
+
+
+
