@@ -51,27 +51,37 @@
 <body>
     <!-- 左側: プレイリスト -->
     <div class="sidebar">
-        <h2>プレイリスト</h2>
-        <%
-            List<SpotifyPlayListBean> playlistBeans = (List<SpotifyPlayListBean>) session.getAttribute("playlistBeans");
-        %>
-        <ul>
-            <c:forEach var="playlist" items="${playlistBeans}">
-                <li>
-                    <strong>プレイリスト名:</strong> ${playlist.playlistName}<br>
-                    <strong>プレイリストID:</strong> ${playlist.playlistId}<br>
-                    <ul>
-                        <c:forEach var="track" items="${playlist.trackList}">
-                            <li>
-                                <strong>トラック名:</strong> ${track.trackName}<br>
-                                <strong>アーティスト名:</strong> ${track.artistName}<br>
-                                <button onclick="playTrack('${track.trackId}', '${track.trackName}')">再生</button>
-                            </li>
-                        </c:forEach>
-                    </ul>
-                </li>
-            </c:forEach>
-        </ul>
+
+    <h2>プレイリスト</h2>
+    <%
+        // セッションスコープからプレイリストBeansを取得
+        List<SpotifyPlayListBean> playlistBeans = (List<SpotifyPlayListBean>) session.getAttribute("playlistBeans");
+    %>
+
+    <!-- プレイリスト情報を表示 -->
+    <ul>
+        <c:forEach var="playlist" items="${playlistBeans}">
+            <li>
+                <strong>プレイリスト名:</strong> ${playlist.playlistName}<br>
+                <strong>プレイリストID:</strong> ${playlist.playlistId}<br>
+                <strong>トラック一覧:</strong>
+                <ul>
+                    <c:forEach var="track" items="${playlist.trackList}">
+                        <li>
+                            <strong>トラック名:</strong> ${track.trackName} <br>
+                            <strong>アーティスト名:</strong> ${track.artistName}<br>
+                            <strong>トラックID:</strong> ${track.trackId}<br>
+                            
+                            <!-- トラック再生ボタン -->
+                            <button onclick="playTrack('${track.trackId}')">再生</button>
+                        </li>
+                    </c:forEach>
+                </ul>
+            </li>
+        </c:forEach>
+    </ul>
+    
+    
     </div>
 
     <!-- 中央: 人気のアーティスト -->
@@ -88,162 +98,177 @@
                 <li><strong>${artistName}</strong></li>
             </c:forEach>
         </ul>
-
-        <h1>Spotify API情報取得結果</h1>
-        <c:if test="${not empty error}">
-            <p style="color: red;">エラー: ${error}</p>
-        </c:if>
-        <c:if test="${empty error}">
-            <p>Spotify APIの情報取得に成功しました。</p>
-        </c:if>
-        <br>
-        <a href="/auth">プレイリストを再取得</a>
-    </div>
-
-    <!-- 右側: 詳細情報パネル -->
-    <div class="property-panel" id="propertyPanel">
-        <h2>トラック詳細</h2>
-        <p id="track-detail">再生中のトラック詳細が表示されます。</p>
-        <div id="player-controls">
-            <h3>プレイヤー</h3>
-            <p id="now-playing">現在再生中: <span id="current-track">なし</span></p>
+	    <h1>Spotify API情報取得結果</h1>
+	
+	    <c:if test="${not empty error}">
+	        <p style="color: red;">エラー: ${error}</p>
+	    </c:if>
+	
+	    <c:if test="${empty error}">
+	        <p>Spotify APIの情報取得に成功しました。</p>
+	    </c:if>
+	
+	    <br>
+	    <a href="/auth">プレイリストを再取得</a> |
+	    
+	    
+	    <!-- プレイヤー -->
+        <div id="player">
+        <h2>再生プレイヤー</h2>
+        <p id="now-playing">現在再生中: <span id="current-track">なし</span></p>
+        <div id="controls">
             <button id="prev">前の曲</button>
             <button id="play-pause">再生/停止</button>
             <button id="next">次の曲</button>
-            <input type="range" id="progress-bar" value="50" min="0" max="100">
         </div>
-    </div>
+        <div>
+ <!--            <label for="volume-slider">音量調整:</label> -->
+            <input type="range" id="progress-bar" value="50" min="0" max="100">
+
+        </div>
+
+
+    <!-- ログアウトボタン -->
+    <button onclick="logout()">ログアウト</button>
+    
+    	 </div>
 
     <script>
-        window.onSpotifyWebPlaybackSDKReady = () => {
-            const token = '<%= session.getAttribute("access_token") %>';
+    window.onSpotifyWebPlaybackSDKReady = () => {
+    const token = '<%= session.getAttribute("access_token") %>';
 
-            if (!token || token === "null") {
-                console.error("アクセストークンが無効です。再ログインしてください。");
-                alert("アクセストークンが無効です。再ログインしてください。");
+    if (!token || token === "null") {
+        console.error("アクセストークンが無効です。再ログインしてください。");
+        alert("アクセストークンが無効です。再ログインしてください。");
+        return;
+    }
+
+    // プレイヤーの初期化
+    const player = new Spotify.Player({
+        name: 'Web Playback SDK Player',
+        getOAuthToken: cb => { cb(token); },
+        volume: 0.5
+    });
+
+    // プレイヤーのイベントリスナーを追加
+    player.addListener('ready', ({ device_id }) => {
+        console.log('デバイスが準備できました:', device_id);
+        setupDevice(device_id);
+    });
+
+    player.addListener('not_ready', ({ device_id }) => {
+        console.log('デバイスがオフラインになりました:', device_id);
+    });
+
+    player.addListener('player_state_changed', state => {
+        if (state) {
+            const track = state.track_window.current_track;
+            document.getElementById('now-playing').innerText = track ? track.name : "なし";
+        }
+    });
+
+    player.connect().then(success => {
+        if (success) {
+            console.log("Spotify プレイヤーが接続されました。");
+        } else {
+            console.error("Spotify プレイヤーの接続に失敗しました。");
+            alert("Spotify プレイヤーの接続に失敗しました。");
+        }
+    });
+
+    // 再生コントロールイベント
+    document.getElementById('play-pause').addEventListener('click', () => {
+        controlSpotify('togglePlay', null, null, player);
+    });
+
+    // 前の曲イベント
+    document.getElementById('prev').addEventListener('click', () => {
+        controlSpotify('previousTrack', null, null, player);
+    });
+
+    // 次の曲イベント
+    document.getElementById('next').addEventListener('click', () => {
+        controlSpotify('nextTrack', null, null, player);
+    });
+
+    // 音量スライダーイベント
+    document.getElementById('progress-bar').addEventListener('input', (e) => {
+        const volume = e.target.value / 100; // スライダーの値を0-1に変換
+        console.log("設定する音量:", volume); // デバッグ用
+        player.setVolume(volume).then(() => {
+            console.log("音量が設定されました:", volume);
+        }).catch(err => console.error("音量設定エラー:", err));
+    });
+};
+
+async function controlSpotify(action, trackId = null, deviceId = null, player = null, volume = null) {
+    if (player) {
+        switch (action) {
+            case 'togglePlay':
+                player.togglePlay().then(() => {
+                    console.log("再生/停止を切り替えました");
+                }).catch(err => console.error("再生/停止切り替えエラー:", err));
                 return;
-            }
-
-            const player = new Spotify.Player({
-                name: 'Web Playback SDK Player',
-                getOAuthToken: cb => { cb(token); },
-                volume: 0.5
-            });
-
-            player.addListener('ready', ({ device_id }) => {
-                console.log('デバイスが準備できました:', device_id);
-                setupDevice(device_id);
-            });
-
-            player.addListener('not_ready', ({ device_id }) => {
-                console.log('デバイスがオフラインになりました:', device_id);
-            });
-
-            player.addListener('player_state_changed', state => {
-                if (state) {
-                    const track = state.track_window.current_track;
-                    document.getElementById('now-playing').innerText = track ? track.name : "なし";
-                }
-            });
-
-            player.connect().then(success => {
-                if (success) {
-                    console.log("Spotify プレイヤーが接続されました。");
-                } else {
-                    console.error("Spotify プレイヤーの接続に失敗しました。");
-                    alert("Spotify プレイヤーの接続に失敗しました。");
-                }
-            });
-
-            document.getElementById('play-pause').addEventListener('click', () => {
-                controlSpotify('togglePlay', null, null, player);
-                document.getElementById('propertyPanel').classList.add('active');
-            });
-
-            document.getElementById('prev').addEventListener('click', () => {
-                controlSpotify('previousTrack', null, null, player);
-            });
-
-            document.getElementById('next').addEventListener('click', () => {
-                controlSpotify('nextTrack', null, null, player);
-            });
-
-            document.getElementById('progress-bar').addEventListener('input', (e) => {
-                const volume = e.target.value / 100;
+            case 'previousTrack':
+                player.previousTrack().then(() => {
+                    console.log("前の曲に戻りました");
+                }).catch(err => console.error("前の曲エラー:", err));
+                return;
+            case 'nextTrack':
+                player.nextTrack().then(() => {
+                    console.log("次の曲に進みました");
+                }).catch(err => console.error("次の曲エラー:", err));
+                return;
+            case 'setVolume':
                 player.setVolume(volume).then(() => {
-                    console.log("音量が設定されました:", volume);
+                    console.log("音量を設定しました:", volume);
                 }).catch(err => console.error("音量設定エラー:", err));
-            });
-        };
-
-        async function controlSpotify(action, trackId = null, deviceId = null, player = null) {
-            if (player) {
-                switch (action) {
-                    case 'togglePlay':
-                        player.togglePlay().then(() => {
-                            console.log("再生/停止を切り替えました");
-                        }).catch(err => console.error("再生/停止切り替えエラー:", err));
-                        return;
-                    case 'previousTrack':
-                        player.previousTrack().then(() => {
-                            console.log("前の曲に戻りました");
-                        }).catch(err => console.error("前の曲エラー:", err));
-                        return;
-                    case 'nextTrack':
-                        player.nextTrack().then(() => {
-                            console.log("次の曲に進みました");
-                        }).catch(err => console.error("次の曲エラー:", err));
-                        return;
-                    case 'setVolume':
-                        player.setVolume(volume).then(() => {
-                            console.log("音量を設定しました:", volume);
-                        }).catch(err => console.error("音量設定エラー:", err));
-                        return;
-                }
-            }
-
-            const params = new URLSearchParams();
-            params.append("action", action);
-            if (trackId) params.append("trackId", trackId);
-            if (deviceId) params.append("deviceId", deviceId);
-
-            try {
-                const response = await fetch("/SpotMusic/spotifyControl", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded"
-                    },
-                    body: params,
-                });
-
-                if (!response.ok) {
-                    const error = await response.text();
-                    console.error("Error:", error);
-                    alert("エラーが発生しました: " + error);
-                } else {
-                    console.log(action + " 成功");
-                }
-            } catch (error) {
-                console.error("Request failed:", error);
-            }
+                return;
         }
+    }
 
-        function playTrack(trackId, trackName) {
-            console.log("送信するトラック ID: ", trackId);
-            controlSpotify("play", trackId);
-            const propertyPanel = document.getElementById('propertyPanel');
-            const trackDetail = document.getElementById('track-detail');
-            trackDetail.textContent = `トラック名: ${trackName}`;
-            propertyPanel.classList.add('active');
+    // 既存のサーバーAPIを呼び出す処理
+    const params = new URLSearchParams();
+    params.append("action", action);
+    if (trackId) params.append("trackId", trackId);
+    if (deviceId) params.append("deviceId", deviceId);
+
+    try {
+        const response = await fetch("/SpotMusic/spotifyControl", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: params,
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            console.error("Error:", error);
+            alert("エラーが発生しました: " + error);
+        } else {
+            console.log(action + " 成功");
         }
+    } catch (error) {
+        console.error("Request failed:", error);
+    }
+}
 
-        function setupDevice(deviceId) {
-            controlSpotify("setup", null, deviceId);
-        }
+function playTrack(trackId) {
+    console.log("送信するトラック ID: ", trackId);
+    controlSpotify("play", trackId);
+}
 
-        function logout() {
-            window.location.href = '/SpotMusic/logout';
+function setupDevice(deviceId) {
+    controlSpotify("setup", null, deviceId);
+}
 
+function pausePlayback() {
+    controlSpotify("pause");
+}
+
+function logout() {
+    window.location.href = '/SpotMusic/logout';
 }
         function logout() {
             // サーバー側のログアウト処理を呼び出し、Spotifyのログアウト画面をポップアップで表示
