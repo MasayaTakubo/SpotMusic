@@ -62,7 +62,7 @@ public class PlayListDetailsCommand extends AbstractCommand {
         } catch (Exception e) {
             e.printStackTrace();
             responseContext.setResult("error");
-            responseContext.setTarget("error.jsp");
+            responseContext.setTarget("playList");
         }
 
         return responseContext;
