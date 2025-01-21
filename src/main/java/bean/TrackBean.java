@@ -4,6 +4,7 @@ public class TrackBean {
     private String trackId;
     private String trackName;
     private String artistName;
+    private String previewUrl;
 
     // コンストラクタ
     public TrackBean(String trackId, String trackName, String artistName) {
@@ -35,5 +36,13 @@ public class TrackBean {
 
     public void setArtistName(String artistName) {
         this.artistName = artistName;
+    }
+    
+    public String getPreviewUrl() {
+        return previewUrl;
+    }
+
+    public void setPreviewUrl(String previewUrl) {
+        this.previewUrl = previewUrl;
     }
 }

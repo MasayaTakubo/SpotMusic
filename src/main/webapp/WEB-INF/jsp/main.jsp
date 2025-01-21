@@ -1,8 +1,9 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ page import="java.util.List" %>
-<%@ page import="bean.SpotifyPlayListBean" %>
-<%@ page import="bean.TrackBean" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ page import="java.util.List"%>
+<%@ page import="bean.SpotifyPlayListBean"%>
+<%@ page import="bean.TrackBean"%>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -76,17 +77,32 @@
 
     <!-- 中央: 人気のアーティスト -->
     <div class="content">
-        <h2>人気のアーティスト</h2>
+        <h2>フォロー中のアーティスト</h2>
         <%
             List<String> followedArtistNames = (List<String>) session.getAttribute("followedArtistNames");
             if (followedArtistNames == null) {
                 followedArtistNames = new java.util.ArrayList<>();
             }
         %>
-        <ul>
-            <c:forEach var="artistName" items="${followedArtistNames}">
-                <li><strong>${artistName}</strong></li>
-            </c:forEach>
+        
+    <c:choose>
+        <c:when test="${not empty sessionScope.artistIds}">
+            <ul>
+                <!-- アーティストIDをループでリンクを生成 -->
+                <c:forEach var="artistId" items="${sessionScope.artistIds}" varStatus="status">
+                    <li>
+                        <a href="/SpotMusic/FrontServlet?command=ArtistDetails&artistId=${artistId}">
+                            アーティスト名（ ${sessionScope.artistNames[status.index]} ）
+                        </a>
+                    </li>
+                </c:forEach>
+            </ul>
+        </c:when>
+        <c:otherwise>
+            <p>フォロー中のアーティストが見つかりませんでした。</p>
+        </c:otherwise>
+    </c:choose>
+</ul>
         </ul>
 
         <h1>Spotify API情報取得結果</h1>
@@ -249,6 +265,7 @@
 
 
     
+
 
 </body>
 </html>

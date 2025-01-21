@@ -2,6 +2,7 @@ package service;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -10,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 @WebServlet("/auth")
 public class SpotifyAuthServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -28,7 +30,8 @@ public class SpotifyAuthServlet extends HttpServlet {
                     + "?client_id=" + SpotifyAuthService.CLIENT_ID
                     + "&response_type=code"
                     + "&redirect_uri=" + java.net.URLEncoder.encode(SpotifyAuthService.REDIRECT_URI, "UTF-8")
-                    + "&scope=streaming user-read-playback-state user-modify-playback-state playlist-read-private playlist-read-collaborative user-follow-read";
+                    + "&scope=streaming user-read-playback-state user-modify-playback-state playlist-read-private playlist-read-collaborative user-follow-read"
+                    + "&scope=playlist-read-private,user-follow-read,user-read-private,user-read-email,user-top-read"; 
             response.sendRedirect(authUrl);
             return;
         }
@@ -36,7 +39,6 @@ public class SpotifyAuthServlet extends HttpServlet {
         // 認証コードを取得
         String authorizationCode = request.getParameter("code");
         System.out.println("認証コード取得完了");
-
         if (authorizationCode != null) {
             try {
                 // アクセストークンとリフレッシュトークンを取得
@@ -58,11 +60,22 @@ public class SpotifyAuthServlet extends HttpServlet {
                 session.setAttribute("refresh_token", refreshToken);
                 session.setAttribute("user_id", userId);
                 session.setAttribute("command", command);
-                System.out.println("セッション登録完了");
 
-                // フロントページへリダイレクト
+                // Listを保存する
+                List<String> artistIds = spotifyAuthService.getArtistIds(accessToken, 50);
+                List<String> artistNames = spotifyAuthService.getArtistNames(accessToken, 50);
+                session.setAttribute("artistIds", artistIds);
+                session.setAttribute("artistNames", artistNames);
+                System.out.println("アーティスト情報取得完了");
+
+                // Mapを保存する
+                Map<String, String> userInfoMap = Map.of("userId", userId, "accessToken", accessToken, "refreshToken", refreshToken);
+                session.setAttribute("userInfoMap", userInfoMap);
+                System.out.println("ユーザー情報Map登録完了");
+
+                // リダイレクト先へ
                 response.sendRedirect(frontURL);
-                System.out.println("forward完了しました。");
+                System.out.println("リダイレクト完了");
 
             } catch (IOException | SQLException e) {
                 e.printStackTrace();

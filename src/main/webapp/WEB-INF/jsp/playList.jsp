@@ -21,8 +21,8 @@
         <ul>
             <c:forEach var="track" items="${trackList}">
                 <li>
-                    <strong>トラック名:</strong> ${track.trackName}<br>
-                    <strong>アーティスト名:</strong> ${track.artistName}
+                    <strong>トラック名: ${track.trackName}</strong><br>
+                    <strong>アーティスト名：${track.artistName}</strong>
                 </li>
             </c:forEach>
         </ul>

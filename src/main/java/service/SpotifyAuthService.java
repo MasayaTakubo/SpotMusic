@@ -2,6 +2,7 @@ package service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -19,6 +20,7 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import bean.SpotifyPlayListBean;
@@ -69,7 +71,7 @@ public class SpotifyAuthService {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.setRequestProperty("Authorization", "Bearer " + accessToken);
-
+        System.out.println("ここまで来ています。");
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String inputLine;
         StringBuilder response = new StringBuilder();
@@ -79,7 +81,7 @@ public class SpotifyAuthService {
         in.close();
 
         JSONObject jsonResponse = new JSONObject(response.toString());
-        System.out.println("Service" + jsonResponse.getString("id"));
+        System.out.println("Service::" + jsonResponse);
         return jsonResponse.getString("id"); // ユーザーIDを返す
     }
 
@@ -337,6 +339,228 @@ public class SpotifyAuthService {
         int responseCode = conn.getResponseCode();
         if (responseCode != HttpURLConnection.HTTP_NO_CONTENT) {
             throw new IOException("Pause playback failed with HTTP code " + responseCode);
+        }
+    }
+    
+    
+    public List<String> getArtistNames(String accessToken, int limit) throws IOException {
+        // アクセストークンを使ってSpotifyからフォローしているアーティストの情報を取得
+        URL url = new URL("https://api.spotify.com/v1/me/following?type=artist&limit=" + limit);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Authorization", "Bearer " + accessToken);
+        System.out.println("リクエスト送信中...");
+
+        // ステータスコードを確認
+        int responseCode = connection.getResponseCode();
+        if (responseCode != 200) {
+            throw new IOException("Failed to get artist data: HTTP code " + responseCode);
+        }
+
+        // レスポンスを読み取る
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        StringBuilder response = new StringBuilder();
+        String inputLine;
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        // JSONを解析してアーティスト名を取得する
+        return extractArtistNames(response.toString());
+    }
+
+    private List<String> extractArtistNames(String jsonResponse) {
+        List<String> artistNames = new ArrayList<>();
+        try {
+            // JSONレスポンスを解析する
+            JSONObject jsonObject = new JSONObject(jsonResponse);
+
+            // artistsオブジェクトが存在するか確認
+            if (jsonObject.has("artists")) {
+                JSONObject artists = jsonObject.getJSONObject("artists");
+
+                // "items" 配列を取得
+                if (artists.has("items")) {
+                    JSONArray itemsArray = artists.getJSONArray("items");
+
+                    // 各アーティスト名をリストに追加
+                    for (int i = 0; i < itemsArray.length(); i++) {
+                        JSONObject artist = itemsArray.getJSONObject(i);
+                        String artistName = artist.getString("name");
+                        System.out.println("アーティスト名：" + artistName);
+                        artistNames.add(artistName);
+                    }
+                } else {
+                    System.out.println("items 配列が見つかりませんでした");
+                }
+            } else {
+                System.out.println("artists オブジェクトが見つかりませんでした");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return artistNames;
+    }
+
+    
+    
+    
+    
+    
+    
+    
+    public List<String> getArtistIds(String accessToken, int limit) throws IOException {
+        // アクセストークンを使ってSpotifyからフォローしているアーティスト情報を取得
+        URL url = new URL("https://api.spotify.com/v1/me/following?type=artist&limit=" + limit);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Authorization", "Bearer " + accessToken);
+        System.out.println("リクエスト送信中...");
+
+        // ステータスコードを確認
+        int responseCode = connection.getResponseCode();
+        if (responseCode != 200) {
+            throw new IOException("Failed to get artist data: HTTP code " + responseCode);
+        }
+
+        // レスポンスを読み取る
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        StringBuilder response = new StringBuilder();
+        String inputLine;
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        // JSONを解析してアーティストIDを取得する
+        return extractArtistIds(response.toString());
+    }
+
+    /**
+     * JSONレスポンスからアーティストIDのリストを抽出するメソッド
+     */
+    private List<String> extractArtistIds(String jsonResponseString) {
+        List<String> artistIds = new ArrayList<>();
+
+        try {
+            // JSONレスポンスをパース
+            JSONObject jsonResponse = new JSONObject(jsonResponseString);
+            if (jsonResponse.has("artists")) {
+                JSONObject artistsObject = jsonResponse.getJSONObject("artists");
+                JSONArray items = artistsObject.getJSONArray("items");
+
+                // 各アーティストIDをリストに追加
+                for (int i = 0; i < items.length(); i++) {
+                    JSONObject artist = items.getJSONObject(i);
+                    artistIds.add(artist.getString("id"));
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("JSON解析中にエラーが発生しました: " + e.getMessage());
+        }
+
+        return artistIds;
+    }
+
+    
+ // アーティストの詳細情報を取得
+    public JSONObject getArtistDetails(String accessToken, String artistId) throws Exception {
+        String url = "https://api.spotify.com/v1/artists/" + artistId;
+        return sendGetRequest(accessToken, url);
+    }
+
+    // アーティストの人気曲を取得
+    public JSONArray getArtistTopTracks(String accessToken, String artistId) throws Exception {
+        String url = "https://api.spotify.com/v1/artists/" + artistId + "/top-tracks?market=US";
+        JSONObject response = sendGetRequest(accessToken, url);
+        return response.getJSONArray("tracks");
+    }
+
+    // アーティストのプレイリスト(アルバム？)を取得
+    //もしかしたらplaylistでエンドポイントが違ったのでアルバムかもしれないです。
+    public JSONArray getArtistPlaylists(String accessToken, String artistId) throws Exception {
+    	String url = "https://api.spotify.com/v1/artists/" + artistId + "/albums";
+        JSONObject response = sendGetRequest(accessToken, url);
+        return response.getJSONArray("items");
+    }
+    
+    //アーティストに紐づいたアルバムの中のtrackを取得
+    public List<JSONObject> getAllAlbumTracks(String accessToken, String albumId) throws Exception {
+        List<JSONObject> allTracks = new ArrayList<>();
+        String nextUrl = "https://api.spotify.com/v1/albums/" + albumId + "/tracks";
+
+        while (nextUrl != null) {
+            URL url = new URL(nextUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Authorization", "Bearer " + accessToken);
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuilder response = new StringBuilder();
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+
+            JSONObject responseJson = new JSONObject(response.toString());
+            JSONArray items = responseJson.getJSONArray("items");
+            for (int i = 0; i < items.length(); i++) {
+                allTracks.add(items.getJSONObject(i));
+            }
+
+            // 次のページがある場合、URLを取得
+            nextUrl = responseJson.optString("next", null);
+        }
+
+        return allTracks;
+    }
+
+    
+    
+    
+
+
+    // 汎用的なGETリクエストを送信するメソッド
+    private JSONObject sendGetRequest(String accessToken, String urlString) throws Exception {
+        HttpURLConnection connection = null;
+        try {
+            URL url = new URL(urlString);
+            connection = (HttpURLConnection) url.openConnection();
+
+            // HTTPリクエストの設定
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Authorization", "Bearer " + accessToken);
+            connection.setRequestProperty("Content-Type", "application/json");
+
+            // ステータスコードを取得
+            int responseCode = connection.getResponseCode();
+
+            // ストリームを取得
+            InputStream inputStream;
+            if (responseCode >= 200 && responseCode < 300) {
+                inputStream = connection.getInputStream(); // 正常なレスポンス
+            } else {
+                inputStream = connection.getErrorStream(); // エラーレスポンス
+                if (inputStream == null) {
+                    throw new RuntimeException("HTTPエラーコード: " + responseCode + "、エラーストリームが存在しません。");
+                }
+            }
+
+            // レスポンスを読み取る
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                StringBuilder responseBuilder = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    responseBuilder.append(line);
+                }
+                return new JSONObject(responseBuilder.toString());
+            }
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
         }
     }
 
