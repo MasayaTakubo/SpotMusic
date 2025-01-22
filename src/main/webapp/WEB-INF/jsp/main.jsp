@@ -3,6 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ page import="java.util.List"%>
 <%@ page import="bean.SpotifyPlayListBean"%>
+<%@ page import="java.util.ArrayList" %>
 <%@ page import="bean.TrackBean"%>
 <!DOCTYPE html>
 <html lang="ja">
@@ -53,9 +54,21 @@
     <!-- 左側: プレイリスト -->
     <div class="sidebar">
         <h2>プレイリスト</h2>
-        <%
-            List<SpotifyPlayListBean> playlistBeans = (List<SpotifyPlayListBean>) session.getAttribute("playlistBeans");
-        %>
+<%
+    List<SpotifyPlayListBean> playlistBeans = (List<SpotifyPlayListBean>) session.getAttribute("playlistBeans");
+    List<String> trackIds = new ArrayList<>();
+    if (playlistBeans != null) {
+        for (SpotifyPlayListBean playlist : playlistBeans) {
+            for (TrackBean track : playlist.getTrackList()) {
+                trackIds.add(track.getTrackId());
+            }
+        }
+    }
+    session.setAttribute("trackIds", trackIds);
+    session.setAttribute("currentTrackIndex", 0);
+    
+%>
+
         <ul>
             <c:forEach var="playlist" items="${playlistBeans}">
                 <li>
@@ -102,6 +115,7 @@
             <p>フォロー中のアーティストが見つかりませんでした。</p>
         </c:otherwise>
     </c:choose>
+
 </ul>
         </ul>
         
@@ -261,12 +275,32 @@
             });
 
             document.getElementById('prev').addEventListener('click', () => {
-                controlSpotify('previousTrack', null, null, player);
+                console.log("前の曲ボタンが押されました"); 
+                fetch("/SpotMusic/spotifyControl", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: "action=previousTrack"
+                }).then(response => response.text())
+                  .then(data => console.log("前の曲の応答: ", data))
+                  .catch(error => console.error("エラー:", error));
             });
 
             document.getElementById('next').addEventListener('click', () => {
-                controlSpotify('nextTrack', null, null, player);
+                console.log("次の曲ボタンが押されました");
+                fetch("/SpotMusic/spotifyControl", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: "action=nextTrack"
+                }).then(response => response.text())
+                  .then(data => console.log("次の曲の応答: ", data))
+                  .catch(error => console.error("エラー:", error));
             });
+
+
 
             document.getElementById('progress-bar').addEventListener('input', (e) => {
                 const volume = e.target.value / 100;
@@ -277,6 +311,8 @@
         };
 
         async function controlSpotify(action, trackId = null, deviceId = null, player = null) {
+        	console.log("送信アクション: " + action);
+        	
             if (player) {
                 switch (action) {
                     case 'togglePlay':
@@ -304,6 +340,7 @@
 
             const params = new URLSearchParams();
             params.append("action", action);
+            console.log("送信データ:", params.toString());
             if (trackId) params.append("trackId", trackId);
             if (deviceId) params.append("deviceId", deviceId);
 
@@ -337,9 +374,33 @@
             propertyPanel.classList.add('active');
         }
 
-        function setupDevice(deviceId) {
-            controlSpotify("setup", null, deviceId);
+        async function setupDevice(deviceId) {
+            console.log("デバイスのセットアップを開始: ", deviceId);
+            const params = new URLSearchParams();
+            params.append("action", "setup");
+            params.append("deviceId", deviceId);
+
+            try {
+                const response = await fetch("/SpotMusic/spotifyControl", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: params,
+                });
+
+                if (!response.ok) {
+                    const error = await response.text();
+                    console.error("デバイスセットアップエラー:", error);
+                    alert("デバイスのセットアップに失敗しました。Spotifyアプリを開いていますか？");
+                } else {
+                    console.log("デバイスセットアップ成功");
+                }
+            } catch (error) {
+                console.error("デバイスセットアップ失敗:", error);
+            }
         }
+
 
         function logout() {
             window.location.href = '/SpotMusic/logout';
