@@ -1,5 +1,7 @@
 package command;
 
+import java.util.List;
+
 import bean.relationBean;
 import context.RequestContext;
 import context.ResponseContext;
@@ -18,8 +20,9 @@ public class AddRelationCommand extends AbstractCommand {
         // データベースに保存
         RelationDAO relationDAO = new RelationDAO();
         relationDAO.addRelation(relationBean);
-        // レスポンスに結果をセット
-        resc.setTarget("friendList"); // 画面にリダイレクト
+        List<relationBean> relations = relationDAO.getRelation(user1Id);
+        resc.setResult(relations);
+        resc.setTarget("friendList");
         return resc;
     }
 }

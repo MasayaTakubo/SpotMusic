@@ -49,7 +49,7 @@
     <div class="chatWindow">
         <form action="FrontServlet" method="POST" id="chatForm" onsubmit="return false;">
             <textarea name="message" id="messageInput" placeholder="Type your message here..." required></textarea>
-            <input type="hidden" name="relationId" value="${requestScope.relationId}">
+            <input type="hidden" name="relationId" id="relationId" value="${param.relationId}">
             <input type="hidden" name="userId" id="userId" value="${sessionScope.userId }">
             <input type="hidden" name="command" value="AddMessage">
             <button id="sendButton" type="button">Send</button> <!-- IDとタイプ修正 -->
@@ -70,6 +70,7 @@
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
         const userId = document.getElementById('userId').value; // セッションから渡されたuserIdを取得
+        const relationId = document.getElementById('relationId').value;
         // メッセージ送信イベント
 		sendButton.addEventListener('click', function () {
 		    const message = messageInput.value;
@@ -94,6 +95,7 @@
 		    	    return response.json();
 		    	})
 		    	.then(data => {
+			    	chatBox.innerHTML = '';
 		    	    messageInput.value = '';
 		    	    channel.postMessage(data);
 		    	    data.forEach(message => addMessageToBox(message));
@@ -104,6 +106,7 @@
         // 他タブからのメッセージ受信イベント
 		channel.onmessage = function (event) {
 		    if (typeof event.data === 'object') {
+			    chatBox.innerHTML='';
 		    	event.data.forEach(message => addMessageToBox(message));
 		    } else {
 		        console.error('Received data is not an object:', event.data);

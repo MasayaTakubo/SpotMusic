@@ -15,8 +15,6 @@ public class ListRelationCommand extends AbstractCommand {
         
         RelationDAO relationDAO = new RelationDAO();
         List<relationBean> relations = relationDAO.getRelation(userId);
-        // レスポンスに結果をセット
-        System.out.println(relations.size());
         resc.setResult(relations);
         resc.setTarget("friendList");
         return resc;
