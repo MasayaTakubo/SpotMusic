@@ -104,6 +104,90 @@
     </c:choose>
 </ul>
         </ul>
+        
+        
+        
+        <h1>今回新たにしゅとくしようとしているもの</h1>
+         <!-- 最近再生履歴の表示 -->
+    <h2>Recently Played Tracks</h2>
+    <c:if test="${not empty recentryDatas}">
+        <table>
+            <thead>
+                <tr>
+                    <th>Track ID</th>
+                
+                </tr>
+            </thead>
+            <tbody>
+                <c:forEach var="entry" items="${recentryDatas}">
+                    <tr>
+                        <td>${entry.key}</td>
+                        
+                    </tr>
+                </c:forEach>
+            </tbody>
+        </table>
+    </c:if>
+    <c:if test="${empty recentryDatas}">
+        <p>No recently played tracks found.</p>
+    </c:if>
+
+    <!-- Top Mix Tracksの表示 -->
+    <h2>Top Mix Tracks</h2>
+    <c:if test="${not empty topMixDatas}">
+        <table>
+            <thead>
+                <tr>
+                    <th>Track ID</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                <c:forEach var="entry" items="${topMixDatas}">
+                    <tr>
+                        <td>${entry.key}</td>
+                        
+                    </tr>
+                </c:forEach>
+            </tbody>
+        </table>
+    </c:if>
+    <c:if test="${empty topMixDatas}">
+        <p>No top mix tracks found.</p>
+    </c:if>
+
+    <!-- レコメンドデータの表示 -->
+    <h2>Recommended Tracks</h2>
+<c:if test="${not empty recomendDatas}">
+    <table>
+        <thead>
+            <tr>
+                <th>Track Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            <c:forEach var="entry" items="${recomendDatas}">
+                <tr>
+                    <td>${entry.value}</td> <!-- トラック名だけ表示 -->
+                </tr>
+            </c:forEach>
+        </tbody>
+    </table>
+</c:if>
+<c:if test="${empty recomendDatas}">
+    <p>No recommended tracks found.</p>
+</c:if>
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
 
         <h1>Spotify API情報取得結果</h1>
         <c:if test="${not empty error}">

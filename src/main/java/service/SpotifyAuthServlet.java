@@ -30,7 +30,7 @@ public class SpotifyAuthServlet extends HttpServlet {
                     + "?client_id=" + SpotifyAuthService.CLIENT_ID
                     + "&response_type=code"
                     + "&redirect_uri=" + java.net.URLEncoder.encode(SpotifyAuthService.REDIRECT_URI, "UTF-8")
-                    + "&scope=streaming user-read-playback-state user-modify-playback-state playlist-read-private playlist-read-collaborative user-follow-read user-read-private user-read-email user-top-read";
+                    + "&scope=streaming user-read-playback-state user-modify-playback-state playlist-read-private playlist-read-collaborative user-follow-read user-read-private user-read-email user-top-read user-read-recently-played";
             response.sendRedirect(authUrl);
             return;
         }
@@ -66,7 +66,19 @@ public class SpotifyAuthServlet extends HttpServlet {
                 session.setAttribute("artistIds", artistIds);
                 session.setAttribute("artistNames", artistNames);
                 System.out.println("アーティスト情報取得完了");
+                
+                
+                
+                //再生履歴
+                Map<String, String> recentryDatas = spotifyAuthService.getRecentlyPlayedTrackNamesAndIds(accessToken, 20);
+                //Map<String, String> topMixDatas = spotifyAuthService.getTopMixTracks(accessToken, 20);
+                //Map<String, String> recomendDatas = spotifyAuthService.getRecommendedTracks(accessToken, 20);
 
+                session.setAttribute("recentryDatas", recentryDatas);
+                //session.setAttribute("topMixDatas", topMixDatas);
+                //session.setAttribute("recomendDatas", recomendDatas);
+                
+                
                 // Mapを保存する
                 Map<String, String> userInfoMap = Map.of("userId", userId, "accessToken", accessToken, "refreshToken", refreshToken);
                 session.setAttribute("userInfoMap", userInfoMap);
