@@ -1,5 +1,7 @@
 package command;
 
+import java.util.List;
+
 import bean.relationBean;
 import context.RequestContext;
 import context.ResponseContext;
@@ -19,8 +21,11 @@ public class CancelRelationCommand extends AbstractCommand {
         // データベースに保存
         RelationDAO relationDAO = new RelationDAO();
         relationDAO.cancelRelation(relationBean);
-        // レスポンスに結果をセット
-        resc.setTarget("friendList"); // チャット画面にリダイレクト
+        //表示データ取得用
+        String userId = reqc.getParameter("userId")[0];
+        List<relationBean> relations = relationDAO.getRelation(userId);
+        resc.setResult(relations);
+        resc.setTarget("friendList");
         return resc;
     }
 }

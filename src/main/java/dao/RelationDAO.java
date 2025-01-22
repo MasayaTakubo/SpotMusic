@@ -71,13 +71,12 @@ public class RelationDAO {
         }
     }
     
-    public List<String> getUsersId(String userId) {
-        String sql = "SELECT user_id FROM users WHERE user_id != ?";
+    public List<String> getUsersId() {
+        String sql = "SELECT user_id FROM users";
         List<String> userIds = new ArrayList<>();
         
         try (Connection conn = MySQLConnector.getConn();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, userId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 userIds.add(rs.getString("user_id"));

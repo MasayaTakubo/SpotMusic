@@ -24,15 +24,7 @@
         <button type="button" onclick="window.open('https://www.spotify.com/signup/', '_blank')">サインアップ</button>
     </p>
     <br>
-
-    <!-- ユーザーIDでログイン -->
-    <h2>ユーザーIDでログイン</h2>
-    <form action="FrontServlet" method="POST">
-        <input type="text" name="userId" placeholder="Enter your user ID" required><br><br>
-        <input type="hidden" name="command" value="ChatCommand">
-        <button type="submit">ログイン</button>
-    </form>
-    <br><br>
+<br>
     
     <h2>フレンドリスト</h2>
     <form action="FrontServlet" method="POST">
