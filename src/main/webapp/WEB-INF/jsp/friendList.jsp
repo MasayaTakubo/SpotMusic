@@ -23,37 +23,44 @@
                 <td>${relation.user2Id}</td>
                 <td>${relation.status}</td>
                 <td>
-		            <c:if test="${relation.status == 'PENDING'}">
-		                <form action="FrontServlet" method="POST">
-		                    <input type="hidden" name="relationId" value="${relation.relationId}">
-		                    <input type="hidden" name="command" value="AcceptRelation">
-		                    <input type="submit" value="承認">
-		                </form>
-		                <form action="FrontServlet" method="POST">
-		                    <input type="hidden" name="relationId" value="${relation.relationId}">
-		                    <input type="hidden" name="command" value="CancelRelation">
-		                    <input type="submit" value="拒否">
-		                </form>
-		            </c:if>
-		            <c:if test="${relation.status == 'ACCEPT'}">
-		                <form action="FrontServlet" method="POST">
-		                    <input type="hidden" name="relationId" value="${relation.relationId}">
-		                    <input type="hidden" name="command" value="CancelRelation">
-		                    <input type="submit" value="拒否">
-		                </form>
-		            </c:if>
-		            <c:if test="${relation.status == 'CANCEL'}">
-		            <form action="FrontServlet" method="POST">
-		                    <input type="hidden" name="relationId" value="${relation.relationId}">
-		                    <input type="hidden" name="command" value="AcceptRelation">
-		                    <input type="submit" value="承認">
-		                </form>
-		            </c:if>
+                	<c:if test="${relation.user1Id != sessionScope.userId}">
+			            <c:if test="${relation.status == 'PENDING'}">
+			                <form action="FrontServlet" method="POST">
+			                    <input type="hidden" name="relationId" value="${relation.relationId}">
+			                    <input type="hidden" name="userId" value="${sessionScope.userId}">
+			                    <input type="hidden" name="command" value="AcceptRelation">
+			                    <input type="submit" value="承認">
+			                </form>
+			                <form action="FrontServlet" method="POST">
+			                    <input type="hidden" name="relationId" value="${relation.relationId}">
+			                    <input type="hidden" name="userId" value="${sessionScope.userId}">
+			                    <input type="hidden" name="command" value="CancelRelation">
+			                    <input type="submit" value="拒否">
+			                </form>
+			            </c:if>
+			            <c:if test="${relation.status == 'ACCEPT'}">
+			                <form action="FrontServlet" method="POST">
+			                    <input type="hidden" name="relationId" value="${relation.relationId}">
+			                    <input type="hidden" name="userId" value="${sessionScope.userId}">
+			                    <input type="hidden" name="command" value="CancelRelation">
+			                    <input type="submit" value="拒否">
+			                </form>
+			            </c:if>
+			            <c:if test="${relation.status == 'CANCEL'}">
+			            <form action="FrontServlet" method="POST">
+			                    <input type="hidden" name="relationId" value="${relation.relationId}">
+			                    <input type="hidden" name="userId" value="${sessionScope.userId}">
+			                    <input type="hidden" name="command" value="AcceptRelation">
+			                    <input type="submit" value="承認">
+			                </form>
+			            </c:if>
+			        </c:if>
 		        </td>
                 <td>
 		            <c:if test="${relation.status == 'ACCEPT'}">
 		                <form action="FrontServlet" method="POST">
 		                	<input type="hidden" name="relationId" value="${relation.relationId}">
+		                	<input type="hidden" name="userId" value="${sessionScope.userId}">
 					        <input type="hidden" name="command" value="ChatCommand">
 					        <button type="submit">ログイン</button>
 					    </form>
