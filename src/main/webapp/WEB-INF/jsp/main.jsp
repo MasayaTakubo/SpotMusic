@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ page import="java.util.List"%>
 <%@ page import="bean.SpotifyPlayListBean"%>
+<%@ page import="java.util.ArrayList" %>
 <%@ page import="bean.TrackBean"%>
 <!DOCTYPE html>
 <html lang="ja">
@@ -52,9 +53,21 @@
     <!-- 左側: プレイリスト -->
     <div class="sidebar">
         <h2>プレイリスト</h2>
-        <%
-            List<SpotifyPlayListBean> playlistBeans = (List<SpotifyPlayListBean>) session.getAttribute("playlistBeans");
-        %>
+<%
+    List<SpotifyPlayListBean> playlistBeans = (List<SpotifyPlayListBean>) session.getAttribute("playlistBeans");
+    List<String> trackIds = new ArrayList<>();
+    if (playlistBeans != null) {
+        for (SpotifyPlayListBean playlist : playlistBeans) {
+            for (TrackBean track : playlist.getTrackList()) {
+                trackIds.add(track.getTrackId());
+            }
+        }
+    }
+    session.setAttribute("trackIds", trackIds);
+    session.setAttribute("currentTrackIndex", 0);
+    
+%>
+
         <ul>
             <c:forEach var="playlist" items="${playlistBeans}">
                 <li>
@@ -83,6 +96,111 @@
                 followedArtistNames = new java.util.ArrayList<>();
             }
         %>
+        
+    <c:choose>
+        <c:when test="${not empty sessionScope.artistIds}">
+            <ul>
+                <!-- アーティストIDをループでリンクを生成 -->
+                <c:forEach var="artistId" items="${sessionScope.artistIds}" varStatus="status">
+                    <li>
+                        <a href="/SpotMusic/FrontServlet?command=ArtistDetails&artistId=${artistId}">
+                            アーティスト名（ ${sessionScope.artistNames[status.index]} ）
+                        </a>
+                    </li>
+                </c:forEach>
+            </ul>
+        </c:when>
+        <c:otherwise>
+            <p>フォロー中のアーティストが見つかりませんでした。</p>
+        </c:otherwise>
+    </c:choose>
+
+</ul>
+        </ul>
+        
+        
+        
+        <h1>今回新たにしゅとくしようとしているもの</h1>
+         <!-- 最近再生履歴の表示 -->
+    <h2>Recently Played Tracks</h2>
+    <c:if test="${not empty recentryDatas}">
+        <table>
+            <thead>
+                <tr>
+                    <th>Track ID</th>
+                
+                </tr>
+            </thead>
+            <tbody>
+                <c:forEach var="entry" items="${recentryDatas}">
+                    <tr>
+                        <td>${entry.key}</td>
+                        
+                    </tr>
+                </c:forEach>
+            </tbody>
+        </table>
+    </c:if>
+    <c:if test="${empty recentryDatas}">
+        <p>No recently played tracks found.</p>
+    </c:if>
+
+    <!-- Top Mix Tracksの表示 -->
+    <h2>Top Mix Tracks</h2>
+    <c:if test="${not empty topMixDatas}">
+        <table>
+            <thead>
+                <tr>
+                    <th>Track ID</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                <c:forEach var="entry" items="${topMixDatas}">
+                    <tr>
+                        <td>${entry.key}</td>
+                        
+                    </tr>
+                </c:forEach>
+            </tbody>
+        </table>
+    </c:if>
+    <c:if test="${empty topMixDatas}">
+        <p>No top mix tracks found.</p>
+    </c:if>
+
+    <!-- レコメンドデータの表示 -->
+    <h2>Recommended Tracks</h2>
+<c:if test="${not empty recomendDatas}">
+    <table>
+        <thead>
+            <tr>
+                <th>Track Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            <c:forEach var="entry" items="${recomendDatas}">
+                <tr>
+                    <td>${entry.value}</td> <!-- トラック名だけ表示 -->
+                </tr>
+            </c:forEach>
+        </tbody>
+    </table>
+</c:if>
+<c:if test="${empty recomendDatas}">
+    <p>No recommended tracks found.</p>
+</c:if>
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
 
         <c:choose>
             <c:when test="${not empty sessionScope.artistIds}">
@@ -167,12 +285,32 @@
             });
 
             document.getElementById('prev').addEventListener('click', () => {
-                controlSpotify('previousTrack', null, null, player);
+                console.log("前の曲ボタンが押されました"); 
+                fetch("/SpotMusic/spotifyControl", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: "action=previousTrack"
+                }).then(response => response.text())
+                  .then(data => console.log("前の曲の応答: ", data))
+                  .catch(error => console.error("エラー:", error));
             });
 
             document.getElementById('next').addEventListener('click', () => {
-                controlSpotify('nextTrack', null, null, player);
+                console.log("次の曲ボタンが押されました");
+                fetch("/SpotMusic/spotifyControl", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: "action=nextTrack"
+                }).then(response => response.text())
+                  .then(data => console.log("次の曲の応答: ", data))
+                  .catch(error => console.error("エラー:", error));
             });
+
+
 
             document.getElementById('progress-bar').addEventListener('input', (e) => {
                 const volume = e.target.value / 100;
@@ -183,6 +321,8 @@
         };
 
         async function controlSpotify(action, trackId = null, deviceId = null, player = null) {
+        	console.log("送信アクション: " + action);
+        	
             if (player) {
                 switch (action) {
                     case 'togglePlay':
@@ -210,6 +350,7 @@
 
             const params = new URLSearchParams();
             params.append("action", action);
+            console.log("送信データ:", params.toString());
             if (trackId) params.append("trackId", trackId);
             if (deviceId) params.append("deviceId", deviceId);
 
@@ -243,9 +384,33 @@
             propertyPanel.classList.add('active');
         }
 
-        function setupDevice(deviceId) {
-            controlSpotify("setup", null, deviceId);
+        async function setupDevice(deviceId) {
+            console.log("デバイスのセットアップを開始: ", deviceId);
+            const params = new URLSearchParams();
+            params.append("action", "setup");
+            params.append("deviceId", deviceId);
+
+            try {
+                const response = await fetch("/SpotMusic/spotifyControl", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: params,
+                });
+
+                if (!response.ok) {
+                    const error = await response.text();
+                    console.error("デバイスセットアップエラー:", error);
+                    alert("デバイスのセットアップに失敗しました。Spotifyアプリを開いていますか？");
+                } else {
+                    console.log("デバイスセットアップ成功");
+                }
+            } catch (error) {
+                console.error("デバイスセットアップ失敗:", error);
+            }
         }
+
 
         function logout() {
             window.location.href = '/SpotMusic/logout';

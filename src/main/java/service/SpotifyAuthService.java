@@ -10,6 +10,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -563,5 +564,169 @@ public class SpotifyAuthService {
             }
         }
     }
+    
+    
+    
+    public Map<String, String> getRecentlyPlayedTrackNamesAndIds(String accessToken, int limit) throws IOException {
+        // Spotify APIのエンドポイントURL
+        URL url = new URL("https://api.spotify.com/v1/me/player/recently-played?limit=" + limit);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Authorization", "Bearer " + accessToken);
+
+        // ステータスコードを確認
+        int responseCode = connection.getResponseCode();
+        if (responseCode != 200) {
+            throw new IOException("Failed to get recently played tracks: HTTP code " + responseCode);
+        }
+
+        // レスポンスを読み取る
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        StringBuilder response = new StringBuilder();
+        String inputLine;
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        // デバッグ用：取得したJSONレスポンスを出力
+        System.out.println("Recently Played JSON Response: " + response.toString());
+
+        // JSONからトラック名とIDを抽出
+        Map<String, String> trackData = extractTrackNamesAndIds(response.toString());
+
+        // デバッグ用：抽出したデータを出力
+        trackData.forEach((key, value) -> System.out.println("Track Name: " + key + ", Track ID: " + value));
+
+        return trackData;
+    }
+
+    // TopMixの中の曲を取得
+    public Map<String, String> getTopMixTracks(String accessToken, int limit) throws IOException {
+        // Spotify APIのエンドポイントURL
+        URL url = new URL("https://api.spotify.com/v1/me/top/tracks?limit=" + limit);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Authorization", "Bearer " + accessToken);
+
+        // ステータスコードを確認
+        int responseCode = connection.getResponseCode();
+        if (responseCode != 200) {
+            throw new IOException("Failed to get TopMix tracks: HTTP code " + responseCode);
+        }
+
+        // レスポンスを読み取る
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        StringBuilder response = new StringBuilder();
+        String inputLine;
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        // デバッグ用：取得したJSONレスポンスを出力
+        System.out.println("TopMix JSON Response: " + response.toString());
+
+        // JSONからトラック名とIDを抽出
+        Map<String, String> trackData = extractTrackNamesAndIds(response.toString());
+
+        // デバッグ用：抽出したデータを出力
+        trackData.forEach((key, value) -> System.out.println("Track Name: " + key + ", Track ID: " + value));
+
+        return trackData;
+    }
+
+    // 再生履歴に基づくおすすめ曲取得
+    public Map<String, String> getRecommendedTracks(String accessToken, int limit) throws IOException {
+        // Spotify APIのエンドポイントURL
+        URL url = new URL("https://api.spotify.com/v1/recommendations?limit=" + limit);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Authorization", "Bearer " + accessToken);
+
+        // ステータスコードを確認
+        int responseCode = connection.getResponseCode();
+        if (responseCode != 200) {
+            throw new IOException("Failed to get recommended tracks: HTTP code " + responseCode);
+        }
+
+        // レスポンスを読み取る
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        StringBuilder response = new StringBuilder();
+        String inputLine;
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        // デバッグ用：取得したJSONレスポンスを出力
+        System.out.println("Recommended Tracks JSON Response: " + response.toString());
+
+        // JSONからトラック名とIDを抽出
+        Map<String, String> trackData = extractTrackNamesAndIds(response.toString());
+
+        // デバッグ用：抽出したデータを出力
+        trackData.forEach((key, value) -> System.out.println("Track Name: " + key + ", Track ID: " + value));
+
+        return trackData;
+    }
+
+    /**
+     * JSONレスポンスからトラック名とIDを抽出するメソッド
+     */
+    private Map<String, String> extractTrackNamesAndIds(String jsonResponseString) {
+        Map<String, String> trackNamesAndIds = new LinkedHashMap<>();
+
+        try {
+            // JSONレスポンスを解析
+            JSONObject jsonResponse = new JSONObject(jsonResponseString);
+
+            // "items"が存在するか確認
+            if (jsonResponse.has("items")) {
+                JSONArray items = jsonResponse.getJSONArray("items");
+
+                // 各トラックの名前とIDをマップに追加
+                for (int i = 0; i < items.length(); i++) {
+                    JSONObject item = items.getJSONObject(i);
+
+                    // "track"が存在しない場合もIDと名前を取得する
+                    if (item.has("track")) {
+                        JSONObject trackObject = item.getJSONObject("track");
+                        String trackName = trackObject.getString("name");
+                        String trackId = trackObject.getString("id");
+                        trackNamesAndIds.put(trackName, trackId);
+                    } else if (item.has("name") && item.has("id")) {
+                        // "track"がない場合でも直接"items"内の"name"と"id"を取得
+                        String trackName = item.getString("name");
+                        String trackId = item.getString("id");
+                        trackNamesAndIds.put(trackName, trackId);
+                    } else {
+                        System.err.println("Warning: 'track' or 'name' and 'id' not found in item: " + item.toString());
+                    }
+                }
+            } else {
+                // "items"が存在しない場合の警告
+                System.err.println("Warning: 'items' not found in response.");
+            }
+        } catch (Exception e) {
+            System.err.println("JSON解析中にエラーが発生しました: " + e.getMessage());
+        }
+
+        // デバッグ用：抽出結果を出力
+        trackNamesAndIds.forEach((key, value) -> System.out.println("Extracted Track Name: " + key + ", Track ID: " + value));
+
+        return trackNamesAndIds;
+    }
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
 
 }
