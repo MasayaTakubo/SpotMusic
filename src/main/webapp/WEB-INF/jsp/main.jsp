@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ page import="java.util.List"%>
 <%@ page import="bean.SpotifyPlayListBean"%>
@@ -84,37 +83,28 @@
                 followedArtistNames = new java.util.ArrayList<>();
             }
         %>
-        
-    <c:choose>
-        <c:when test="${not empty sessionScope.artistIds}">
-            <ul>
-                <!-- アーティストIDをループでリンクを生成 -->
-                <c:forEach var="artistId" items="${sessionScope.artistIds}" varStatus="status">
-                    <li>
-                        <a href="/SpotMusic/FrontServlet?command=ArtistDetails&artistId=${artistId}">
-                            アーティスト名（ ${sessionScope.artistNames[status.index]} ）
-                        </a>
-                    </li>
-                </c:forEach>
-            </ul>
-        </c:when>
-        <c:otherwise>
-            <p>フォロー中のアーティストが見つかりませんでした。</p>
-        </c:otherwise>
-    </c:choose>
-</ul>
-        </ul>
 
-        <h1>Spotify API情報取得結果</h1>
-        <c:if test="${not empty error}">
-            <p style="color: red;">エラー: ${error}</p>
-        </c:if>
-        <c:if test="${empty error}">
-            <p>Spotify APIの情報取得に成功しました。</p>
-        </c:if>
-        <br>
-        <a href="/auth">プレイリストを再取得</a>
+        <c:choose>
+            <c:when test="${not empty sessionScope.artistIds}">
+                <ul>
+                    <!-- アーティストIDをループでリンクを生成 -->
+                    <c:forEach var="artistId" items="${sessionScope.artistIds}" varStatus="status">
+                        <li>
+                            <!-- リンクをクリックすると、中央のiframeでartist.jspを表示 -->
+<a href="javascript:void(0);" onclick="loadArtistPage('${artistId}')">
+                                アーティスト名（ ${sessionScope.artistNames[status.index]} ）
+                            </a>
+                        </li>
+                    </c:forEach>
+                </ul>
+            </c:when>
+            <c:otherwise>
+                <p>フォロー中のアーティストが見つかりませんでした。</p>
+            </c:otherwise>
+        </c:choose>
     </div>
+
+
 
     <!-- 右側: 詳細情報パネル -->
     <div class="property-panel" id="propertyPanel">
@@ -262,7 +252,25 @@
 
         }
     </script>
+<script>
+        // artist.jspを動的に読み込む関数
+function loadArtistPage(artistId) {
+    var contentDiv = document.querySelector('.content');
+    var url = '/SpotMusic/FrontServlet?command=ArtistDetails&artistId=' + artistId;
+    
+    fetch(url)
+        .then(response => response.text())
+        .then(data => {
+            // 取得したデータを.content内に上書きする
+            contentDiv.innerHTML = data;
+        })
+        .catch(error => {
+            console.error('Error loading artist page:', error);
+            contentDiv.innerHTML = '<p>アーティスト情報の取得に失敗しました。</p>';
+        });
+}
 
+    </script>
 
     
 
