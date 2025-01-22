@@ -20,15 +20,28 @@
 		        <tr>
 		            <td>${userId}</td>
 		            <td>
-		                <c:set var="isFriend" value="false" />
+		                <c:set var="friendStatus" value="none" />
 		                <c:forEach var="friend" items="${messages.isfriend}">
 		                    <c:if test="${friend.user1Id == userId || friend.user2Id == userId}">
-		                        <c:set var="isFriend" value="true" />
+		                        <c:set var="friendStatus" value="${friend.status}" />
+		                        <c:set var="relationId" value="${friend.relationId}" />
 		                    </c:if>
+		                    
 		                </c:forEach>
 		                <c:choose>
-		                    <c:when test="${isFriend}">
-		                        申請済み
+		                    <c:when test="${friendStatus == 'ACCEPT'}">
+		                        フレンドです
+		                    </c:when>
+		                    <c:when test="${friendStatus == 'CANCEL'}">
+		                        フレンド申請は拒否されました
+		                    </c:when>
+		                    <c:when test="${friendStatus == 'PENDING'}">
+		                        <form action="FrontServlet" method="post">
+		                            <input type="hidden" name="userId" value="${sessionScope.userId}">
+		                            <input type="hidden" name="relationId" value="${relationId}">
+		                            <input type="hidden" name="command" value="DeleteRelation">
+		                            <button type="submit">フレンド申請解除</button>
+		                        </form>
 		                    </c:when>
 		                    <c:otherwise>
 		                        <form action="FrontServlet" method="post">
@@ -43,7 +56,6 @@
 		        </tr>
 		    </c:if>
 		</c:forEach>
-
     </table>
     <form action="FrontServlet" method="POST">
     	<input type="hidden" name="userId" value="${sessionScope.userId}">

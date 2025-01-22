@@ -87,5 +87,15 @@ public class RelationDAO {
         
         return userIds;  // ユーザーIDのリストを返す
     }
+    public void deleteRelation(int relationId) {
+    	String sql = "DELETE from relation where relation_Id = ?";
+    	try (Connection conn = MySQLConnector.getConn();
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
+               stmt.setInt(1, relationId);
+               stmt.executeUpdate();
+           } catch (SQLException e) {
+               e.printStackTrace();
+           }
+    }
 
 }
