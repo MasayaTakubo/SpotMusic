@@ -21,8 +21,8 @@ public class SpotifyAuth {
         String postData = "code=" + authorizationCode
                           + "&redirect_uri=http://localhost:8080/SpotMusic/auth"
                           + "&grant_type=authorization_code"
-                          + "&client_id=47d25dfe57a84365a5560a0d4d5b904c"
-                          + "&client_secret=85177e25506d47c4b8b2b8de65e68d3b";
+                          + "&client_id=277b350dfbe146e8b5b48171bc6ceaed"
+                          + "&client_secret=5cdda2ff3df040de9b8ba8cbf0122885";
 
         // 出力ストリームにデータを書き込む
         try (var os = connection.getOutputStream()) {
