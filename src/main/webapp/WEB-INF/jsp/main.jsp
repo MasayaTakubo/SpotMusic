@@ -198,14 +198,19 @@
     <div class="property-panel" id="propertyPanel">
         <h2>トラック詳細</h2>
         <p id="track-detail">再生中のトラック詳細が表示されます。</p>
-        <div id="player-controls">
-            <h3>プレイヤー</h3>
-            <p id="now-playing">現在再生中: <span id="current-track">なし</span></p>
-            <button id="prev">前の曲</button>
-            <button id="play-pause">再生/停止</button>
-            <button id="next">次の曲</button>
-            <input type="range" id="progress-bar" value="50" min="0" max="100">
-        </div>
+		<div id="player-controls">
+		    <h3>プレイヤー</h3>
+		    <p>再生時間: <span id="current-time">0:00</span> / <span id="total-time">0:00</span></p>
+		    <input type="range" id="seek-bar" value="0" min="0" max="100">            
+		    <p id="now-playing">現在再生中: <span id="current-track">なし</span></p>
+		    <button id="prev">前の曲</button>
+		    <button id="play-pause">再生/停止</button>
+		    <button id="next">次の曲</button>
+		    <input type="range" id="progress-bar" value="50" min="0" max="100">
+		    <button id="repeat-track">リピート</button>
+		    <button id="shuffle-track">シャッフル</button>
+		</div>
+
     </div>
 
     <script>
@@ -233,12 +238,42 @@
                 console.log('デバイスがオフラインになりました:', device_id);
             });
 
+            let trackEnded = false; // フラグ変数を追加
+
             player.addListener('player_state_changed', state => {
-                if (state) {
-                    const track = state.track_window.current_track;
-                    document.getElementById('now-playing').innerText = track ? track.name : "なし";
+                if (!state) return;
+
+                const track = state.track_window.current_track;
+                document.getElementById('now-playing').innerText = track ? track.name : "なし";
+
+                // 曲が終了した場合の処理
+                if (state.paused && state.position === 0 && !state.track_window.next_tracks.length) {
+                    if (!trackEnded) {
+                        trackEnded = true;  // 連続リクエストを防止
+                        console.log("曲が終了しました。次の曲へ移動します。");
+                        
+                        fetch("/SpotMusic/spotifyControl", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/x-www-form-urlencoded"
+                            },
+                            body: "action=nextTrack"
+                        }).then(response => response.text())
+                          .then(data => {
+                              console.log("次の曲へ移行: ", data);
+                              trackEnded = false;  // 次の曲が始まったらフラグをリセット
+                          })
+                          .catch(error => {
+                              console.error("エラー:", error);
+                              trackEnded = false;  // エラー時もフラグをリセット
+                          });
+                    }
+                } else {
+                    trackEnded = false;  // 再生中に戻ったらフラグをリセット
                 }
             });
+
+
 
             player.connect().then(success => {
                 if (success) {
@@ -287,6 +322,31 @@
                 player.setVolume(volume).then(() => {
                     console.log("音量が設定されました:", volume);
                 }).catch(err => console.error("音量設定エラー:", err));
+            });
+
+            //Repeat
+            document.getElementById('repeat-track').addEventListener('click', () => {
+                fetch("/SpotMusic/spotifyControl", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: "action=repeatTrack&state=track"
+                }).then(response => response.text())
+                  .then(data => console.log("リピートの応答: ", data))
+                  .catch(error => console.error("エラー:", error));
+            });
+            //Shuffle
+            document.getElementById('shuffle-track').addEventListener('click', () => {
+                fetch("/SpotMusic/spotifyControl", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: "action=shuffle&state=true"
+                }).then(response => response.text())
+                  .then(data => console.log("シャッフルの応答: ", data))
+                  .catch(error => console.error("エラー:", error));
             });
         };
 
@@ -437,7 +497,73 @@ function loadArtistPage(artistId) {
     }
 </script>
 
-    
+<script>
+    const seekBar = document.getElementById('seek-bar');
+    const currentTimeDisplay = document.getElementById('current-time');
+    const totalTimeDisplay = document.getElementById('total-time');
+
+    seekBar.addEventListener('change', () => {
+        const positionMs = seekBar.value * 1000;
+        fetch("/SpotMusic/spotifyControl", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "action=seek&positionMs=" + positionMs
+        }).then(response => response.text())
+          .then(data => console.log("シークの応答: ", data))
+          .catch(error => console.error("エラー:", error));
+    });
+
+    function updateProgress() {
+        fetch("/SpotMusic/spotifyControl", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "action=getPlaybackState"
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data && data.item) {
+                const progressMs = data.progress_ms || 0;
+                const durationMs = data.item.duration_ms || 0;
+
+                // シークバー設定
+                seekBar.max = durationMs / 1000;
+                seekBar.value = progressMs / 1000;
+
+                // 現在時間と総再生時間の表示
+                currentTimeDisplay.textContent = formatTime(progressMs);
+                totalTimeDisplay.textContent = formatTime(durationMs);
+            } else {
+                console.error("無効なデータ: ", data);
+                currentTimeDisplay.textContent = "0:00";
+                totalTimeDisplay.textContent = "0:00";
+            }
+        })
+        .catch(error => {
+            console.error("再生状態の取得エラー:", error);
+        });
+    }
+
+    // 時間を mm:ss 形式にフォーマットする関数
+    function formatTime(ms) {
+        const minutes = Math.floor(ms / 60000);
+        const seconds = Math.floor((ms % 60000) / 1000);
+        return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+    }
+
+    // 5秒ごとに更新
+    setInterval(updateProgress, 1000);
+     
+</script>
+
 
 
 </body>

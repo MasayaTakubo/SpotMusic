@@ -14,12 +14,17 @@ import javax.servlet.http.HttpSession;
 public class SpotifyControlServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private SpotifyAuthService spotifyService = new SpotifyAuthService();
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        doPost(request, response);
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        System.out.println("サーブレット受信: " + request.getRequestURI());
-        System.out.println("リクエスト受信アクション: " + request.getParameter("action"));
+        //System.out.println("サーブレット受信: " + request.getRequestURI());
+        //System.out.println("リクエスト受信アクション: " + request.getParameter("action"));
         HttpSession session = request.getSession();
         String action = request.getParameter("action");
         String trackId = request.getParameter("trackId");
@@ -81,10 +86,11 @@ public class SpotifyControlServlet extends HttpServlet {
                         currentIndex = 0; // ループ再生
                     }
                     session.setAttribute("currentTrackIndex", currentIndex);
-                    System.out.println("次の曲へ: " + trackIds.get(currentIndex));  // デバッグ出力
+                    System.out.println("次の曲へ: " + trackIds.get(currentIndex));
                     spotifyService.playTrack(accessToken, "spotify:track:" + trackIds.get(currentIndex));
                     response.setStatus(HttpServletResponse.SC_OK);
                     break;
+
 
                 case "previousTrack":
                     if (currentIndex > 0) {
@@ -102,6 +108,44 @@ public class SpotifyControlServlet extends HttpServlet {
                     spotifyService.pausePlayback(accessToken);
                     response.setStatus(HttpServletResponse.SC_OK);
                     break;
+                //Repeat
+                case "repeatTrack":
+                    String repeatState = request.getParameter("state"); // "track", "context", "off"
+                    if (repeatState == null) repeatState = "track"; // デフォルトは1曲リピート
+                    spotifyService.setRepeatMode(accessToken, repeatState);
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    break;
+                //Shuffle
+                case "shuffle":
+                    String shuffleState = request.getParameter("state");  // "true" または "false"
+                    if (shuffleState == null) shuffleState = "true"; // デフォルトはシャッフルON
+
+                    spotifyService.setShuffleMode(accessToken, Boolean.parseBoolean(shuffleState));
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.getWriter().write("Shuffle mode set to: " + shuffleState);
+                    break;
+
+                case "seek":
+                    String positionMs = request.getParameter("positionMs"); // ミリ秒単位で取得
+                    if (positionMs == null) {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        response.getWriter().write("Error: Position is missing");
+                        return;
+                    }
+                    spotifyService.seekPlayback(accessToken, positionMs);
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.getWriter().write("Playback position set to: " + positionMs);
+                    break;
+                    
+                case "getPlaybackState":
+                    String playbackState = spotifyService.getPlaybackState(accessToken);
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    response.getWriter().write(playbackState);
+                    break;
+
+
+
 
                 default:
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
