@@ -97,7 +97,6 @@
             }
         %>
 
-        
 <c:choose>
             <c:when test="${not empty sessionScope.artistIds}">
                 <ul>
@@ -116,6 +115,7 @@
                 <p>フォロー中のアーティストが見つかりませんでした。</p>
             </c:otherwise>
         </c:choose>
+        
 
 </ul>
         </ul>
@@ -192,18 +192,9 @@
 <c:if test="${empty recomendDatas}">
     <p>No recommended tracks found.</p>
 </c:if>
-    
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
- <!-- 右側: 詳細情報パネル -->
+ 
+
+    <!-- 右側: 詳細情報パネル -->
     <div class="property-panel" id="propertyPanel">
         <h2>トラック詳細</h2>
         <p id="track-detail">再生中のトラック詳細が表示されます。</p>
