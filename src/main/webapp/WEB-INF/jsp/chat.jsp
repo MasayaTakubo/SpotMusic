@@ -43,7 +43,7 @@
         String jsonResponse = (String) request.getAttribute("messages");
     %>
     <h1>Chat Room</h1>
-    <h1>${sessionScope.userId }</h1>
+    <h1>ログインユーザー：${sessionScope.userId }</h1>
     <div id="chat-box" class="chat-box"></div>
     <!-- メッセージ送信フォーム -->
     <div class="chatWindow">
