@@ -23,6 +23,8 @@
                 <li>
                     <strong>トラック名: ${track.trackName}</strong><br>
                     <strong>アーティスト名：${track.artistName}</strong>
+					<button onclick="playTrack('${track.trackId}', '${track.trackName}')">再生</button>
+
                 </li>
             </c:forEach>
         </ul>
