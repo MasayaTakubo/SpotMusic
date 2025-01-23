@@ -193,7 +193,7 @@
     <p>No recommended tracks found.</p>
 </c:if>
  
-
+</div>
     <!-- 右側: 詳細情報パネル -->
     <div class="property-panel" id="propertyPanel">
         <h2>トラック詳細</h2>
