@@ -238,12 +238,42 @@
                 console.log('デバイスがオフラインになりました:', device_id);
             });
 
+            let trackEnded = false; // フラグ変数を追加
+
             player.addListener('player_state_changed', state => {
-                if (state) {
-                    const track = state.track_window.current_track;
-                    document.getElementById('now-playing').innerText = track ? track.name : "なし";
+                if (!state) return;
+
+                const track = state.track_window.current_track;
+                document.getElementById('now-playing').innerText = track ? track.name : "なし";
+
+                // 曲が終了した場合の処理
+                if (state.paused && state.position === 0 && !state.track_window.next_tracks.length) {
+                    if (!trackEnded) {
+                        trackEnded = true;  // 連続リクエストを防止
+                        console.log("曲が終了しました。次の曲へ移動します。");
+                        
+                        fetch("/SpotMusic/spotifyControl", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/x-www-form-urlencoded"
+                            },
+                            body: "action=nextTrack"
+                        }).then(response => response.text())
+                          .then(data => {
+                              console.log("次の曲へ移行: ", data);
+                              trackEnded = false;  // 次の曲が始まったらフラグをリセット
+                          })
+                          .catch(error => {
+                              console.error("エラー:", error);
+                              trackEnded = false;  // エラー時もフラグをリセット
+                          });
+                    }
+                } else {
+                    trackEnded = false;  // 再生中に戻ったらフラグをリセット
                 }
             });
+
+
 
             player.connect().then(success => {
                 if (success) {

@@ -23,8 +23,8 @@ public class SpotifyControlServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        System.out.println("サーブレット受信: " + request.getRequestURI());
-        System.out.println("リクエスト受信アクション: " + request.getParameter("action"));
+        //System.out.println("サーブレット受信: " + request.getRequestURI());
+        //System.out.println("リクエスト受信アクション: " + request.getParameter("action"));
         HttpSession session = request.getSession();
         String action = request.getParameter("action");
         String trackId = request.getParameter("trackId");
@@ -86,10 +86,11 @@ public class SpotifyControlServlet extends HttpServlet {
                         currentIndex = 0; // ループ再生
                     }
                     session.setAttribute("currentTrackIndex", currentIndex);
-                    System.out.println("次の曲へ: " + trackIds.get(currentIndex));  // デバッグ出力
+                    System.out.println("次の曲へ: " + trackIds.get(currentIndex));
                     spotifyService.playTrack(accessToken, "spotify:track:" + trackIds.get(currentIndex));
                     response.setStatus(HttpServletResponse.SC_OK);
                     break;
+
 
                 case "previousTrack":
                     if (currentIndex > 0) {
