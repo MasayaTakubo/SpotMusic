@@ -113,4 +113,6 @@ public class SpotifyAuthServlet extends HttpServlet {
         session.setAttribute("access_token", newAccessToken);
         System.out.println("アクセストークンがリフレッシュされました。");
     }
+    
+
 }

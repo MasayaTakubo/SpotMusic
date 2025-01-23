@@ -718,15 +718,87 @@ public class SpotifyAuthService {
         return trackNamesAndIds;
     }
 
+    private void sendPutRequest(String urlString, String accessToken) throws IOException {
+        HttpURLConnection connection = null;
+        try {
+            URL url = new URL(urlString);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("PUT");
+            connection.setRequestProperty("Authorization", "Bearer " + accessToken);
+            connection.setRequestProperty("Content-Type", "application/json");
+            
+            // 空のリクエストボディを送信して Content-Length をセット
+            connection.setDoOutput(true);
+            String jsonPayload = "{}";  // 空のJSONボディ
+            byte[] outputBytes = jsonPayload.getBytes(StandardCharsets.UTF_8);
+            connection.setRequestProperty("Content-Length", String.valueOf(outputBytes.length));
+
+            try (OutputStream os = connection.getOutputStream()) {
+                os.write(outputBytes);
+            }
+
+            int responseCode = connection.getResponseCode();
+            System.out.println("Spotify API PUT response code: " + responseCode);
+
+            if (responseCode == HttpURLConnection.HTTP_NO_CONTENT) {
+                System.out.println("Spotify API PUT success (No Content)");
+                return;  // 204レスポンスの場合、ストリームは存在しないためここで処理を終了
+            }
+
+            // エラーハンドリング: レスポンスコードが204以外のときに処理
+            InputStream errorStream = connection.getErrorStream();
+            if (errorStream != null) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+                throw new IOException("Spotify APIエラー: HTTP " + responseCode + " - " + response.toString());
+            }
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+    }
 
 
+
+
+    public void setRepeatMode(String accessToken, String state) throws IOException {
+        String endpoint = "https://api.spotify.com/v1/me/player/repeat?state=" + state;
+        sendPutRequest(endpoint, accessToken);
+    }
     
+    public void setShuffleMode(String accessToken, boolean shuffle) throws IOException {
+        String endpoint = "https://api.spotify.com/v1/me/player/shuffle?state=" + shuffle;
+        sendPutRequest(endpoint, accessToken);
+    }
     
+    public void seekPlayback(String accessToken, String positionMs) throws IOException {
+        String endpoint = "https://api.spotify.com/v1/me/player/seek?position_ms=" + positionMs;
+        sendPutRequest(endpoint, accessToken);
+    }
     
-    
-    
-    
-    
-    
+    public String getPlaybackState(String accessToken) throws IOException {
+        URL url = new URL("https://api.spotify.com/v1/me/player");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+        conn.setRequestProperty("Authorization", "Bearer " + accessToken);
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder response = new StringBuilder();
+        String inputLine;
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        return response.toString();
+    }
+
+
 
 }
