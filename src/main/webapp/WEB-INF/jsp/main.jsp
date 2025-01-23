@@ -68,26 +68,22 @@
     
 %>
 
+
         <ul>
             <c:forEach var="playlist" items="${playlistBeans}">
                 <li>
-                    <strong>プレイリスト名:</strong> ${playlist.playlistName}<br>
-                    <strong>プレイリストID:</strong> ${playlist.playlistId}<br>
-                    <ul>
-                        <c:forEach var="track" items="${playlist.trackList}">
-                            <li>
-                                <strong>トラック名:</strong> ${track.trackName}<br>
-                                <strong>アーティスト名:</strong> ${track.artistName}<br>
-                                <button onclick="playTrack('${track.trackId}', '${track.trackName}')">再生</button>
-                            </li>
-                        </c:forEach>
-                    </ul>
+                    <!-- プレイリスト名をクリックした時に詳細を表示 -->
+                    <button onclick="loadPlaylistPage('${playlist.playlistId}')">
+                        ${playlist.playlistName}
+                        ${playlist.playlistId}
+                        
+                    </button>
                 </li>
             </c:forEach>
         </ul>
     </div>
 
-    <!-- 中央: 人気のアーティスト -->
+    <!-- 中央: コンテンツ -->
     <div class="content">
         <h2>フォロー中のアーティスト</h2>
         <%
@@ -97,14 +93,12 @@
             }
         %>
 
-<c:choose>
+        <c:choose>
             <c:when test="${not empty sessionScope.artistIds}">
                 <ul>
-                    <!-- アーティストIDをループでリンクを生成 -->
                     <c:forEach var="artistId" items="${sessionScope.artistIds}" varStatus="status">
                         <li>
-                            <!-- リンクをクリックすると、中央のiframeでartist.jspを表示 -->
-<a href="javascript:void(0);" onclick="loadArtistPage('${artistId}')">
+                            <a href="javascript:void(0);" onclick="loadArtistPage('${artistId}')">
                                 アーティスト名（ ${sessionScope.artistNames[status.index]} ）
                             </a>
                         </li>
@@ -115,84 +109,73 @@
                 <p>フォロー中のアーティストが見つかりませんでした。</p>
             </c:otherwise>
         </c:choose>
-        
 
-</ul>
-        </ul>
-        
-        
-        
-        <h1>今回新たにしゅとくしようとしているもの</h1>
-         <!-- 最近再生履歴の表示 -->
-    <h2>Recently Played Tracks</h2>
-    <c:if test="${not empty recentryDatas}">
-        <table>
-            <thead>
-                <tr>
-                    <th>Track ID</th>
-                
-                </tr>
-            </thead>
-            <tbody>
-                <c:forEach var="entry" items="${recentryDatas}">
+        <!-- デフォルトのコンテンツ (最近再生したトラックやレコメンドなど) -->
+        <h2>最近再生したトラック</h2>
+        <c:if test="${not empty recentryDatas}">
+            <table>
+                <thead>
                     <tr>
-                        <td>${entry.key}</td>
-                        
+                        <th>Track ID</th>
                     </tr>
-                </c:forEach>
-            </tbody>
-        </table>
-    </c:if>
-    <c:if test="${empty recentryDatas}">
-        <p>No recently played tracks found.</p>
-    </c:if>
+                </thead>
+                <tbody>
+                    <c:forEach var="entry" items="${recentryDatas}">
+                        <tr>
+                            <td>${entry.key}</td>
+                        </tr>
+                    </c:forEach>
+                </tbody>
+            </table>
+        </c:if>
+        <c:if test="${empty recentryDatas}">
+            <p>No recently played tracks found.</p>
+        </c:if>
 
-    <!-- Top Mix Tracksの表示 -->
-    <h2>Top Mix Tracks</h2>
-    <c:if test="${not empty topMixDatas}">
-        <table>
-            <thead>
-                <tr>
-                    <th>Track ID</th>
-                    
-                </tr>
-            </thead>
-            <tbody>
-                <c:forEach var="entry" items="${topMixDatas}">
+        <!-- Top Mix Tracksの表示 -->
+        <h2>Top Mix Tracks</h2>
+        <c:if test="${not empty topMixDatas}">
+            <table>
+                <thead>
                     <tr>
-                        <td>${entry.key}</td>
-                        
+                        <th>Track ID</th>
                     </tr>
-                </c:forEach>
-            </tbody>
-        </table>
-    </c:if>
-    <c:if test="${empty topMixDatas}">
-        <p>No top mix tracks found.</p>
-    </c:if>
+                </thead>
+                <tbody>
+                    <c:forEach var="entry" items="${topMixDatas}">
+                        <tr>
+                            <td>${entry.key}</td>
+                        </tr>
+                    </c:forEach>
+                </tbody>
+            </table>
+        </c:if>
+        <c:if test="${empty topMixDatas}">
+            <p>No top mix tracks found.</p>
+        </c:if>
 
-    <!-- レコメンドデータの表示 -->
-    <h2>Recommended Tracks</h2>
-<c:if test="${not empty recomendDatas}">
-    <table>
-        <thead>
-            <tr>
-                <th>Track Name</th>
-            </tr>
-        </thead>
-        <tbody>
-            <c:forEach var="entry" items="${recomendDatas}">
-                <tr>
-                    <td>${entry.value}</td> <!-- トラック名だけ表示 -->
-                </tr>
-            </c:forEach>
-        </tbody>
-    </table>
-</c:if>
-<c:if test="${empty recomendDatas}">
-    <p>No recommended tracks found.</p>
-</c:if>
- 
+        <!-- レコメンドデータの表示 -->
+        <h2>Recommended Tracks</h2>
+        <c:if test="${not empty recomendDatas}">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Track Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:forEach var="entry" items="${recomendDatas}">
+                        <tr>
+                            <td>${entry.value}</td>
+                        </tr>
+                    </c:forEach>
+                </tbody>
+            </table>
+        </c:if>
+        <c:if test="${empty recomendDatas}">
+            <p>No recommended tracks found.</p>
+        </c:if>
+    </div>
 
     <!-- 右側: 詳細情報パネル -->
     <div class="property-panel" id="propertyPanel">
@@ -213,6 +196,42 @@
 
     </div>
 
+<script>
+    // プレイリストの詳細を受け取った場合
+// プレイリストの詳細を表示する関数
+function loadPlaylistPage(playlistId) {
+    if (!playlistId) {
+        console.error('playlistId が指定されていません');
+        return;
+    }
+
+    // サーバーにリクエストを送信
+    const url = "/SpotMusic/FrontServlet?command=PlayListDetails&playlistId=" + encodeURIComponent(playlistId);
+    const contentDiv = document.querySelector('.content');
+
+    // Fetch APIでリクエストを送信し、結果をページに埋め込む
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('サーバーエラー: ' + response.status);
+            }
+            return response.text(); // レスポンスとしてHTMLを受け取る
+        })
+        .then(data => {
+            contentDiv.innerHTML = data; // 取得したHTMLを表示
+        })
+        .catch(error => {
+            console.error('エラー発生:', error);
+            contentDiv.innerHTML = '<p>プレイリスト情報の取得に失敗しました。</p>';
+        });
+}
+
+
+
+
+</script>
+
+    
     <script>
         window.onSpotifyWebPlaybackSDKReady = () => {
             const token = '<%= session.getAttribute("access_token") %>';
