@@ -30,6 +30,5 @@
         </ul>
     </div>
 
-    <a href="/SpotMusic/FrontServlet?command=ArtistDetails&artistId=${artistId}">アーティストの詳細に戻る</a>
 </body>
 </html>

@@ -19,6 +19,8 @@
             display: flex;
             height: 100vh;
             font-family: Arial, sans-serif;
+            padding-top: 60px; /* ヘッダーの高さ分を確保 */
+            overflow: hidden;
         }
         .sidebar, .content, .property-panel {
             padding: 20px;
@@ -47,9 +49,105 @@
             border-bottom: 2px solid #ddd;
             padding-bottom: 10px;
         }
+        
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000; /* ヘッダーを最上位に表示 */
+}
+		
+		/* ロゴのスタイル */
+		.logo-icon {
+		    height: 40px;
+		}
+		
+		.actions {
+		    display: flex;
+		    align-items: rigt;
+		    justify-content: flex-end; /* アクションエリアを右端揃え */
+		    gap: 10px; /* アイコン間のスペース */
+		}
+		
+		/* リロードアイコンのスタイル */
+		.reload-icon {
+		    width: 32px;
+		    height: 32px;
+		    cursor: pointer;
+		}
+		
+		.account-container {
+		    position: relative;
+		    margin-right: 50px; /* 必要に応じて右の余白を調整 */
+		}
+		.account-icon {
+		    width: 40px;
+		    height: 40px;
+		    border-radius: 50%;
+		    cursor: pointer;
+		
+		}
+
+		
+.account-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 50px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    list-style: none;
+    padding: 10px 0;
+    margin: 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    min-width: 150px; /* 最低幅を設定 */
+    white-space: nowrap; /* 折り返しを防止 */
+}
+
+.account-menu li {
+    padding: 10px 20px;
+    text-align: left; /* テキストを左揃え */
+}
+
+.account-menu a {
+    text-decoration: none;
+    color: #333;
+    display: block; /* リンク全体をクリック可能に */
+}
+
     </style>
+   
+   
 </head>
 <body>
+<div class="header">
+
+    <div class="logo">
+        <!-- リロード用アイコン -->
+        <a href="javascript:void(0)" onclick="location.reload()" class="reload-link">
+            <img src="<c:url value='/img/Spotmusic.webp' />" alt="ロゴを配置" class="reload-icon">
+        </a>
+    </div>
+    <div class="action">
+        <!-- アカウントアイコン -->
+        <div class="account-container">
+<img src="<c:url value='/img/icon.png' />" alt="アイコン" class="account-icon" id="account-icon">
+            <ul class="account-menu" id="account-menu">
+                <li><a href="/account">アカウント</a></li>
+                <li><a href="/profile">プロフィール</a></li>
+                <li><a href="/logout">ログアウト</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
     <!-- 左側: プレイリスト -->
     <div class="sidebar">
         <h2>プレイリスト</h2>
@@ -583,6 +681,23 @@ function loadArtistPage(artistId) {
      
 </script>
 
+<script>
+//アカウントメニューの開閉
+document.getElementById('account-icon').addEventListener('click', () => {
+    const menu = document.getElementById('account-menu');
+    const isDisplayed = menu.style.display === 'block';
+    menu.style.display = isDisplayed ? 'none' : 'block';
+});
+
+// 他の場所をクリックした場合にメニューを閉じる
+document.addEventListener('click', (event) => {
+    const menu = document.getElementById('account-menu');
+    const icon = document.getElementById('account-icon');
+    if (!icon.contains(event.target) && !menu.contains(event.target)) {
+        menu.style.display = 'none';
+    }
+});
+</script>
 
 
 </body>
