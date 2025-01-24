@@ -14,6 +14,7 @@
         <tr>
             <th>User ID</th>
             <th>Action</th>
+            <th>ブロック</th>
         </tr>
 		<c:forEach var="userId" items="${messages.users}">
 		    <c:if test="${userId != sessionScope.userId}">
@@ -25,6 +26,7 @@
 		                    <c:if test="${friend.user1Id == userId || friend.user2Id == userId}">
 		                        <c:set var="friendStatus" value="${friend.status}" />
 		                        <c:set var="relationId" value="${friend.relationId}" />
+		                        <c:set var="user1Id" value="${friend.user1Id}" />
 		                    </c:if>
 		                    
 		                </c:forEach>
@@ -36,12 +38,17 @@
 		                        フレンド申請は拒否されました
 		                    </c:when>
 		                    <c:when test="${friendStatus == 'PENDING'}">
+		                    <c:if test="${user1Id != userId}">
 		                        <form action="FrontServlet" method="post">
 		                            <input type="hidden" name="userId" value="${sessionScope.userId}">
 		                            <input type="hidden" name="relationId" value="${relationId}">
 		                            <input type="hidden" name="command" value="DeleteRelation">
 		                            <button type="submit">フレンド申請解除</button>
 		                        </form>
+		                    </c:if>
+		                    <c:if test="${user1Id == userId}">
+		                    	<p>フレンド申請が来ています</p>
+		                    </c:if>
 		                    </c:when>
 		                    <c:otherwise>
 		                        <form action="FrontServlet" method="post">
@@ -53,6 +60,14 @@
 		                    </c:otherwise>
 		                </c:choose>
 		            </td>
+            		<td>
+					   <form action="FrontServlet" method="POST">
+			               <input type="hidden" name="relationId" value="${relation.relationId}">
+			               <input type="hidden" name="userId" value="${sessionScope.userId}">
+			               <input type="hidden" name="command" value="AddBlock">
+			               <button type="submit">ブロック</button>
+			           </form>
+					</td>
 		        </tr>
 		    </c:if>
 		</c:forEach>
