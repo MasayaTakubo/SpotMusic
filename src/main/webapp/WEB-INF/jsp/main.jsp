@@ -289,7 +289,8 @@
 		    <button id="next">次の曲</button>
 		    <input type="range" id="progress-bar" value="50" min="0" max="100">
 		    <button id="repeat-track">リピート</button>
-		    <button id="shuffle-track">シャッフル</button>
+		    <button id="shuffle-toggle">シャッフル</button>
+		    
 		</div>
 
     </div>
@@ -453,20 +454,26 @@ function loadPlaylistPage(playlistId) {
                   .then(data => console.log("リピートの応答: ", data))
                   .catch(error => console.error("エラー:", error));
             });
-            //Shuffle
-            document.getElementById('shuffle-track').addEventListener('click', () => {
+            //shuffle
+            document.getElementById('shuffle-toggle').addEventListener('click', () => {
                 fetch("/SpotMusic/spotifyControl", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded"
                     },
-                    body: "action=shuffle&state=true"
-                }).then(response => response.text())
-                  .then(data => console.log("シャッフルの応答: ", data))
-                  .catch(error => console.error("エラー:", error));
+                    body: "action=toggleShuffle"
+                })
+                .then(response => response.text())
+                .then(data => {
+                    console.log("シャッフル状態更新:", data);
+                    alert(data);
+                })
+                .catch(error => console.error("シャッフル更新エラー:", error));
             });
-        };
 
+
+            
+        }
         async function controlSpotify(action, trackId = null, deviceId = null, player = null) {
         	console.log("送信アクション: " + action);
         	
@@ -676,7 +683,7 @@ function loadArtistPage(artistId) {
         return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
     }
 
-    // 5秒ごとに更新
+    // 1秒ごとに更新
     setInterval(updateProgress, 1000);
      
 </script>

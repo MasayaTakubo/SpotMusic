@@ -14,6 +14,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpSession;
+
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -225,13 +227,26 @@ public class SpotifyAuthService {
         return allTracks;
     }
     
-    public void playTrack(String accessToken, String trackUri) throws Exception {
+    public void playTrack(HttpSession session, String accessToken, String trackUri) throws Exception {
         if (accessToken == null || accessToken.isEmpty()) {
             throw new IllegalArgumentException("アクセストークンが指定されていません");
         }
         if (trackUri == null || trackUri.isEmpty()) {
             throw new IllegalArgumentException("トラック URI が指定されていません");
         }
+
+        // セッションからシャッフル状態を取得し、安全に処理
+        Object shuffleStateObj = session.getAttribute("shuffle");
+        boolean shuffleState = false;
+
+        if (shuffleStateObj instanceof Boolean) {
+            shuffleState = (Boolean) shuffleStateObj;
+        } else if (shuffleStateObj instanceof String) {
+            shuffleState = Boolean.parseBoolean((String) shuffleStateObj);
+        }
+
+        String endpoint = "https://api.spotify.com/v1/me/player/shuffle?state=" + shuffleState;
+        sendPutRequest(endpoint, accessToken);
 
         URL url = new URL("https://api.spotify.com/v1/me/player/play");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -241,17 +256,13 @@ public class SpotifyAuthService {
         conn.setDoOutput(true);
 
         String jsonPayload = "{\"uris\": [\"" + trackUri + "\"]}";
-        System.out.println("送信する JSON ペイロード: " + jsonPayload); // デバッグ用
-
         try (OutputStream os = conn.getOutputStream()) {
             os.write(jsonPayload.getBytes(StandardCharsets.UTF_8));
         }
 
         int responseCode = conn.getResponseCode();
         if (responseCode != HttpURLConnection.HTTP_NO_CONTENT) {
-            String errorResponse = new BufferedReader(new InputStreamReader(conn.getErrorStream()))
-                .lines().reduce("", String::concat);
-            throw new IOException("Spotify API エラー: HTTP " + responseCode + " - " + errorResponse);
+            throw new IOException("Spotify API エラー: HTTP " + responseCode);
         }
     }
 
@@ -772,10 +783,6 @@ public class SpotifyAuthService {
         sendPutRequest(endpoint, accessToken);
     }
     
-    public void setShuffleMode(String accessToken, boolean shuffle) throws IOException {
-        String endpoint = "https://api.spotify.com/v1/me/player/shuffle?state=" + shuffle;
-        sendPutRequest(endpoint, accessToken);
-    }
     
     public void seekPlayback(String accessToken, String positionMs) throws IOException {
         String endpoint = "https://api.spotify.com/v1/me/player/seek?position_ms=" + positionMs;
@@ -798,6 +805,17 @@ public class SpotifyAuthService {
 
         return response.toString();
     }
+
+    public void setShuffleMode(String accessToken, String state) throws IOException {
+        String endpoint = "https://api.spotify.com/v1/me/player/shuffle?state=" + state;
+
+        System.out.println("Spotifyへ送信するシャッフルリクエスト: " + endpoint);
+
+        sendPutRequest(endpoint, accessToken);
+    }
+
+
+
 
 
 

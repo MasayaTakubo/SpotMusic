@@ -1,6 +1,8 @@
 package service;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -74,20 +76,35 @@ public class SpotifyControlServlet extends HttpServlet {
                         currentIndex = trackIds.indexOf(trackId);
                         session.setAttribute("currentTrackIndex", currentIndex);
                     }
-                    spotifyService.playTrack(accessToken, "spotify:track:" + trackId);
+
+                    spotifyService.playTrack(session, accessToken, "spotify:track:" + trackId);
                     response.setStatus(HttpServletResponse.SC_OK);
                     break;
 
 
+
                 case "nextTrack":
+                    // 現在のシャッフル状態を安全に取得
+                    Object shuffleStateObj = session.getAttribute("shuffle");
+                    boolean shuffleState = false; // デフォルトはOFF
+
+                    if (shuffleStateObj instanceof Boolean) {
+                        shuffleState = (Boolean) shuffleStateObj;
+                    } else if (shuffleStateObj instanceof String) {
+                        shuffleState = Boolean.parseBoolean((String) shuffleStateObj);
+                    }
+
+                    System.out.println("現在のシャッフル状態: " + shuffleState);
+
                     if (currentIndex < trackIds.size() - 1) {
                         currentIndex++;
                     } else {
                         currentIndex = 0; // ループ再生
                     }
                     session.setAttribute("currentTrackIndex", currentIndex);
-                    System.out.println("次の曲へ: " + trackIds.get(currentIndex));
-                    spotifyService.playTrack(accessToken, "spotify:track:" + trackIds.get(currentIndex));
+
+                    spotifyService.playTrack(session, accessToken, "spotify:track:" + trackIds.get(currentIndex));
+
                     response.setStatus(HttpServletResponse.SC_OK);
                     break;
 
@@ -99,8 +116,10 @@ public class SpotifyControlServlet extends HttpServlet {
                         currentIndex = trackIds.size() - 1; // 最後のトラックへ
                     }
                     session.setAttribute("currentTrackIndex", currentIndex);
-                    System.out.println("前の曲へ: " + trackIds.get(currentIndex));  // デバッグ出力
-                    spotifyService.playTrack(accessToken, "spotify:track:" + trackIds.get(currentIndex));
+                    System.out.println("前の曲へ: " + trackIds.get(currentIndex));
+
+                    spotifyService.playTrack(session, accessToken, "spotify:track:" + trackIds.get(currentIndex));
+
                     response.setStatus(HttpServletResponse.SC_OK);
                     break;
 
@@ -115,16 +134,6 @@ public class SpotifyControlServlet extends HttpServlet {
                     spotifyService.setRepeatMode(accessToken, repeatState);
                     response.setStatus(HttpServletResponse.SC_OK);
                     break;
-                //Shuffle
-                case "shuffle":
-                    String shuffleState = request.getParameter("state");  // "true" または "false"
-                    if (shuffleState == null) shuffleState = "true"; // デフォルトはシャッフルON
-
-                    spotifyService.setShuffleMode(accessToken, Boolean.parseBoolean(shuffleState));
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    response.getWriter().write("Shuffle mode set to: " + shuffleState);
-                    break;
-
                 case "seek":
                     String positionMs = request.getParameter("positionMs"); // ミリ秒単位で取得
                     if (positionMs == null) {
@@ -144,7 +153,30 @@ public class SpotifyControlServlet extends HttpServlet {
                     response.getWriter().write(playbackState);
                     break;
 
+                case "toggleShuffle":
+                    // セッションから現在のシャッフル状態を取得し、切り替える
+                    Boolean currentShuffleState = (Boolean) session.getAttribute("shuffle");
+                    if (currentShuffleState == null) {
+                        currentShuffleState = false; // デフォルトはOFF
+                    }
 
+                    // シャッフルのON/OFFを切り替え
+                    boolean newShuffleState = !currentShuffleState;
+                    session.setAttribute("shuffle", newShuffleState);
+
+                    try {
+                        // シャッフル状態をエンコードしてSpotify APIに送信
+                        String encodedState = URLEncoder.encode(String.valueOf(newShuffleState), StandardCharsets.UTF_8.toString());
+                        spotifyService.setShuffleMode(accessToken, encodedState);
+
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        response.getWriter().write("シャッフル状態を " + newShuffleState + " に設定しました");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        response.getWriter().write("Error processing shuffle request: " + e.getMessage());
+                    }
+                    break;
 
 
                 default:
@@ -158,3 +190,5 @@ public class SpotifyControlServlet extends HttpServlet {
         }
     }
 }
+
+
