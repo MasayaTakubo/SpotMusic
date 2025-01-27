@@ -15,4 +15,21 @@
         <servlet-name>FrontServlet</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
+    
+        <!-- 静的リソースへのアクセスをFrontServletから外す -->
+    <servlet-mapping>
+        <servlet-name>FrontServlet</servlet-name>
+        <url-pattern>/front/*</url-pattern> <!-- FrontServletを使うパス -->
+    </servlet-mapping>
+
+    <!-- 静的リソースのマッピング -->
+    <servlet>
+        <servlet-name>default</servlet-name>
+        <servlet-class>org.apache.catalina.servlets.DefaultServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>/img/*</url-pattern> <!-- 画像などの静的リソース -->
+    </servlet-mapping>
 </web-app>

@@ -35,6 +35,5 @@
     </c:if>
 
     <br>
-    <a href="main.jsp">戻る</a>
 </body>
 </html>
