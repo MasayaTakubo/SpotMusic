@@ -9,7 +9,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spotify情報表示</title>
+    <title>SpotMusic - Web Player：すべての人に音楽を</title>
 
     <script src="https://sdk.scdn.co/spotify-player.js"></script>
 
@@ -357,6 +357,8 @@ function loadPlaylistPage(playlistId) {
             });
 
             let trackEnded = false; // フラグ変数を追加
+            let trackStarted = false; // 最初の再生を検知
+            let lastTrackId = null;   // 現在再生中のトラックIDを記憶
 
             player.addListener('player_state_changed', state => {
                 if (!state) return;
@@ -364,32 +366,36 @@ function loadPlaylistPage(playlistId) {
                 const track = state.track_window.current_track;
                 document.getElementById('now-playing').innerText = track ? track.name : "なし";
 
-                // 曲が終了した場合の処理
-                if (state.paused && state.position === 0 && !state.track_window.next_tracks.length) {
+                // 再生開始時にフラグをリセット
+                if (!state.paused && state.position > 0) {
+                    trackStarted = true;
+                    trackEnded = false; // 新しい曲が始まったのでリセット
+                    lastTrackId = track ? track.id : null;
+                }
+
+                // **曲の終了判定**（最初の再生時はスキップ）
+                if (trackStarted && state.paused && state.position === 0 && !state.track_window.next_tracks.length) {
                     if (!trackEnded) {
-                        trackEnded = true;  // 連続リクエストを防止
-                        console.log("曲が終了しました。次の曲へ移動します。");
-                        
+                        trackEnded = true; // 連続リクエスト防止
+                        console.log("曲が終了しました。次の曲へ移行します。");
+
                         fetch("/SpotMusic/spotifyControl", {
                             method: "POST",
-                            headers: {
-                                "Content-Type": "application/x-www-form-urlencoded"
-                            },
+                            headers: { "Content-Type": "application/x-www-form-urlencoded" },
                             body: "action=nextTrack"
-                        }).then(response => response.text())
-                          .then(data => {
-                              console.log("次の曲へ移行: ", data);
-                              trackEnded = false;  // 次の曲が始まったらフラグをリセット
-                          })
-                          .catch(error => {
-                              console.error("エラー:", error);
-                              trackEnded = false;  // エラー時もフラグをリセット
-                          });
+                        })
+                        .then(response => response.text())
+                        .then(() => {
+                            trackEnded = false; // 次の曲再生後にフラグをリセット
+                        })
+                        .catch(error => {
+                            console.error("次の曲への移行エラー:", error);
+                            trackEnded = false; // エラー時もリセット
+                        });
                     }
-                } else {
-                    trackEnded = false;  // 再生中に戻ったらフラグをリセット
                 }
             });
+
 
 
 
