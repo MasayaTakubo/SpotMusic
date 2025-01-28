@@ -128,12 +128,40 @@ public class SpotifyControlServlet extends HttpServlet {
                     response.setStatus(HttpServletResponse.SC_OK);
                     break;
                 //Repeat
-                case "repeatTrack":
-                    String repeatState = request.getParameter("state"); // "track", "context", "off"
-                    if (repeatState == null) repeatState = "track"; // デフォルトは1曲リピート
-                    spotifyService.setRepeatMode(accessToken, repeatState);
+				/*                case "repeatTrack":
+				        String repeatState = request.getParameter("state"); // "track", "context", "off"
+				        if (repeatState == null) repeatState = "track"; // デフォルトは1曲リピート
+				        spotifyService.setRepeatMode(accessToken, repeatState);
+				        response.setStatus(HttpServletResponse.SC_OK);
+				        break;*/
+                case "toggleRepeat":
+                    // 現在のリピート状態をセッションから取得
+                    String currentRepeatState = (String) session.getAttribute("repeatState");
+                    if (currentRepeatState == null) currentRepeatState = "off";
+
+                    // 次のリピート状態を決定
+                    String nextRepeatState;
+                    switch (currentRepeatState) {
+                        case "off":
+                            nextRepeatState = "context"; // プレイリストリピート
+                            break;
+                        case "context":
+                            nextRepeatState = "track"; // 1曲リピート
+                            break;
+                        case "track":
+                        default:
+                            nextRepeatState = "off"; // リピートなし
+                            break;
+                    }
+
+                    // 新しいリピート状態をSpotify APIに送信
+                    spotifyService.setRepeatMode(accessToken, nextRepeatState);
+                    session.setAttribute("repeatState", nextRepeatState);
+
                     response.setStatus(HttpServletResponse.SC_OK);
+                    response.getWriter().write("Repeat mode set to: " + nextRepeatState);
                     break;
+
                 case "seek":
                     String positionMs = request.getParameter("positionMs"); // ミリ秒単位で取得
                     if (positionMs == null) {

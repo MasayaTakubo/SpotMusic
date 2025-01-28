@@ -143,7 +143,7 @@
             <ul class="account-menu" id="account-menu">
                 <li><a href="/account">アカウント</a></li>
                 <li><a href="/profile">プロフィール</a></li>
-                <li><a href="/logout">ログアウト</a></li>
+                <li><a href="javascript:void(0);" onclick="logout()">ログアウト</a></li>
             </ul>
         </div>
     </div>
@@ -449,7 +449,7 @@ function loadPlaylistPage(playlistId) {
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded"
                     },
-                    body: "action=repeatTrack&state=track"
+                    body: "action=toggleRepeat"
                 }).then(response => response.text())
                   .then(data => console.log("リピートの応答: ", data))
                   .catch(error => console.error("エラー:", error));
