@@ -284,7 +284,7 @@
    	<!-- 下部: player -->
     <div id="player-container">
         <div id="player-controls">
-            <h5>🤓</h5> 
+            <h2>🤓</h2> 
             <p><span id="current-time">0:00</span> / <span id="total-time">0:00</span></p>
             <input type="range" id="seek-bar" value="0" min="0" max="100">            
             <p id="now-playing">現在再生中: <span id="current-track">なし</span></p>

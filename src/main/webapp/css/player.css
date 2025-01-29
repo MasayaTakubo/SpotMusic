@@ -50,7 +50,7 @@ button {
 
 button:hover {
     color: #1DB954;
-    transform: scale(1.1);
+    /*transform: scale(1.1);*/
 }
 
 /* ボタンアイコンのデザイン */
@@ -211,9 +211,6 @@ button {
     transition: transform 0.2s ease-in-out;
 }
 
-#play-pause:hover i {
-    transform: scale(1.1);
-}
 
 
 /* [仮] playlist.jspのボタン調整*/
