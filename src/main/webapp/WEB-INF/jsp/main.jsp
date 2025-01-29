@@ -10,7 +10,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SpotMusic - Web Player：すべての人に音楽を</title>
-
+	<link rel="stylesheet" type="text/css" href="<c:url value='/css/player.css' />">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://sdk.scdn.co/spotify-player.js"></script>
 
     <style>
@@ -276,24 +277,26 @@
     </div>
 
     <!-- 右側: 詳細情報パネル -->
-    <div class="property-panel" id="propertyPanel">
-        <h2>トラック詳細</h2>
-        <p id="track-detail">再生中のトラック詳細が表示されます。</p>
-		<div id="player-controls">
-		    <h3>プレイヤー</h3>
-		    <p>再生時間: <span id="current-time">0:00</span> / <span id="total-time">0:00</span></p>
-		    <input type="range" id="seek-bar" value="0" min="0" max="100">            
-		    <p id="now-playing">現在再生中: <span id="current-track">なし</span></p>
-		    <button id="prev">前の曲</button>
-		    <button id="play-pause">再生/停止</button>
-		    <button id="next">次の曲</button>
-		    <input type="range" id="progress-bar" value="50" min="0" max="100">
-		    <button id="repeat-track">リピート</button>
-		    <button id="shuffle-toggle">シャッフル</button>
-		    
-		</div>
-
+	<div class="property-panel" id="propertyPanel">
+	    <h2>トラック詳細</h2>
+	    <p id="track-detail">再生中のトラック詳細が表示されます。</p>	    
     </div>
+   	<!-- 下部: player -->
+    <div id="player-container">
+        <div id="player-controls">
+            <h2>🤓</h2> 
+            <p><span id="current-time">0:00</span> / <span id="total-time">0:00</span></p>
+            <input type="range" id="seek-bar" value="0" min="0" max="100">            
+            <p id="now-playing">現在再生中: <span id="current-track">なし</span></p>
+            <button id="prev"><i class="fas fa-step-backward"></i></button>
+			<button id="play-pause"><i class="fas fa-play"></i></button>	
+			<button id="next"><i class="fas fa-step-forward"></i></button>
+            <h5>🔊</h5><input type="range" id="progress-bar" value="50" min="0" max="100">
+            <button id="repeat-track"><i class="fas fa-redo"></i></button>
+			<button id="shuffle-toggle"><i class="fas fa-random"></i></button>
+        </div>
+	</div>
+    <!-- ここまで -->
 
 <script>
     // プレイリストの詳細を受け取った場合
@@ -332,6 +335,7 @@ function loadPlaylistPage(playlistId) {
 
     
     <script>
+    //再生プレイヤー用JavaScript
         window.onSpotifyWebPlaybackSDKReady = () => {
             const token = '<%= session.getAttribute("access_token") %>';
 
@@ -361,12 +365,30 @@ function loadPlaylistPage(playlistId) {
             let lastTrackId = null;   // 現在再生中のトラックIDを記憶
 
             player.addListener('player_state_changed', state => {
-                if (!state) return;
 
-                const track = state.track_window.current_track;
-                document.getElementById('now-playing').innerText = track ? track.name : "なし";
+           	console.log("プレイヤーの状態更新:", state); // デバッグ用ログ
 
-                // 再生開始時にフラグをリセット
+       	    const playPauseButton = document.getElementById('play-pause');
+           	const nowPlaying = document.getElementById('now-playing');
+
+            // デフォルトの状態（何も再生されていない時）
+            if (!state || !state.track_window || !state.track_window.current_track) {
+                nowPlaying.innerText = "なし";
+                playPauseButton.innerHTML = `<i class="fas fa-play"></i>`; // 再生ボタンを表示
+                return;
+            }
+            /* document.getElementById('now-playing').innerText = track ? track.name : "なし"; */
+  		    const track = state.track_window.current_track;
+    		nowPlaying.innerText = track.name || "なし";
+
+    	    // ** 再生/停止ボタンのアイコンを更新 **
+    	    if (state.paused) {
+    	        playPauseButton.innerHTML = `<i class="fas fa-play"></i>`; // 一時停止状態なら再生ボタンを表示
+    	    } else {
+    	        playPauseButton.innerHTML = `<i class="fas fa-pause"></i>`; // 再生中なら停止ボタンを表示
+    	    }
+
+    	          
                 if (!state.paused && state.position > 0) {
                     trackStarted = true;
                     trackEnded = false; // 新しい曲が始まったのでリセット
@@ -408,9 +430,15 @@ function loadPlaylistPage(playlistId) {
                 }
             });
 
-            document.getElementById('play-pause').addEventListener('click', () => {
+/*             document.getElementById('play-pause').addEventListener('click', () => {
                 controlSpotify('togglePlay', null, null, player);
                 document.getElementById('propertyPanel').classList.add('active');
+            }); */
+            // 再生・停止ボタンのクリックイベント
+            document.getElementById('play-pause').addEventListener('click', () => {
+                player.togglePlay().then(() => {
+                    console.log("再生/停止を切り替えました");
+                }).catch(err => console.error("再生/停止切り替えエラー:", err));
             });
 
             document.getElementById('prev').addEventListener('click', () => {
@@ -472,7 +500,7 @@ function loadPlaylistPage(playlistId) {
                 .then(response => response.text())
                 .then(data => {
                     console.log("シャッフル状態更新:", data);
-                    alert(data);
+/*                     alert(data); */
                 })
                 .catch(error => console.error("シャッフル更新エラー:", error));
             });
@@ -571,7 +599,7 @@ function loadPlaylistPage(playlistId) {
             }
         }
 
-
+//Spotifyログアウト用JavaScript
         function logout() {
             window.location.href = '/SpotMusic/logout';
 
@@ -628,6 +656,7 @@ function loadArtistPage(artistId) {
 </script>
 
 <script>
+//シークバー管理JavaScript
     const seekBar = document.getElementById('seek-bar');
     const currentTimeDisplay = document.getElementById('current-time');
     const totalTimeDisplay = document.getElementById('total-time');
@@ -711,7 +740,25 @@ document.addEventListener('click', (event) => {
     }
 });
 </script>
+<script>
+//再生プレイヤー　CSS用JavaScript
+        document.getElementById('shuffle-toggle').addEventListener('click', function() {
+            this.classList.toggle('active');
+        });
 
+        document.getElementById('repeat-track').addEventListener('click', function() {
+            if (this.classList.contains('off')) {
+                this.classList.remove('off');
+                this.classList.add('playlist');
+            } else if (this.classList.contains('playlist')) {
+                this.classList.remove('playlist');
+                this.classList.add('track');
+            } else {
+                this.classList.remove('track');
+                this.classList.add('off');
+            }
+        });
+</script>
 
 </body>
 </html>

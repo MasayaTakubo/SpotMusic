@@ -1,0 +1,268 @@
+/* プレイヤー全体のデザイン */
+#player-container {
+    background-color: black;
+    color: white;
+    position: fixed;
+    bottom: 0; /* 画面下部に配置 */
+    left: 50%;
+    transform: translateX(-50%); /* 中央揃え */
+    width: 99%; /* 横幅を少し縮小 (100% → 95%) */
+    height: 55px; /* 高さを縮小 */
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px; /* 内側の余白を調整 */
+    z-index: 10000 !important;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.5);
+
+}
+
+/* トラック詳細 */
+#track-detail {
+    font-size: 14px;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+
+/* プレイヤーコントロール */
+#player-controls {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    width: 100%;
+}
+
+button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+button:hover {
+    color: #1DB954;
+    /*transform: scale(1.1);*/
+}
+
+/* ボタンアイコンのデザイン */
+button#prev::before {
+    content: '\f104'; /* FontAwesomeの前の曲アイコン */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+}
+
+button#play-pause::before {
+    content: '\f04b'; /* FontAwesomeの再生アイコン */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+}
+
+button#pause::before {
+    content: '\f04c'; /* FontAwesomeの一時停止アイコン */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+}
+
+button#next::before {
+    content: '\f105'; /* FontAwesomeの次の曲アイコン */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+}
+
+button#repeat-track::before {
+    content: '\f363'; /* FontAwesomeのリピートアイコン */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+}
+
+button#shuffle-toggle::before {
+    content: '\f074'; /* FontAwesomeのシャッフルアイコン */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+}
+
+/* シャッフルボタンの状態 */
+#shuffle-toggle.active {
+    color: #1DB954;
+}
+
+/* リピートボタンの状態 */
+#repeat-track.off {
+    color: white;
+}
+
+#repeat-track.playlist {
+    color: #1DB954;
+}
+
+#repeat-track.track {
+    color: #1DB954;
+    font-weight: bold;
+}
+
+/* シークバーのデザイン */
+#seek-bar, #progress-bar {
+    width: 50%;
+    appearance: none;
+    background: transparent;
+    margin: 0 10px;
+}
+
+#seek-bar::-webkit-slider-runnable-track, #progress-bar::-webkit-slider-runnable-track {
+    background: #555;
+    height: 4px;
+    border-radius: 4px;
+}
+
+#seek-bar::-webkit-slider-thumb, #progress-bar::-webkit-slider-thumb {
+    appearance: none;
+    background: #1DB954;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* 再生/停止ボタンのデザイン */
+#play-pause {
+    position: relative;
+    font-size: 20px;
+}
+
+/* `::before` でアイコンを表示しないようにする */
+#play-pause::before {
+    content: none !important;
+}
+
+/* アイコンが1つだけ表示されるよう調整 */
+#play-pause i {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* シャッフルボタンのデザイン */
+#shuffle-toggle {
+    position: relative;
+    font-size: 20px;
+}
+
+/* 余計な `::before` を削除 */
+#shuffle-toggle::before {
+    content: none;
+}
+
+/* アイコンの位置調整 */
+#shuffle-toggle i {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* 🔽 プレイヤー全体のサイズを縮小 */
+#player-container {
+    height: 50px; /* 高さをさらに縮小 */
+    padding: 5px 8px; /* 内側の余白を微調整 */
+}
+
+/* 🔽 コントロールボタンのサイズを縮小 */
+button {
+    font-size: 12px; /* アイコンのサイズを小さく */
+}
+/* 🔽 再生/停止ボタン */
+#play-pause {
+    font-size: 14px;
+}
+
+/* 🔽 シャッフル & リピート ボタンの調整 */
+#shuffle-toggle, #repeat-track {
+    font-size: 14px;
+    width: 20px;  /* ボタンの幅を縮小 */
+    height: 20px;
+}
+
+/* 🔽 シークバーのサイズ調整 */
+#seek-bar, #progress-bar {
+    width: 30%; /* さらに短くしてスペースを確保 */
+}
+
+/* 🔽 ボタン間の間隔を縮小 */
+#player-controls {
+    gap: 8px; /* ボタン同士の間隔を縮める */
+}
+
+#shuffle-toggle, #repeat-track {
+    margin-left: 5px; /* 左側に少し寄せてはみ出しを防ぐ */
+}
+
+/*　再生停止ボタン */
+#play-pause i {
+    transition: transform 0.2s ease-in-out;
+}
+
+
+
+/* [仮] playlist.jspのボタン調整*/
+/* プレイリストのボタンのスタイル（黒色に設定） */
+.sidebar button {
+    background-color: transparent;
+    color: black !important;  /* 文字色を黒に固定 */
+    font-size: 16px;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: color 0.3s, transform 0.2s;
+}
+
+/* プレイリストボタンのホバー時（強調しすぎないように少し明るい黒） */
+.sidebar button:hover {
+    color: #222 !important; /* やや明るめの黒 */
+    transform: scale(1.05);
+}
+
+/* 各曲の再生ボタンのデザイン（黒色に設定） */
+.track-play-button {
+    background-color: transparent;
+    color: black !important; /* ボタンのアイコン色を黒に固定 */
+    font-size: 18px;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s, transform 0.2s;
+}
+
+/* ホバー時（少しだけ明るめの黒に） */
+.track-play-button:hover {
+    color: #222 !important; /* ホバー時に若干明るい黒 */
+    transform: scale(1.1);
+}
+/* プレイリスト詳細ページの再生ボタンのみ黒くする */
+.track-list button {
+    background-color: transparent;
+    color: black !important; /* 文字・アイコン色を黒に */
+    font-size: 16px;
+    border: 1px solid black; /* ボタンの枠線も黒に */
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: color 0.3s, transform 0.2s;
+}
+
+/* ホバー時に少し明るめの黒 */
+.track-list button:hover {
+    color: #222 !important;
+    border-color: #222;
+    transform: scale(1.05);
+}
+
+
+/* 仮ここまで */

@@ -32,4 +32,10 @@
         <servlet-name>default</servlet-name>
         <url-pattern>/img/*</url-pattern> <!-- 画像などの静的リソース -->
     </servlet-mapping>
+    
+    <servlet-mapping>
+    	<servlet-name>default</servlet-name>
+    	<url-pattern>/css/*</url-pattern>
+	</servlet-mapping>
+    
 </web-app>

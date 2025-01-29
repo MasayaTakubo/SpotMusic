@@ -18,7 +18,7 @@
     %>
 
     <c:if test="${not empty trackList}">
-        <ul>
+        <ul class="track-list">
             <c:forEach var="track" items="${trackList}">
                 <li>
                     <strong>トラック名: ${track.trackName}</strong><br>
