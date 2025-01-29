@@ -1,216 +1,245 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ page import="java.util.List"%>
 <%@ page import="bean.SpotifyPlayListBean"%>
-<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.ArrayList"%>
 <%@ page import="bean.TrackBean"%>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spotify情報表示</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spotify情報表示</title>
 
-    <script src="https://sdk.scdn.co/spotify-player.js"></script>
+<script src="https://sdk.scdn.co/spotify-player.js"></script>
 
-    <style>
-        body {
-            margin: 0;
-            display: flex;
-            height: 100vh;
-            font-family: Arial, sans-serif;
-        }
-        .sidebar, .content, .property-panel {
-            padding: 20px;
-            overflow-y: auto;
-        }
-        .sidebar {
-            width: 25%;
-            background-color: #f4f4f4;
-            border-right: 1px solid #ddd;
-        }
-        .content {
-            width: 50%;
-            background-color: #ffffff;
-            text-align: center;
-        }
-        .property-panel {
-            width: 25%;
-            background-color: #f9f9f9;
-            border-left: 1px solid #ddd;
-            display: none; /* デフォルトでは非表示 */
-        }
-        .property-panel.active {
-            display: block; /* 音楽再生時に表示 */
-        }
-        h2 {
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 10px;
-        }
-    </style>
+<style>
+body {
+	margin: 0;
+	display: flex;
+	height: 100vh;
+	font-family: Arial, sans-serif;
+}
+
+.sidebar, .content, .property-panel {
+	padding: 20px;
+	overflow-y: auto;
+}
+
+.sidebar {
+	width: 25%;
+	background-color: #f4f4f4;
+	border-right: 1px solid #ddd;
+}
+
+.content {
+	width: 50%;
+	background-color: #ffffff;
+	text-align: center;
+}
+
+.property-panel {
+	width: 25%;
+	background-color: #f9f9f9;
+	border-left: 1px solid #ddd;
+	display: none; /* デフォルトでは非表示 */
+}
+
+.property-panel.active {
+	display: block; /* 音楽再生時に表示 */
+}
+
+h2 {
+	border-bottom: 2px solid #ddd;
+	padding-bottom: 10px;
+}
+</style>
 </head>
 <body>
-    <!-- 左側: プレイリスト -->
-    <div class="sidebar">
-        <h2>プレイリスト</h2>
-<%
-    List<SpotifyPlayListBean> playlistBeans = (List<SpotifyPlayListBean>) session.getAttribute("playlistBeans");
-    List<String> trackIds = new ArrayList<>();
-    if (playlistBeans != null) {
-        for (SpotifyPlayListBean playlist : playlistBeans) {
-            for (TrackBean track : playlist.getTrackList()) {
-                trackIds.add(track.getTrackId());
-            }
-        }
-    }
-    session.setAttribute("trackIds", trackIds);
-    session.setAttribute("currentTrackIndex", 0);
-    
-%>
+	<!-- 左側: プレイリスト -->
+	<div class="sidebar">
+		<h2>プレイリスト</h2>
+		<%
+		// ここでプレイリストのtrackIdsをsessionに保存しています
+		List<SpotifyPlayListBean> playlistBeans = (List<SpotifyPlayListBean>) session.getAttribute("playlistBeans");
+		List<String> trackIds = new ArrayList<>();
+		if (playlistBeans != null) {
+			for (SpotifyPlayListBean playlist : playlistBeans) {
+				for (TrackBean track : playlist.getTrackList()) {
+			trackIds.add(track.getTrackId());
+				}
+			}
+		}
+		session.setAttribute("trackIds", trackIds);
+		session.setAttribute("currentTrackIndex", 0);
+		%>
 
-        <ul>
-            <c:forEach var="playlist" items="${playlistBeans}">
-                <li>
-                    <strong>プレイリスト名:</strong> ${playlist.playlistName}<br>
-                    <strong>プレイリストID:</strong> ${playlist.playlistId}<br>
-                    <ul>
-                        <c:forEach var="track" items="${playlist.trackList}">
-                            <li>
-                                <strong>トラック名:</strong> ${track.trackName}<br>
-                                <strong>アーティスト名:</strong> ${track.artistName}<br>
-                                <button onclick="playTrack('${track.trackId}', '${track.trackName}')">再生</button>
-                            </li>
-                        </c:forEach>
-                    </ul>
-                </li>
-            </c:forEach>
-        </ul>
-    </div>
+		<ul>
+			<!-- playlistBeansをループで表示 -->
+			<c:forEach var="playlist" items="${playlistBeans}">
+				<li><strong>プレイリスト名:</strong> ${playlist.playlistName}<br>
+					<strong>プレイリストID:</strong> ${playlist.playlistId}<br> <strong>イメージ画像：</strong><img
+					src="${playlist.imageUrl}" alt="Playlist Image" width="100" /> 
+						
+					<ul>
+						<!-- 各プレイリストのtrackListをループ -->
+						<c:forEach var="track" items="${playlist.trackList}">
+							<li><strong>トラック名:</strong> ${track.trackName}<br> <strong>アーティスト名:</strong>
+								${track.artistName}<br> <!-- 画像URLが設定されている場合、画像を表示 --> <c:if
+									test="${not empty track.trackImageUrl}">
+									<img src="${track.trackImageUrl}" alt="${track.trackName}"
+										width="100" />
+								</c:if>
 
-    <!-- 中央: 人気のアーティスト -->
-    <div class="content">
-        <h2>フォロー中のアーティスト</h2>
-        <%
-            List<String> followedArtistNames = (List<String>) session.getAttribute("followedArtistNames");
-            if (followedArtistNames == null) {
-                followedArtistNames = new java.util.ArrayList<>();
-            }
-        %>
+								<button
+									onclick="playTrack('${track.trackId}', '${track.trackName}')">再生</button>
+							</li>
+						</c:forEach>
+					</ul></li>
+			</c:forEach>
+		</ul>
+	</div>
 
-<c:choose>
-            <c:when test="${not empty sessionScope.artistIds}">
-                <ul>
-                    <!-- アーティストIDをループでリンクを生成 -->
-                    <c:forEach var="artistId" items="${sessionScope.artistIds}" varStatus="status">
-                        <li>
-                            <!-- リンクをクリックすると、中央のiframeでartist.jspを表示 -->
-<a href="javascript:void(0);" onclick="loadArtistPage('${artistId}')">
-                                アーティスト名（ ${sessionScope.artistNames[status.index]} ）
-                            </a>
-                        </li>
-                    </c:forEach>
-                </ul>
-            </c:when>
-            <c:otherwise>
-                <p>フォロー中のアーティストが見つかりませんでした。</p>
-            </c:otherwise>
-        </c:choose>
-        
+	<!-- 中央: 人気のアーティスト -->
+	<div class="content">
+		<h2>フォロー中のアーティスト</h2>
+		<%
+		List<String> followedArtistNames = (List<String>) session.getAttribute("followedArtistNames");
+		List<String> followedArtistImages = (List<String>) session.getAttribute("followedArtistImages");
+		if (followedArtistNames == null) {
+			followedArtistNames = new java.util.ArrayList<>();
+		}
+		if (followedArtistImages == null) {
+			followedArtistImages = new java.util.ArrayList<>();
+		}
+		%>
 
-</ul>
-        </ul>
-        
-        
-        
-        <h1>今回新たにしゅとくしようとしているもの</h1>
-         <!-- 最近再生履歴の表示 -->
-    <h2>Recently Played Tracks</h2>
-    <c:if test="${not empty recentryDatas}">
-        <table>
-            <thead>
-                <tr>
-                    <th>Track ID</th>
-                
-                </tr>
-            </thead>
-            <tbody>
-                <c:forEach var="entry" items="${recentryDatas}">
-                    <tr>
-                        <td>${entry.key}</td>
-                        
-                    </tr>
-                </c:forEach>
-            </tbody>
-        </table>
-    </c:if>
-    <c:if test="${empty recentryDatas}">
-        <p>No recently played tracks found.</p>
-    </c:if>
+		<c:choose>
+			<c:when test="${not empty followedArtistNames}">
+				<ul>
+					<!-- アーティストの情報をループで表示 -->
+					<c:forEach var="artistName" items="${followedArtistNames}"
+						varStatus="status">
+						<li>
+							<!-- アーティストの画像と名前を表示 --> <c:if
+								test="${not empty followedArtistImages[status.index]}">
+								<img src="${followedArtistImages[status.index]}"
+									alt="${artistName}" width="100" />
+							</c:if> <a href="javascript:void(0);"
+							onclick="loadArtistPage('${sessionScope.artistIds[status.index]}')">
+								${artistName} </a>
+						</li>
+					</c:forEach>
+				</ul>
+			</c:when>
+			<c:otherwise>
+				<p>フォロー中のアーティストが見つかりませんでした。</p>
+			</c:otherwise>
+		</c:choose>
 
-    <!-- Top Mix Tracksの表示 -->
-    <h2>Top Mix Tracks</h2>
-    <c:if test="${not empty topMixDatas}">
-        <table>
-            <thead>
-                <tr>
-                    <th>Track ID</th>
-                    
-                </tr>
-            </thead>
-            <tbody>
-                <c:forEach var="entry" items="${topMixDatas}">
-                    <tr>
-                        <td>${entry.key}</td>
-                        
-                    </tr>
-                </c:forEach>
-            </tbody>
-        </table>
-    </c:if>
-    <c:if test="${empty topMixDatas}">
-        <p>No top mix tracks found.</p>
-    </c:if>
 
-    <!-- レコメンドデータの表示 -->
-    <h2>Recommended Tracks</h2>
-<c:if test="${not empty recomendDatas}">
-    <table>
-        <thead>
-            <tr>
-                <th>Track Name</th>
-            </tr>
-        </thead>
-        <tbody>
-            <c:forEach var="entry" items="${recomendDatas}">
-                <tr>
-                    <td>${entry.value}</td> <!-- トラック名だけ表示 -->
-                </tr>
-            </c:forEach>
-        </tbody>
-    </table>
-</c:if>
-<c:if test="${empty recomendDatas}">
-    <p>No recommended tracks found.</p>
-</c:if>
- 
+		</ul>
 
-    <!-- 右側: 詳細情報パネル -->
-    <div class="property-panel" id="propertyPanel">
-        <h2>トラック詳細</h2>
-        <p id="track-detail">再生中のトラック詳細が表示されます。</p>
-        <div id="player-controls">
-            <h3>プレイヤー</h3>
-            <p id="now-playing">現在再生中: <span id="current-track">なし</span></p>
-            <button id="prev">前の曲</button>
-            <button id="play-pause">再生/停止</button>
-            <button id="next">次の曲</button>
-            <input type="range" id="progress-bar" value="50" min="0" max="100">
+
+
+		<h1>今回新たにしゅとくしようとしているもの</h1>
+		<!-- 最近再生履歴の表示 -->
+		<h2>Recently Played Tracks</h2>
+		<c:if test="${not empty recentryDatas}">
+			<table>
+				<thead>
+					<tr>
+						<th>Track ID</th>
+
+					</tr>
+				</thead>
+				<tbody>
+					<c:forEach var="entry" items="${recentryDatas}">
+						<tr>
+							<td>${entry.key}</td>
+
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+		</c:if>
+		<c:if test="${empty recentryDatas}">
+			<p>No recently played tracks found.</p>
+		</c:if>
+
+		<!-- Top Mix Tracksの表示 -->
+		<h2>Top Mix Tracks</h2>
+		<c:if test="${not empty topMixDatas}">
+			<table>
+				<thead>
+					<tr>
+						<th>Track ID</th>
+
+					</tr>
+				</thead>
+				<tbody>
+					<c:forEach var="entry" items="${topMixDatas}">
+						<tr>
+							<td>${entry.key}</td>
+
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+		</c:if>
+		<c:if test="${empty topMixDatas}">
+			<p>No top mix tracks found.</p>
+		</c:if>
+
+		<!-- レコメンドデータの表示 -->
+		<h2>Recommended Tracks</h2>
+		<c:if test="${not empty recomendDatas}">
+			<table>
+				<thead>
+					<tr>
+						<th>Track Name</th>
+					</tr>
+				</thead>
+				<tbody>
+					<c:forEach var="entry" items="${recomendDatas}">
+						<tr>
+							<td>${entry.value}</td>
+							<!-- トラック名だけ表示 -->
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+		</c:if>
+		<c:if test="${empty recomendDatas}">
+			<p>No recommended tracks found.</p>
+		</c:if>
+
+	</div>
+	<!-- 右側: 詳細情報パネル -->
+<div class="property-panel" id="propertyPanel">
+    <h2>トラック詳細</h2>
+    <p id="track-detail">再生中のトラック詳細が表示されます。</p>
+    <div id="player-controls">
+        <h3>プレイヤー</h3>
+        <p id="now-playing">
+            現在再生中: <span id="current-track">なし</span>
+        </p>
+        <!-- トラック画像の表示 -->
+        <div id="track-image-container">
+            <img id="current-track-image" src="" alt="現在再生中のトラック画像" style="width:100px; height:auto;">
         </div>
+        <button id="prev">前の曲</button>
+        <button id="play-pause">再生/停止</button>
+        <button id="next">次の曲</button>
+        <input type="range" id="progress-bar" value="50" min="0" max="100">
     </div>
+</div>
 
-    <script>
+
+	<script>
         window.onSpotifyWebPlaybackSDKReady = () => {
-            const token = '<%= session.getAttribute("access_token") %>';
+            const token = '<%=session.getAttribute("access_token")%>';
 
             if (!token || token === "null") {
                 console.error("アクセストークンが無効です。再ログインしてください。");
@@ -387,7 +416,7 @@
 
         }
     </script>
-<script>
+	<script>
         // artist.jspを動的に読み込む関数
 function loadArtistPage(artistId) {
     var contentDiv = document.querySelector('.content');
@@ -406,8 +435,8 @@ function loadArtistPage(artistId) {
 }
 
     </script>
-    
-    <script>
+
+	<script>
     // アルバム情報を動的に読み込む関数
     function loadAlbumPage(albumId) {
         if (!albumId) {
@@ -435,9 +464,20 @@ function loadArtistPage(artistId) {
                 contentDiv.innerHTML = '<p>アルバム情報の取得に失敗しました。</p>';
             });
     }
-</script>
+
+
+
+
+ // 再生中のトラックの情報を取得して画像を更新
+    function updateTrackInfo(track) {
+        document.getElementById('current-track').textContent = track.trackName;
+        document.getElementById('current-track-image').src = track.trackImageUrl; // 画像のURLを設定
+    }
 
     
+</script>
+
+
 
 
 </body>

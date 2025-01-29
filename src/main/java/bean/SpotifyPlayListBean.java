@@ -13,13 +13,14 @@ public class SpotifyPlayListBean {
     private List<TrackBean> trackList = new ArrayList<>(); // トラック情報（TrackBean）
     private String userId;
     private String playlistCoverImageUrl; // プレイリストのカバー画像URL
+    private String albumImageUrl; // アルバムの画像URL（新しく追加）
 
     // コンストラクタでJSONをBeanに変換
     public SpotifyPlayListBean(JSONObject playlist, String userId) {
-        this.playlistId = playlist.getString("id");  // プレイリストID
-        this.playlistName = playlist.getString("name");  // プレイリスト名
+        this.playlistId = playlist.optString("id", "");  // プレイリストID
+        this.playlistName = playlist.optString("name", "");  // プレイリスト名
         this.userId = userId;  // ユーザーID
-        
+
         // プレイリスト内のトラック情報が存在するか確認
         if (playlist.has("tracks") && playlist.getJSONObject("tracks").has("items")) {
             JSONArray tracks = playlist.getJSONObject("tracks").getJSONArray("items");  // プレイリスト内のトラック情報
@@ -27,14 +28,24 @@ public class SpotifyPlayListBean {
                 JSONObject track = tracks.getJSONObject(i);
                 // トラック情報が正しく存在するかを確認し、名前を取得
                 if (track.has("track") && track.getJSONObject("track").has("name")) {
-                    String trackName = track.getJSONObject("track").getString("name");  // トラック名
-                    String trackId = track.getJSONObject("track").getString("id"); // トラックID
-                    String artistName = track.getJSONObject("track").getJSONArray("artists")
-                        .getJSONObject(0).getString("name"); // アーティスト名
+                    String trackName = track.getJSONObject("track").optString("name", "Unknown Track");  // トラック名
+                    String trackId = track.getJSONObject("track").optString("id", "Unknown ID"); // トラックID
+                    String artistName = track.getJSONObject("track")
+                        .optJSONArray("artists").optJSONObject(0).optString("name", "Unknown Artist"); // アーティスト名
+
+                    // トラック画像URLを取得
+                    String trackImageUrl = "";
+                    if (track.getJSONObject("track").has("album")) {
+                        JSONArray albumImages = track.getJSONObject("track").getJSONObject("album").optJSONArray("images");
+                        if (albumImages != null && albumImages.length() > 0) {
+                            trackImageUrl = albumImages.getJSONObject(0).optString("url", ""); // 最初の画像URL
+                        }
+                    }
+
                     trackNames.add(trackName);  // トラック名
 
                     // TrackBeanを作成し、trackListに追加
-                    trackList.add(new TrackBean(trackId, trackName, artistName));
+                    trackList.add(new TrackBean(trackId, trackName, artistName, trackImageUrl));
                 }
             }
         } else {
@@ -46,43 +57,80 @@ public class SpotifyPlayListBean {
             JSONArray images = playlist.getJSONArray("images");
             if (images.length() > 0) {
                 JSONObject image = images.getJSONObject(0);  // 最初の画像（一般的には最大サイズのもの）
-                this.playlistCoverImageUrl = image.getString("url");  // 画像URLを取得
+                this.playlistCoverImageUrl = image.optString("url", "");  // 画像URLを取得
+                this.albumImageUrl = this.playlistCoverImageUrl; // アルバム画像URLとしてカバー画像を設定
+            } else {
+                this.playlistCoverImageUrl = "";  // 画像がない場合は空文字列
+                this.albumImageUrl = "";  // 画像がない場合
             }
+        } else {
+            this.playlistCoverImageUrl = "";  // 画像が存在しない場合
+            this.albumImageUrl = "";  // 画像が存在しない場合
         }
     }
 
-    // プレイリストのIDを取得
+    // 以下、GetterとSetter（省略なし）
     public String getPlaylistId() {
         return playlistId;
     }
 
-    // プレイリストの名前を取得
+    public void setPlaylistId(String playlistId) {
+        this.playlistId = playlistId;
+    }
+
     public String getPlaylistName() {
         return playlistName;
     }
 
-    // プレイリスト内のトラック名を取得
+    public void setPlaylistName(String playlistName) {
+        this.playlistName = playlistName;
+    }
+
     public List<String> getTrackNames() {
         return trackNames;
     }
 
-    // プレイリスト内のトラックリストを取得
+    public void setTrackNames(List<String> trackNames) {
+        this.trackNames = trackNames;
+    }
+
     public List<TrackBean> getTrackList() {
         return trackList;
     }
 
-    // ユーザーIDを取得
+    public void setTrackList(List<TrackBean> trackList) {
+        this.trackList = trackList;
+    }
+
     public String getUserId() {
         return userId;
     }
 
-    // プレイリストのカバー画像URLを取得
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
     public String getPlaylistCoverImageUrl() {
         return playlistCoverImageUrl;
     }
 
-    // TrackリストをセットするためのsetTrackListメソッド
-    public void setTrackList(List<TrackBean> trackList) {
-        this.trackList = trackList;
+    public void setPlaylistCoverImageUrl(String playlistCoverImageUrl) {
+        this.playlistCoverImageUrl = playlistCoverImageUrl;
+    }
+
+    public String getAlbumImageUrl() {
+        return albumImageUrl;
+    }
+
+    public void setAlbumImageUrl(String albumImageUrl) {
+        this.albumImageUrl = albumImageUrl;
+    }
+
+    public String getImageUrl() {
+        return albumImageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.albumImageUrl = imageUrl;
     }
 }

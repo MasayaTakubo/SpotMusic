@@ -33,22 +33,46 @@ public class ArtistCommand extends AbstractCommand {
             responseContext.setTarget("error.jsp");
             return responseContext;
         }
-        System.out.println("アーティストのID：："+artistId);
+        System.out.println("アーティストのID：：" + artistId);
 
         try {
             SpotifyAuthService sas = new SpotifyAuthService();
 
             // アーティストの詳細情報を取得
             JSONObject artistDetails = sas.getArtistDetails(accessToken, artistId);
+            
+            
+            
+            // アーティストのアイコン画像URLを取得
+            JSONArray artistImages = artistDetails.getJSONArray("images");
+            String artistImageUrl = (artistImages.length() > 0) ? artistImages.getJSONObject(0).getString("url") : null;
 
             // アーティストの人気曲を取得
             JSONArray topTracksJson = sas.getArtistTopTracks(accessToken, artistId);
+            // トラックのアイコン画像URLを取得
+            for (int i = 0; i < topTracksJson.length(); i++) {
+                JSONObject trackJson = topTracksJson.getJSONObject(i);
+                JSONObject albumJson = trackJson.getJSONObject("album");
+                JSONArray albumImages = albumJson.getJSONArray("images");
+                String albumImageUrl = (albumImages.length() > 0) ? albumImages.getJSONObject(0).getString("url") : null;
+                trackJson.put("albumImageUrl", albumImageUrl); // トラックにアルバムの画像URLを追加
+            }
 
             // アーティストのプレイリストを取得
             JSONArray playlistsJson = sas.getArtistPlaylists(accessToken, artistId);
 
+            // プレイリストにアルバム画像URLを追加
+            for (int i = 0; i < playlistsJson.length(); i++) {
+                JSONObject playlistJson = playlistsJson.getJSONObject(i);
+                JSONArray playlistImages = playlistJson.has("images") ? playlistJson.getJSONArray("images") : null;
+                String playlistImageUrl = (playlistImages != null && playlistImages.length() > 0)
+                        ? playlistImages.getJSONObject(0).getString("url")
+                        : null;
+                playlistJson.put("albumImageUrl", playlistImageUrl); // プレイリストに画像URLを追加
+            }
+
             // `ArtistBean` クラスに情報をセット（コンストラクタで処理）
-            ArtistBean artistBean = new ArtistBean(artistDetails, topTracksJson, playlistsJson);
+            ArtistBean artistBean = new ArtistBean(artistDetails, topTracksJson, playlistsJson, artistImageUrl);
 
             // セッションに保存
             session.setAttribute("artistBean", artistBean);
@@ -59,7 +83,7 @@ public class ArtistCommand extends AbstractCommand {
         } catch (Exception e) {
             e.printStackTrace();
             responseContext.setResult("error");
-            responseContext.setTarget("error.jsp");
+            responseContext.setTarget("artist");
         }
 
         return responseContext;
