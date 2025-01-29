@@ -291,7 +291,8 @@
             <button id="prev"><i class="fas fa-step-backward"></i></button>
 			<button id="play-pause"><i class="fas fa-play"></i></button>	
 			<button id="next"><i class="fas fa-step-forward"></i></button>
-            <h5>🔊</h5><input type="range" id="progress-bar" value="50" min="0" max="100">
+            <button id="mute-toggle"><i class="fas fa-volume-up"></i></button>
+            <input type="range" id="progress-bar" value="50" min="0" max="100">
             <button id="repeat-track"><i class="fas fa-redo"></i></button>
 			<button id="shuffle-toggle"><i class="fas fa-random"></i></button>
         </div>
@@ -430,11 +431,6 @@ function loadPlaylistPage(playlistId) {
                 }
             });
 
-/*             document.getElementById('play-pause').addEventListener('click', () => {
-                controlSpotify('togglePlay', null, null, player);
-                document.getElementById('propertyPanel').classList.add('active');
-            }); */
-            // 再生・停止ボタンのクリックイベント
             document.getElementById('play-pause').addEventListener('click', () => {
                 player.togglePlay().then(() => {
                     console.log("再生/停止を切り替えました");
@@ -466,15 +462,49 @@ function loadPlaylistPage(playlistId) {
                   .then(data => console.log("次の曲の応答: ", data))
                   .catch(error => console.error("エラー:", error));
             });
+			//Mute
+		    const muteButton = document.getElementById("mute-toggle");
+		    let isMuted = false;
+		    let lastVolume = 0.5; // ミュート解除時に戻す音量
+		
+		    muteButton.addEventListener("click", () => {
+		        if (player) {
+		            player.getVolume().then(volume => {
+		                if (!isMuted) {
+		                    lastVolume = volume; // 現在の音量を保存
+		                    player.setVolume(0).then(() => {
+		                        isMuted = true;
+		                        muteButton.classList.add("muted");
+		                        muteButton.innerHTML = `<i class="fas fa-volume-mute"></i>`;
+		                    });
+		                } else {
+		                    player.setVolume(lastVolume).then(() => {
+		                        isMuted = false;
+		                        muteButton.classList.remove("muted");
+		                        muteButton.innerHTML = `<i class="fas fa-volume-up"></i>`;
+		                    });
+		                }
+		            }).catch(err => console.error("音量取得エラー:", err));
+		        }
+		    });
+			
 
 
-
-            document.getElementById('progress-bar').addEventListener('input', (e) => {
-                const volume = e.target.value / 100;
-                player.setVolume(volume).then(() => {
-                    console.log("音量が設定されました:", volume);
-                }).catch(err => console.error("音量設定エラー:", err));
-            });
+			//音量調整
+			document.getElementById('progress-bar').addEventListener('input', (e) => {
+    			const volume = e.target.value / 100;
+    			player.setVolume(volume).then(() => {
+        			console.log("音量が設定されました:", volume);
+        
+        		// ミュート解除時はボタンのアイコンも戻す
+        			if (volume > 0) {
+            			isMuted = false;
+            			muteButton.classList.remove("muted");
+            			muteButton.innerHTML = `<i class="fas fa-volume-up"></i>`;
+        			}
+    			}).catch(err => console.error("音量設定エラー:", err));
+			});
+			
 
             //Repeat
             document.getElementById('repeat-track').addEventListener('click', () => {
@@ -745,8 +775,6 @@ document.addEventListener('click', (event) => {
         document.getElementById('shuffle-toggle').addEventListener('click', function() {
             this.classList.toggle('active');
         });
-</script>
-<script>
 //再生プレイヤー　リピートCSS用JavaScript
  document.addEventListener("DOMContentLoaded", () => {
 	    const repeatButton = document.getElementById('repeat-track');

@@ -237,6 +237,25 @@ button {
     color: #1DB954;
 }
 
+/* ミュートボタンのデザイン */
+#mute-toggle {
+    font-size: 14px;
+    color: white;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+#mute-toggle:hover {
+    color: #1DB954;
+}
+
+/* ミュート時のスタイル */
+#mute-toggle.muted {
+    color: white;
+}
+
 
 
 
