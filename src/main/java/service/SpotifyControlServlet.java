@@ -133,7 +133,7 @@ public class SpotifyControlServlet extends HttpServlet {
                     String currentRepeatState = (String) session.getAttribute("repeatState");
                     if (currentRepeatState == null) currentRepeatState = "off";
 
-                    // 次のリピート状態を決定
+                    // 次のリピート状態を決定 (ズレを修正)
                     String nextRepeatState;
                     switch (currentRepeatState) {
                         case "off":
@@ -153,8 +153,9 @@ public class SpotifyControlServlet extends HttpServlet {
                     session.setAttribute("repeatState", nextRepeatState);
 
                     response.setStatus(HttpServletResponse.SC_OK);
-                    response.getWriter().write("Repeat mode set to: " + nextRepeatState);
+                    response.getWriter().write("{\"repeatState\":\"" + nextRepeatState + "\"}");
                     break;
+
 
                 case "seek":
                     String positionMs = request.getParameter("positionMs"); // ミリ秒単位で取得

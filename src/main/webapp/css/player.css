@@ -211,6 +211,33 @@ button {
     transition: transform 0.2s ease-in-out;
 }
 
+/* ------------リピート用---------- */
+/* リピートボタンの状態 */
+#repeat-track.off {
+    color: white;
+}
+
+#repeat-track.playlist {
+    color: #1DB954;
+}
+
+#repeat-track.track {
+    color: #1DB954;
+    font-weight: bold;
+    position: relative;
+}
+
+/* 1曲リピート時に「①」アイコンを表示 */
+#repeat-track.track::after {
+    content: '①';
+    font-size: 12px;
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    color: #1DB954;
+}
+
+
 
 
 /* [仮] playlist.jspのボタン調整*/

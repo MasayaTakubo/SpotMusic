@@ -782,6 +782,7 @@ public class SpotifyAuthService {
         String endpoint = "https://api.spotify.com/v1/me/player/repeat?state=" + state;
         sendPutRequest(endpoint, accessToken);
     }
+
     
     
     public void seekPlayback(String accessToken, String positionMs) throws IOException {
