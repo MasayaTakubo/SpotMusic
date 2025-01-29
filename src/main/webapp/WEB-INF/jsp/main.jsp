@@ -743,24 +743,55 @@ document.addEventListener('click', (event) => {
 });
 </script>
 <script>
-//再生プレイヤー　CSS用JavaScript
+//再生プレイヤー　シャッフルCSS用JavaScript
         document.getElementById('shuffle-toggle').addEventListener('click', function() {
             this.classList.toggle('active');
         });
-
-        document.getElementById('repeat-track').addEventListener('click', function() {
-            if (this.classList.contains('off')) {
-                this.classList.remove('off');
-                this.classList.add('playlist');
-            } else if (this.classList.contains('playlist')) {
-                this.classList.remove('playlist');
-                this.classList.add('track');
-            } else {
-                this.classList.remove('track');
-                this.classList.add('off');
-            }
-        });
 </script>
+<script>
+//再生プレイヤー　リピートCSS用JavaScript
+ document.addEventListener("DOMContentLoaded", () => {
+	    const repeatButton = document.getElementById('repeat-track');
+
+	    // 初回ロード時に現在のリピート状態を取得し、適用
+	    fetch("/SpotMusic/spotifyControl?action=getRepeatState")
+	        .then(response => response.json())
+	        .then(data => {
+	            applyRepeatState(data.repeatState);
+	        })
+	        .catch(error => console.error("リピート状態取得エラー:", error));
+
+	    // リピートボタンのクリックイベント
+	    repeatButton.addEventListener('click', () => {
+	        fetch("/SpotMusic/spotifyControl", {
+	            method: "POST",
+	            headers: {
+	                "Content-Type": "application/x-www-form-urlencoded"
+	            },
+	            body: `action=toggleRepeat`
+	        })
+	        .then(response => response.json())
+	        .then(data => {
+	            if (data.repeatState) {
+	                applyRepeatState(data.repeatState);
+	            }
+	        })
+	        .catch(error => console.error("リピート設定エラー:", error));
+	    });
+
+	    // CSS適用用の関数
+	    function applyRepeatState(state) {
+	        repeatButton.classList.remove('off', 'playlist', 'track');
+	        if (state === "context") {
+	            repeatButton.classList.add('playlist');
+	        } else if (state === "track") {
+	            repeatButton.classList.add('track');
+	        } else {
+	            repeatButton.classList.add('off');
+	        }
+	    }
+	});
+ </script>
 
 </body>
 </html>
