@@ -142,8 +142,10 @@
         <div class="account-container">
 <img src="<c:url value='/img/icon.png' />" alt="アイコン" class="account-icon" id="account-icon">
             <ul class="account-menu" id="account-menu">
-                <li><a href="/account">アカウント</a></li>
-                <li><a href="/profile">プロフィール</a></li>
+            	<li>ログイン中のユーザー:<%= session.getAttribute("user_name") %></li>
+                <li><a href="/xxx">アカウント</a></li>
+                <li><a href="/xxx">プロフィール</a></li>
+                <li><a href="/xxx">フレンドリスト</a></li>
                 <li><a href="javascript:void(0);" onclick="logout()">ログアウト</a></li>
             </ul>
         </div>
@@ -174,7 +176,7 @@
                     <!-- プレイリスト名をクリックした時に詳細を表示 -->
                     <button onclick="loadPlaylistPage('${playlist.playlistId}')">
                         ${playlist.playlistName}
-                        ${playlist.playlistId}
+
                         
                     </button>
                 </li>

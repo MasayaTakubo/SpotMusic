@@ -89,8 +89,8 @@ public class SpotifyAuthService {
     }
 
     // ユーザー情報をデータベースに保存する処理
-    public void saveUser(String userId, String accessToken, String refreshToken, int expiresIn) throws Exception {
-        userDAO.saveUser(userId, accessToken, refreshToken, expiresIn);
+    public void saveUser(String userId, String accessToken, String refreshToken, int expiresIn, String userName) throws Exception {
+        userDAO.saveUser(userId, accessToken, refreshToken, expiresIn, userName);
     }
 
     public void saveUserPlaylists(String accessToken, String userId) throws Exception {
@@ -813,6 +813,28 @@ public class SpotifyAuthService {
 
         sendPutRequest(endpoint, accessToken);
     }
+    
+ // SpotifyAuthServiceにユーザー名を取得するメソッドを追加
+    public String getUserName(String accessToken) throws IOException {
+        String url = "https://api.spotify.com/v1/me";
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+        con.setRequestMethod("GET");
+        con.setRequestProperty("Authorization", "Bearer " + accessToken);
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        // JSONパースしてユーザー名を取り出す
+        JSONObject jsonResponse = new JSONObject(response.toString());
+        return jsonResponse.getString("display_name");
+    }
+
 
 
 
