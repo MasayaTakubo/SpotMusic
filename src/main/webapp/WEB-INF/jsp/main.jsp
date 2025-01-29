@@ -291,7 +291,7 @@
             <button id="prev"><i class="fas fa-step-backward"></i></button>
 			<button id="play-pause"><i class="fas fa-play"></i></button>	
 			<button id="next"><i class="fas fa-step-forward"></i></button>
-            <input type="range" id="progress-bar" value="50" min="0" max="100">
+            <h5>🔊</h5><input type="range" id="progress-bar" value="50" min="0" max="100">
             <button id="repeat-track"><i class="fas fa-redo"></i></button>
 			<button id="shuffle-toggle"><i class="fas fa-random"></i></button>
         </div>
