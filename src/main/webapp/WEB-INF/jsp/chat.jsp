@@ -44,18 +44,22 @@
     %>
     <h1>Chat Room</h1>
     <h1>ログインユーザー：${sessionScope.userId }</h1>
-    <div id="chat-box" class="chat-box"></div>
-    <!-- メッセージ送信フォーム -->
-    <div class="chatWindow">
-        <form action="FrontServlet" method="POST" id="chatForm" onsubmit="return false;">
-            <textarea name="message" id="messageInput" placeholder="Type your message here..." required></textarea>
-            <input type="hidden" name="relationId" id="relationId" value="${param.relationId}">
-            <input type="hidden" name="userId" id="userId" value="${sessionScope.userId }">
-            <input type="hidden" name="command" value="AddMessage">
-            <button id="sendButton" type="button">Send</button> <!-- IDとタイプ修正 -->
-        </form>
-    </div>
-
+    <div id="chat-box" name="chat-box" style="border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; "></div>
+	<!-- css修正する、後でやる -->
+	<c:set var="isBlock" value="${param.isBlock}" />
+	<!-- ブロック時の警告メッセージ -->
+	<c:if test="${isBlock eq 'true'}">
+	    <p style="color: red;">ブロック中のため、メッセージを送信できません。</p>
+	</c:if>
+	<div class="chatWindow">
+	    <form action="FrontServlet" method="POST" id="chatForm" onsubmit="return false;">
+	        <textarea name="message" id="messageInput" placeholder="Type your message here..." required></textarea>
+	        <input type="hidden" name="relationId" id="relationId" value="${param.relationId}">
+	        <input type="hidden" name="userId" id="userId" value="${sessionScope.userId}">
+	        <input type="hidden" name="command" value="AddMessage">
+	        <button id="sendButton" type="submit" ${isBlock eq 'true' ? 'disabled' : ''}>送信</button>
+	    </form>
+	</div>
     <script>
         // サーバーから受け取ったJSONメッセージをパースして表示
         //ChatCommandからのデータ
@@ -149,6 +153,18 @@
 	        chatBox.appendChild(messageContainer);
 	        chatBox.scrollTop = chatBox.scrollHeight;
 		}
+		//ロード時にisBlockがtrueならチャットの送信ボタンが押せないようにする
+		document.addEventListener("DOMContentLoaded", function () {
+	        var isBlock = "${isBlock}";
+	        
+	        var sendButton = document.getElementById("sendButton");
+	        var messageInput = document.getElementById("messageInput");
+	
+	        if (isBlock === "true") {
+	            sendButton.disabled = true;
+	            messageInput.disabled = true;
+	        }
+	    });
     </script>
 </body>
 </html>

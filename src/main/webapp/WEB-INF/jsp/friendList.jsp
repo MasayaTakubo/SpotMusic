@@ -4,20 +4,20 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Friend List</title>
+    <title>フレンドリスト</title>
 </head>
 <body>
-    <h1>Friend List</h1>
+    <h1>フレンドリスト</h1>
     <h1>${sessionScope.userId}</h1>
     <p>申請中のユーザー</p>
     <table border="1">
         <tr>
             <th>ユーザーID</th>
-            <th>^-^</th>
+            <th>状態</th>
             <th>ボタン</th>
         </tr>
-	    <c:forEach var="relation" items="${requestScope.messages}">
-	    <c:if test="${relation.status == 'PENDING'}">
+	    <c:forEach var="relation" items="${messages.relations}">
+	    <c:if test="${relation.status eq 'PENDING'}">
         <tr>
             <c:choose>
                 <c:when test="${relation.user1Id != sessionScope.userId}">
@@ -66,51 +66,66 @@
     </c:forEach>
     </table>
     <p>フレンド</p>
-    <table border="1">
-        <tr>
-            <th>ユーザーID</th>
-            <th>ボタン</th>
-            <th>チャットページ</th>
-        </tr>
-	    <c:forEach var="relation" items="${requestScope.messages}">
-	    <c:if test="${relation.status == 'ACCEPT'}">
-           <tr>
-	            <c:choose>
-	                <c:when test="${relation.user1Id != sessionScope.userId}">
-                        <td>${relation.user1Id}</td>
-	                </c:when>
-	                <c:when test="${relation.user2Id != sessionScope.userId}">
-                        <td>${relation.user2Id}</td>
-	                </c:when>
-	            </c:choose>
-               <td>
-                <form action="FrontServlet" method="POST">
-                    <input type="hidden" name="relationId" value="${relation.relationId}">
-                    <input type="hidden" name="userId" value="${sessionScope.userId}">
-                    <input type="hidden" name="command" value="AddBlock">
-                    <button type="submit">ブロック</button>
-                </form>
-		        </td>
-               <td>
-                <form action="FrontServlet" method="POST">
-                	<input type="hidden" name="relationId" value="${relation.relationId}">
-                	<input type="hidden" name="userId" value="${sessionScope.userId}">
-			        <input type="hidden" name="command" value="ChatCommand">
-			        <button type="submit">ログイン</button>
-			    </form>
-			    <br><br>
-	        </td>
-           </tr>
-    </c:if>
-    </c:forEach>
-    </table>
+	<table border="1">
+	    <c:forEach var="relation" items="${messages.relations}">
+	        <c:if test="${relation.status eq 'ACCEPT'}">
+	            <c:set var="blocked" value="false"/>
+	            <c:forEach var="block" items="${messages.blockusers}">
+	                <c:if test="${(relation.user1Id == sessionScope.userId and relation.user2Id == block.blockedId) or 
+	                              (relation.user2Id == sessionScope.userId and relation.user1Id == block.blockedId)}">
+	                    <c:set var="blocked" value="true"/>
+	                    <c:set var="blockId" value="${block.blockId}"/>
+	                </c:if>
+	            </c:forEach>
+	            <tr>
+	                <td>
+	                    <c:choose>
+	                        <c:when test="${relation.user1Id != sessionScope.userId}">
+	                            ${relation.user1Id}
+	                        </c:when>
+	                        <c:otherwise>
+	                            ${relation.user2Id}
+	                        </c:otherwise>
+	                    </c:choose>
+	                </td>
+	                <td>
+	                    <form action="FrontServlet" method="POST">
+	                        <input type="hidden" name="userId" value="${sessionScope.userId}"/>
+	                        <c:choose>
+	                            <c:when test="${blocked}">
+	                                <input type="hidden" name="blockId" value="${blockId}"/>
+	                                <input type="hidden" name="command" value="RemoveBlock"/>
+	                                <button type="submit">ブロック解除</button>
+	                            </c:when>
+	                            <c:otherwise>
+	                                <input type="hidden" name="relationId" value="${relation.relationId}"/>
+	                                <input type="hidden" name="command" value="AddBlockFriend"/>
+	                                <button type="submit">ブロック</button>
+	                            </c:otherwise>
+	                        </c:choose>
+	                    </form>
+	                </td>
+	                <td>
+	                    <form action="FrontServlet" method="POST">
+	                        <input type="hidden" name="relationId" value="${relation.relationId}"/>
+	                        <input type="hidden" name="userId" value="${sessionScope.userId}"/>
+	                        <input type="hidden" name="command" value="ChatCommand"/>
+	                        <input type="hidden" name="isBlock" value="${blocked}"/>
+	                        <button type="submit">ログイン</button>
+	                    </form>
+	                </td>
+	            </tr>
+	        </c:if>
+	    </c:forEach>
+	</table>
+
     <p>フレンド申請をキャンセルしたユーザー</p>
 	<table border="1">
 	    <tr>
 	        <th>ユーザーID</th>
 	    </tr>
-	    <c:forEach var="relation" items="${requestScope.messages}">
-	        <c:if test="${relation.status == 'CANCEL'}">
+	    <c:forEach var="relation" items="${messages.relations}">
+	        <c:if test="${relation.status eq 'CANCEL'}">
 	            <c:choose>
 	                <c:when test="${relation.user1Id != sessionScope.userId}">
 	                    <tr>
@@ -126,5 +141,16 @@
 	        </c:if>
 	    </c:forEach>
 	</table>
+	<h2>ユーザーリスト</h2>  
+    <form action="FrontServlet" method="POST">
+        <input type="hidden" name="userId" value="${sessionScope.userId}"><br><br>
+        <input type="hidden" name="command" value="UsersList">
+        <button type="submit">ユーザーリストへ</button>
+    </form>
+	<form action="FrontServlet" method="POST">
+    	<input type="hidden" name="userId" value="${sessionScope.userId}">
+        <input type="hidden" name="command" value="BlockList">
+        <button type="submit">ブロックリストへ</button>
+    </form>
 </body>
 </html>

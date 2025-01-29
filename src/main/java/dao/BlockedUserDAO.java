@@ -16,8 +16,8 @@ public class BlockedUserDAO {
         String sql = "Insert into blocked_user(BLOCKER_ID,BLOCKED_ID) values(?,?)";
         try (Connection conn = MySQLConnector.getConn();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-        	stmt.setString(1, blockBean.getUserId());
-        	stmt.setString(2, blockBean.getRelationId());
+        	stmt.setString(1, blockBean.getBlockerId());
+        	stmt.setString(2, blockBean.getBlockedId());
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -33,17 +33,23 @@ public class BlockedUserDAO {
             e.printStackTrace();
         }
     }
-    public String getBlockedId(String relationId) {
+    public String getBlockedId(blockBean blockBean) {
     	String sql = "Select user1_Id,user2_Id from relation where relation_Id=?";
     	String blockedId="";
         try (Connection conn = MySQLConnector.getConn();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
+        	String userId = blockBean.getUserId();
+        	String relationId = blockBean.getRelationId();
            	stmt.setString(1, relationId);
            	ResultSet rs = stmt.executeQuery();
-           	String user1Id = rs.getString("USER1_ID");
-           	String user2Id = rs.getString("USER2_ID");
+        	String user1Id="";
+        	String user2Id="";
+           	if (rs.next()) {
+	           	user1Id = rs.getString("USER1_ID");
+	           	user2Id = rs.getString("USER2_ID");
+           	}
            	//自分が相手をブロックする。
-           	if (user1Id.equals(relationId)) {
+           	if (user1Id.equals(userId)) {
            		blockedId = user2Id;
            	} else {
            		blockedId = user1Id;
@@ -54,15 +60,18 @@ public class BlockedUserDAO {
            }
         return blockedId;
     }
-    public List getBlockList(String userId) {
-    	String sql = "Select blocked_id from blocked_user where blocker_ID = ?";
-    	List<String> blocklist = new ArrayList<>();
+    public List<blockBean> getBlockList(String userId) {
+    	String sql = "Select block_id,blocked_id from blocked_user where blocker_ID = ?";
+    	List<blockBean> blocklist = new ArrayList<>();
         try (Connection conn = MySQLConnector.getConn();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
            	stmt.setString(1, userId);
            	ResultSet rs = stmt.executeQuery();
            	while (rs.next()) {
-                blocklist.add(rs.getString("blocked_id"));  // 自分がブロックしている相手のIDをリストに追加
+           		blockBean blockBean = new blockBean();
+           		blockBean.setBlockId(rs.getString("block_id"));
+                blockBean.setBlockedId(rs.getString("blocked_id"));  // 自分がブロックしている相手のIDをリストに追加
+                blocklist.add(blockBean);
             }
            } catch (SQLException e) {
                e.printStackTrace();

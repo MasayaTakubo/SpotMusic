@@ -18,6 +18,7 @@ public class RelationDAO {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, relationBean.getUser1Id()); 
             stmt.setString(2, relationBean.getUser2Id());
+            System.out.println(relationBean.getUser1Id()+"1-2"+relationBean.getUser2Id());
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
