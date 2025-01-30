@@ -51,14 +51,19 @@ public class SpotifyAuthServlet extends HttpServlet {
                 // ユーザーIDを取得
                 String userId = spotifyAuthService.getUserId(accessToken);
 
+                // ユーザー名を取得
+                String userName = spotifyAuthService.getUserName(accessToken);
+
                 // ユーザー情報をデータベースに保存
-                spotifyAuthService.saveUser(userId, accessToken, refreshToken, 3600);
+                spotifyAuthService.saveUser(userId, accessToken, refreshToken, 3600, userName);
 
                 // セッションにユーザー情報を保存
                 session.setAttribute("access_token", accessToken);
                 session.setAttribute("refresh_token", refreshToken);
                 session.setAttribute("user_id", userId);
+                session.setAttribute("user_name", userName);
                 session.setAttribute("command", command);
+
 
                 // Listを保存する
                 List<String> artistIds = spotifyAuthService.getArtistIds(accessToken, 50);
