@@ -55,10 +55,11 @@ button:hover {
 
 /* ボタンアイコンのデザイン */
 button#prev::before {
-    content: '\f104'; /* FontAwesomeの前の曲アイコン */
+    content: '\f04a'; /* FontAwesomeの前の曲アイコン */
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;
 }
+
 
 button#play-pause::before {
     content: '\f04b'; /* FontAwesomeの再生アイコン */
@@ -73,9 +74,14 @@ button#pause::before {
 }
 
 button#next::before {
-    content: '\f105'; /* FontAwesomeの次の曲アイコン */
+    content: '\f04e'; /* FontAwesomeの次の曲アイコン */
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;
+}
+/* `::before` を削除 */
+button#prev::before,
+button#next::before {
+    content: none !important;
 }
 
 button#repeat-track::before {
@@ -170,34 +176,34 @@ button#shuffle-toggle::before {
     transform: translate(-50%, -50%);
 }
 
-/* 🔽 プレイヤー全体のサイズを縮小 */
+/* ?? プレイヤー全体のサイズを縮小 */
 #player-container {
     height: 50px; /* 高さをさらに縮小 */
     padding: 5px 8px; /* 内側の余白を微調整 */
 }
 
-/* 🔽 コントロールボタンのサイズを縮小 */
+/* ?? コントロールボタンのサイズを縮小 */
 button {
     font-size: 12px; /* アイコンのサイズを小さく */
 }
-/* 🔽 再生/停止ボタン */
+/* ?? 再生/停止ボタン */
 #play-pause {
     font-size: 14px;
 }
 
-/* 🔽 シャッフル & リピート ボタンの調整 */
+/* ?? シャッフル & リピート ボタンの調整 */
 #shuffle-toggle, #repeat-track {
     font-size: 14px;
     width: 20px;  /* ボタンの幅を縮小 */
     height: 20px;
 }
 
-/* 🔽 シークバーのサイズ調整 */
+/* ?? シークバーのサイズ調整 */
 #seek-bar, #progress-bar {
     width: 30%; /* さらに短くしてスペースを確保 */
 }
 
-/* 🔽 ボタン間の間隔を縮小 */
+/* ?? ボタン間の間隔を縮小 */
 #player-controls {
     gap: 8px; /* ボタン同士の間隔を縮める */
 }

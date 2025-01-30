@@ -452,11 +452,15 @@ function loadPlaylistPage(playlistId) {
             player.connect().then(success => {
                 if (success) {
                     console.log("Spotify プレイヤーが接続されました。");
+
+                    // 初回ロード時にSpotifyのシャッフル状態を取得し、UIと同期
+                    syncShuffleState();
                 } else {
                     console.error("Spotify プレイヤーの接続に失敗しました。");
                     alert("Spotify プレイヤーの接続に失敗しました。");
                 }
             });
+
 
             document.getElementById('play-pause').addEventListener('click', () => {
                 player.togglePlay().then(() => {
@@ -844,6 +848,28 @@ document.addEventListener('click', (event) => {
 	        }
 	    }
 	});
+	//シャッフル
+	function syncShuffleState() {
+    fetch("/SpotMusic/spotifyControl?action=syncShuffleState")
+        .then(response => response.json())
+        .then(data => {
+            if (data.shuffleState !== undefined) {
+                applyShuffleState(data.shuffleState);
+            }
+        })
+        .catch(error => console.error("シャッフル状態同期エラー:", error));
+}
+
+// シャッフル状態を適用する関数
+function applyShuffleState(isShuffle) {
+    const shuffleButton = document.getElementById('shuffle-toggle');
+    if (isShuffle) {
+        shuffleButton.classList.add('active');
+    } else {
+        shuffleButton.classList.remove('active');
+    }
+}
+	
  </script>
  <script>
 document.addEventListener('DOMContentLoaded', function () {

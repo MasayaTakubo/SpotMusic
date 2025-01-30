@@ -923,6 +923,44 @@ public class SpotifyAuthService {
 
 
 
+    public boolean getSpotifyShuffleState(String accessToken) throws IOException {
+        URL url = new URL("https://api.spotify.com/v1/me/player");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+        conn.setRequestProperty("Authorization", "Bearer " + accessToken);
+
+        int responseCode = conn.getResponseCode();
+        System.out.println("Spotify API レスポンスコード: " + responseCode);
+
+        if (responseCode == HttpURLConnection.HTTP_NO_CONTENT) {
+            // プレイヤーが起動していない場合
+            System.out.println("Spotifyプレイヤーが起動していません (204 No Content)");
+            return false;
+        } else if (responseCode != HttpURLConnection.HTTP_OK) {
+            // エラーハンドリング: 401, 403, 404, 500 など
+            System.err.println("Spotify API エラー: HTTP " + responseCode);
+            return false;
+        }
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        StringBuilder response = new StringBuilder();
+        String inputLine;
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        String jsonResponse = response.toString();
+        System.out.println("Spotify API レスポンス: " + jsonResponse);
+
+        try {
+            JSONObject jsonObject = new JSONObject(jsonResponse);
+            return jsonObject.optBoolean("shuffle_state", false);
+        } catch (JSONException e) {
+            System.err.println("JSON解析エラー: " + e.getMessage());
+            return false;
+        }
+    }
 
 
 
