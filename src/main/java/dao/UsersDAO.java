@@ -2,8 +2,12 @@ package dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
+import bean.usersBean;
 import connector.MySQLConnector;
 
 public class UsersDAO {
@@ -35,5 +39,24 @@ public class UsersDAO {
             e.printStackTrace();
             throw new SQLException("データベースエラーが発生しました。");
         }
+    }
+    public List<usersBean> getUsersData() {
+        String sql = "SELECT user_id,user_name FROM users";
+        List<usersBean> users = new ArrayList<>();
+        usersBean user = null;
+        try (Connection conn = MySQLConnector.getConn();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+            	user = new usersBean();
+                user.setUserId(rs.getString("user_id"));
+                user.setUserName(rs.getString("user_name"));
+                users.add(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        return users;  // ユーザーIDのリストを返す
     }
 }

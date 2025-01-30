@@ -21,10 +21,22 @@
         <tr>
             <c:choose>
                 <c:when test="${relation.user1Id != sessionScope.userId}">
-                       <td>${relation.user1Id}</td>
+                    <td>
+                        <c:forEach var="user" items="${messages.users}">
+                            <c:if test="${user.userId eq relation.user1Id}">
+                                ${user.userName}
+                            </c:if>
+                        </c:forEach>
+                    </td>
                 </c:when>
                 <c:when test="${relation.user2Id != sessionScope.userId}">
-                       <td>${relation.user2Id}</td>
+                    <td>
+                        <c:forEach var="user" items="${messages.users}">
+                            <c:if test="${user.userId eq relation.user2Id}">
+                                ${user.userName}
+                            </c:if>
+                        </c:forEach>
+                    </td>
                 </c:when>
             </c:choose>
             <c:choose>
@@ -67,6 +79,9 @@
     </table>
     <p>フレンド</p>
 	<table border="1">
+		<th>ユーザー名</th>
+		<th>Action</th>
+		<th>チャット</th>
 	    <c:forEach var="relation" items="${messages.relations}">
 	        <c:if test="${relation.status eq 'ACCEPT'}">
 	            <c:set var="blocked" value="false"/>
@@ -78,16 +93,26 @@
 	                </c:if>
 	            </c:forEach>
 	            <tr>
-	                <td>
-	                    <c:choose>
-	                        <c:when test="${relation.user1Id != sessionScope.userId}">
-	                            ${relation.user1Id}
-	                        </c:when>
-	                        <c:otherwise>
-	                            ${relation.user2Id}
-	                        </c:otherwise>
-	                    </c:choose>
-	                </td>
+                    <c:choose>
+		                <c:when test="${relation.user1Id != sessionScope.userId}">
+		                    <td>
+		                        <c:forEach var="user" items="${messages.users}">
+		                            <c:if test="${user.userId eq relation.user1Id}">
+		                                ${user.userName}
+		                            </c:if>
+		                        </c:forEach>
+		                    </td>
+		                </c:when>
+		                <c:when test="${relation.user2Id != sessionScope.userId}">
+		                    <td>
+		                        <c:forEach var="user" items="${messages.users}">
+		                            <c:if test="${user.userId eq relation.user2Id}">
+		                                ${user.userName}
+		                            </c:if>
+		                        </c:forEach>
+		                    </td>
+		                </c:when>
+		            </c:choose>
 	                <td>
 	                    <form action="FrontServlet" method="POST">
 	                        <input type="hidden" name="userId" value="${sessionScope.userId}"/>
@@ -128,14 +153,22 @@
 	        <c:if test="${relation.status eq 'CANCEL'}">
 	            <c:choose>
 	                <c:when test="${relation.user1Id != sessionScope.userId}">
-	                    <tr>
-	                        <td>${relation.user1Id}</td>
-	                    </tr>
+	                    <td>
+	                        <c:forEach var="user" items="${messages.users}">
+	                            <c:if test="${user.userId eq relation.user1Id}">
+	                                ${user.userName}
+	                            </c:if>
+	                        </c:forEach>
+	                    </td>
 	                </c:when>
 	                <c:when test="${relation.user2Id != sessionScope.userId}">
-	                    <tr>
-	                        <td>${relation.user2Id}</td>
-	                    </tr>
+	                    <td>
+	                        <c:forEach var="user" items="${messages.users}">
+	                            <c:if test="${user.userId eq relation.user2Id}">
+	                                ${user.userName}
+	                            </c:if>
+	                        </c:forEach>
+	                    </td>
 	                </c:when>
 	            </c:choose>
 	        </c:if>

@@ -8,6 +8,7 @@ public class usersBean implements Serializable {
     private String refreshToken;
     private int expiresIn;
     private String spotifyId;
+    private String userName;
 
     // デフォルトコンストラクタ
     public usersBean() {}
@@ -61,6 +62,14 @@ public class usersBean implements Serializable {
     public void setSpotifyId(String spotifyId) {
         this.spotifyId = spotifyId;
     }
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
 
     @Override
     public String toString() {
