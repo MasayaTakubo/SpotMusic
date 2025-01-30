@@ -146,7 +146,10 @@
 <img src="<c:url value='/img/icon.png' />" alt="アイコン" class="account-icon" id="account-icon">
             <ul class="account-menu" id="account-menu">
             	<li>ログイン中のユーザー:<%= session.getAttribute("user_name") %></li>
-                <li><a href="/xxx">アカウント</a></li>
+                <li>
+				  <a href="https://www.spotify.com/jp/account/overview/?utm_source=spotify&utm_medium=menu&utm_campaign=your_account" target="_blank" rel="noopener noreferrer">アカウント</a>
+				</li>
+
                 <li><a href="/xxx">プロフィール</a></li>
                 <li><a href="/xxx">フレンドリスト</a></li>
                 <li><a href="javascript:void(0);" onclick="logout()">ログアウト</a></li>
