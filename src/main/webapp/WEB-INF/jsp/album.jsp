@@ -26,9 +26,11 @@
                 <li>
                     <strong>${track.trackName}</strong>  
                     <span> - ${track.artistName}</span>
+                    <button onclick="playTrack('${track.trackId}', '${track.trackName}')">再生</button>
                     <!-- トラックの画像を表示 -->
                     <c:if test="${not empty track.trackImageUrl}">
                         <img src="${track.trackImageUrl}" alt="${track.trackName}" style="width:50px; height:auto;">
+
                     </c:if>
                 </li>
             </c:forEach>
