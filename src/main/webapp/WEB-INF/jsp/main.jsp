@@ -309,7 +309,6 @@
 	    <h2>トラック詳細</h2>
 	    <p id="track-detail">再生中のトラック詳細が表示されます。</p>	    
     </div>
-   	<!-- 下部: player -->
     <div id="player-container">
         <div id="player-controls">
             <h2>🤓</h2> 
@@ -366,7 +365,7 @@ function loadPlaylistPage(playlistId) {
     <script>
     //再生プレイヤー用JavaScript
         window.onSpotifyWebPlaybackSDKReady = () => {
-            const token = '<%=session.getAttribute("access_token")%>';
+            const token = '<%= session.getAttribute("access_token") %>';
 
             if (!token || token === "null") {
                 console.error("アクセストークンが無効です。再ログインしてください。");
@@ -663,7 +662,7 @@ function loadPlaylistPage(playlistId) {
 
         }
     </script>
-	<script>
+<script>
         // artist.jspを動的に読み込む関数
 function loadArtistPage(artistId) {
     var contentDiv = document.querySelector('.content');
@@ -682,40 +681,37 @@ function loadArtistPage(artistId) {
 }
 
     </script>
-
-	<script>
+    
+    <script>
     // アルバム情報を動的に読み込む関数
-function loadAlbumPage(albumId) {
+    function loadAlbumPage(albumId) {
+        if (!albumId) {
+            console.error('albumId が指定されていません');
+            return;
+        }
 
-    // サーバーにリクエストを送信
-    const url = "/SpotMusic/FrontServlet?command=AlbumDetails&albumId=" + albumId;
-    const contentDiv = document.querySelector('.content');
+        // サーバーにリクエストを送信
+        const url = "/SpotMusic/FrontServlet?command=AlbumDetails&albumId=" + encodeURIComponent(albumId);
+        const contentDiv = document.querySelector('.content');
 
-    console.log("Fetch URL: ", url);
-
-    // Fetch APIでリクエストを送信し、結果をページに埋め込む
-    fetch(url)
-    .then(response => response.text())
-    .then(data => {
-        // 取得したデータを.content内に上書きする
-        contentDiv.innerHTML = data;
-    })
-    .catch(error => {
-        console.error('Error loading artist page:', error);
-        contentDiv.innerHTML = '<p>アーティスト情報の取得に失敗しました。</p>';
-    });
-}
-
-
-
-
- // 再生中のトラックの情報を取得して画像を更新
-    function updateTrackInfo(track) {
-        document.getElementById('current-track').textContent = track.trackName;
-        document.getElementById('current-track-image').src = track.trackImageUrl; // 画像のURLを設定
+        // Fetch APIでリクエストを送信し、結果をページに埋め込む
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('サーバーエラー: ' + response.status);
+                }
+                return response.text();
+            })
+            .then(data => {
+                contentDiv.innerHTML = data; // 取得したHTMLを表示
+            })
+            .catch(error => {
+                console.error('エラー発生:', error);
+                contentDiv.innerHTML = '<p>アルバム情報の取得に失敗しました。</p>';
+            });
     }
 </script>
- 
+
 <script>
 //シークバー管理JavaScript
     const seekBar = document.getElementById('seek-bar');
