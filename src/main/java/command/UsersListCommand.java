@@ -4,9 +4,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import bean.blockBean;
 import bean.relationBean;
 import context.RequestContext;
 import context.ResponseContext;
+import dao.BlockedUserDAO;
 import dao.RelationDAO;
 
 public class UsersListCommand extends AbstractCommand {
@@ -17,9 +19,12 @@ public class UsersListCommand extends AbstractCommand {
         RelationDAO relationDAO = new RelationDAO();
         List<String> users = relationDAO.getUsersId();
         List<relationBean> isfriend = relationDAO.getRelation(userId);
+        BlockedUserDAO blockDAO = new BlockedUserDAO();
+        List<blockBean> blockusers = blockDAO.getBlockList(userId);
         Map<String, List<?>> data = new HashMap<>();
         data.put("users",users);
         data.put("isfriend",isfriend);
+        data.put("blockusers", blockusers);
         resc.setResult(data);
         resc.setTarget("usersList");
         return resc;

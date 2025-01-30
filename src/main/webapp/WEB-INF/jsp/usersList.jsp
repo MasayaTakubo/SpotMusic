@@ -5,10 +5,10 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Users List</title>
+    <title>ユーザーリスト</title>
 </head>
 <body>
-    <h1>Users List</h1>
+    <h1>ユーザーリスト</h1>
     <h1>${sessionScope.userId}</h1>
     <table border="1">
         <tr>
@@ -18,6 +18,13 @@
         </tr>
 		<c:forEach var="userId" items="${messages.users}">
 		    <c:if test="${userId != sessionScope.userId}">
+		    	<c:set var="blocked" value="false"/>
+	            <c:forEach var="block" items="${messages.blockusers}">
+	                <c:if test="${userId == block.blockedId}">
+	                    <c:set var="blocked" value="true"/>
+	                    <c:set var="blockId" value="${block.blockId}"/>
+	                </c:if>
+	            </c:forEach>
 		        <tr>
 		            <td>${userId}</td>
 		            <td>
@@ -60,14 +67,24 @@
 		                    </c:otherwise>
 		                </c:choose>
 		            </td>
-            		<td>
-					   <form action="FrontServlet" method="POST">
-			               <input type="hidden" name="relationId" value="${relation.relationId}">
-			               <input type="hidden" name="userId" value="${sessionScope.userId}">
-			               <input type="hidden" name="command" value="AddBlock">
-			               <button type="submit">ブロック</button>
-			           </form>
-					</td>
+		            <td>
+	                    <form action="FrontServlet" method="POST">
+	                        <c:choose>
+	                            <c:when test="${blocked}">
+	                            	<input type="hidden" name="userId" value="${sessionScope.userId}"/>
+	                                <input type="hidden" name="blockId" value="${blockId}"/>
+	                                <input type="hidden" name="command" value="RemoveBlock"/>
+	                                <button type="submit">ブロック解除</button>
+	                            </c:when>
+	                            <c:otherwise>
+					                <input type="hidden" name="blockedId" value="${userId}">
+					                <input type="hidden" name="blockerId" value="${sessionScope.userId}">
+	                                <input type="hidden" name="command" value="AddBlockUser"/>
+	                                <button type="submit">ブロック</button>
+	                            </c:otherwise>
+	                        </c:choose>
+	                    </form>
+	                </td>
 		        </tr>
 		    </c:if>
 		</c:forEach>

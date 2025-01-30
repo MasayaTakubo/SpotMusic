@@ -1,10 +1,14 @@
 package command;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import bean.blockBean;
 import bean.relationBean;
 import context.RequestContext;
 import context.ResponseContext;
+import dao.BlockedUserDAO;
 import dao.RelationDAO;
 
 public class AddRelationCommand extends AbstractCommand {
@@ -21,7 +25,12 @@ public class AddRelationCommand extends AbstractCommand {
         RelationDAO relationDAO = new RelationDAO();
         relationDAO.addRelation(relationBean);
         List<relationBean> relations = relationDAO.getRelation(user1Id);
-        resc.setResult(relations);
+        BlockedUserDAO blockDAO = new BlockedUserDAO();
+        List<blockBean> blockusers = blockDAO.getBlockList(user1Id);
+        Map<String, List<?>> data = new HashMap<>();
+        data.put("relations",relations);
+        data.put("blockusers",blockusers);
+        resc.setResult(data);
         resc.setTarget("friendList");
         return resc;
     }

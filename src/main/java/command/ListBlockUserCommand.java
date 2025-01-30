@@ -16,7 +16,7 @@ public class ListBlockUserCommand extends AbstractCommand {
         BlockedUserDAO blockDAO = new BlockedUserDAO();
         List<blockBean> blocks = blockDAO.getBlockList(userId);
         resc.setResult(blocks);
-        resc.setTarget("friendList");
+        resc.setTarget("blockList");
         return resc;
     }
 }
