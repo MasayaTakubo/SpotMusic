@@ -6,27 +6,37 @@ import java.util.Map;
 
 import bean.blockBean;
 import bean.relationBean;
+import bean.usersBean;
 import context.RequestContext;
 import context.ResponseContext;
 import dao.BlockedUserDAO;
 import dao.RelationDAO;
+import dao.UsersDAO;
 
 public class UsersListCommand extends AbstractCommand {
     @Override
     public ResponseContext execute(ResponseContext resc) {
     	RequestContext reqc = getRequestContext();
     	String userId = reqc.getParameter("userId")[0];
+    	
+        Map<String, List<?>> data = getShowData(userId);
+        resc.setResult(data);
+        resc.setTarget("usersList");
+        return resc;
+    }
+    
+    private Map<String, List<?>> getShowData(String userId){
+    	//jspの表示に使うものは基本relation,users,blockedUsers表しかないからまとめる
         RelationDAO relationDAO = new RelationDAO();
-        List<String> users = relationDAO.getUsersId();
         List<relationBean> isfriend = relationDAO.getRelation(userId);
+        UsersDAO usersDAO = new UsersDAO();
+        List<usersBean> users = usersDAO.getUsersData();
         BlockedUserDAO blockDAO = new BlockedUserDAO();
         List<blockBean> blockusers = blockDAO.getBlockList(userId);
         Map<String, List<?>> data = new HashMap<>();
         data.put("users",users);
         data.put("isfriend",isfriend);
         data.put("blockusers", blockusers);
-        resc.setResult(data);
-        resc.setTarget("usersList");
-        return resc;
+    	return data;
     }
 }

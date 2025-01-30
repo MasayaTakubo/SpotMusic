@@ -6,10 +6,12 @@ import java.util.Map;
 
 import bean.blockBean;
 import bean.relationBean;
+import bean.usersBean;
 import context.RequestContext;
 import context.ResponseContext;
 import dao.BlockedUserDAO;
 import dao.RelationDAO;
+import dao.UsersDAO;
 
 public class AddRelationCommand extends AbstractCommand {
     @Override
@@ -24,14 +26,24 @@ public class AddRelationCommand extends AbstractCommand {
         // データベースに保存
         RelationDAO relationDAO = new RelationDAO();
         relationDAO.addRelation(relationBean);
-        List<relationBean> relations = relationDAO.getRelation(user1Id);
-        BlockedUserDAO blockDAO = new BlockedUserDAO();
-        List<blockBean> blockusers = blockDAO.getBlockList(user1Id);
-        Map<String, List<?>> data = new HashMap<>();
-        data.put("relations",relations);
-        data.put("blockusers",blockusers);
+        Map<String, List<?>> data = getShowData(user1Id);
         resc.setResult(data);
         resc.setTarget("friendList");
         return resc;
+    }
+    
+    private Map<String, List<?>> getShowData(String userId){
+    	//jspの表示に使うものは基本relation,users,blockedUsers表しかないからまとめる
+        RelationDAO relationDAO = new RelationDAO();
+        List<relationBean> relations = relationDAO.getRelation(userId);
+        UsersDAO usersDAO = new UsersDAO();
+        List<usersBean> users = usersDAO.getUsersData();
+        BlockedUserDAO blockDAO = new BlockedUserDAO();
+        List<blockBean> blockusers = blockDAO.getBlockList(userId);
+        Map<String, List<?>> data = new HashMap<>();
+        data.put("users",users);
+        data.put("relations",relations);
+        data.put("blockusers", blockusers);
+    	return data;
     }
 }

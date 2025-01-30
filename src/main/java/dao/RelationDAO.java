@@ -72,22 +72,6 @@ public class RelationDAO {
         }
     }
     
-    public List<String> getUsersId() {
-        String sql = "SELECT user_id FROM users";
-        List<String> userIds = new ArrayList<>();
-        
-        try (Connection conn = MySQLConnector.getConn();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                userIds.add(rs.getString("user_id"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        
-        return userIds;  // ユーザーIDのリストを返す
-    }
     public void deleteRelation(int relationId) {
     	String sql = "DELETE from relation where relation_Id = ?";
     	try (Connection conn = MySQLConnector.getConn();

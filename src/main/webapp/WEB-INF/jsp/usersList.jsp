@@ -10,13 +10,15 @@
 <body>
     <h1>ユーザーリスト</h1>
     <h1>${sessionScope.userId}</h1>
+    
     <table border="1">
         <tr>
-            <th>User ID</th>
+            <th>ユーザー名</th>
             <th>Action</th>
             <th>ブロック</th>
         </tr>
-		<c:forEach var="userId" items="${messages.users}">
+		<c:forEach var="user" items="${messages.users}">
+			<c:set var="userId" value="${user.userId}"/>
 		    <c:if test="${userId != sessionScope.userId}">
 		    	<c:set var="blocked" value="false"/>
 	            <c:forEach var="block" items="${messages.blockusers}">
@@ -26,7 +28,7 @@
 	                </c:if>
 	            </c:forEach>
 		        <tr>
-		            <td>${userId}</td>
+		            <td>${user.userName}</td>
 		            <td>
 		                <c:set var="friendStatus" value="none" />
 		                <c:forEach var="friend" items="${messages.isfriend}">
