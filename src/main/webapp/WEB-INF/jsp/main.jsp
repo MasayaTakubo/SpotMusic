@@ -309,22 +309,38 @@
 	    <h2>トラック詳細</h2>
 	    <p id="track-detail">再生中のトラック詳細が表示されます。</p>	    
     </div>
-    <div id="player-container">
-        <div id="player-controls">
-            <h2>🤓</h2> 
-            <p><span id="current-time">0:00</span> / <span id="total-time">0:00</span></p>
-            <input type="range" id="seek-bar" value="0" min="0" max="100">            
-            <p id="now-playing">現在再生中: <span id="current-track">なし</span></p>
-            <button id="prev"><i class="fas fa-step-backward"></i></button>
-			<button id="play-pause"><i class="fas fa-play"></i></button>	
-			<button id="next"><i class="fas fa-step-forward"></i></button>
-            <button id="mute-toggle"><i class="fas fa-volume-up"></i></button>
-            <input type="range" id="progress-bar" value="50" min="0" max="100">
-            <button id="repeat-track"><i class="fas fa-redo"></i></button>
-			<button id="shuffle-toggle"><i class="fas fa-random"></i></button>
-        </div>
+
+<div id="player-container">
+    <!-- 左側: 曲名表示 -->
+    <div id="player-left">
+    	<h3>🤓</h3>
+        <p id="now-playing">現在再生中: <span id="current-track">なし</span></p>
+    </div>
+
+    <!-- 中央: プレイヤーコントロール -->
+    <div id="player-controls">
+        <button id="repeat-track"><i class="fas fa-redo"></i></button>
+        <button id="prev"><i class="fas fa-step-backward"></i></button>
+        <button id="play-pause"><i class="fas fa-play"></i></button>
+        <button id="next"><i class="fas fa-step-forward"></i></button>
+        <button id="shuffle-toggle"><i class="fas fa-random"></i></button>
+    </div>
+    <!-- シークバーと再生時間 -->
+	<div id="seek-container">
+    	<span id="current-time">0:00</span>
+    	<input type="range" id="seek-bar" value="0" min="0" max="100">
+    	<span id="total-time">0:00</span>
 	</div>
-    <!-- ここまで -->
+
+    <!-- 右側: 音量調整 -->
+    <div id="player-right">
+        <button id="mute-toggle"><i class="fas fa-volume-up"></i></button>
+        <input type="range" id="progress-bar" value="50" min="0" max="100">
+    </div>
+</div>
+
+
+
 
 <script>
     // プレイリストの詳細を受け取った場合
