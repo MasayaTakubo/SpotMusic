@@ -1,20 +1,19 @@
-/* プレイヤー全体のデザイン */
+/* プレイヤー全体 */
 #player-container {
     background-color: black;
     color: white;
     position: fixed;
-    bottom: 0; /* 画面下部に配置 */
+    bottom: 0;
     left: 50%;
-    transform: translateX(-50%); /* 中央揃え */
-    width: 99%; /* 横幅を少し縮小 (100% → 95%) */
-    height: 55px; /* 高さを縮小 */
-    display: flex !important;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 50px;
+    display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 8px 12px; /* 内側の余白を調整 */
-    z-index: 10000 !important;
+    justify-content: space-between; /* 左・中央・右で分ける */
+    padding: 5px 10px;
+    z-index: 10000;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.5);
-
 }
 
 /* トラック詳細 */
@@ -27,20 +26,22 @@
     max-width: 200px;
 }
 
-/* プレイヤーコントロール */
+/* 中央（コントロールボタン: 幅を広げる） */
 #player-controls {
-    display: flex !important;
+    display: flex;
     align-items: center;
     justify-content: center;
-    gap: 15px;
-    width: 100%;
+    gap: 20px; /* ボタンの間隔を均一に */
+    flex: 3; /* 中央エリアを広げる */
+    position: relative; /* 相対位置指定 */
+    top: -5px; /* 5px分上に移動 */
 }
 
 button {
     background: none;
     border: none;
     color: white;
-    font-size: 18px;
+    font-size: 14px;
     cursor: pointer;
     transition: color 0.2s, transform 0.2s;
     display: flex;
@@ -55,10 +56,11 @@ button:hover {
 
 /* ボタンアイコンのデザイン */
 button#prev::before {
-    content: '\f104'; /* FontAwesomeの前の曲アイコン */
+    content: '\f04a'; /* FontAwesomeの前の曲アイコン */
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;
 }
+
 
 button#play-pause::before {
     content: '\f04b'; /* FontAwesomeの再生アイコン */
@@ -73,9 +75,14 @@ button#pause::before {
 }
 
 button#next::before {
-    content: '\f105'; /* FontAwesomeの次の曲アイコン */
+    content: '\f04e'; /* FontAwesomeの次の曲アイコン */
     font-family: 'Font Awesome 5 Free';
     font-weight: 900;
+}
+/* ::before を削除 */
+button#prev::before,
+button#next::before {
+    content: none !important;
 }
 
 button#repeat-track::before {
@@ -138,7 +145,7 @@ button#shuffle-toggle::before {
     font-size: 20px;
 }
 
-/* `::before` でアイコンを表示しないようにする */
+/* ::before でアイコンを表示しないようにする */
 #play-pause::before {
     content: none !important;
 }
@@ -157,7 +164,7 @@ button#shuffle-toggle::before {
     font-size: 20px;
 }
 
-/* 余計な `::before` を削除 */
+/* 余計な ::before を削除 */
 #shuffle-toggle::before {
     content: none;
 }
@@ -170,37 +177,37 @@ button#shuffle-toggle::before {
     transform: translate(-50%, -50%);
 }
 
-/* 🔽 プレイヤー全体のサイズを縮小 */
+/* ?? プレイヤー全体のサイズを縮小 */
 #player-container {
     height: 50px; /* 高さをさらに縮小 */
     padding: 5px 8px; /* 内側の余白を微調整 */
 }
 
-/* 🔽 コントロールボタンのサイズを縮小 */
+/* ?? コントロールボタンのサイズを縮小 */
 button {
     font-size: 12px; /* アイコンのサイズを小さく */
 }
-/* 🔽 再生/停止ボタン */
+/* ?? 再生/停止ボタン */
 #play-pause {
     font-size: 14px;
 }
 
-/* 🔽 シャッフル & リピート ボタンの調整 */
+/* ?? シャッフル & リピート ボタンの調整 */
 #shuffle-toggle, #repeat-track {
     font-size: 14px;
     width: 20px;  /* ボタンの幅を縮小 */
     height: 20px;
 }
 
-/* 🔽 シークバーのサイズ調整 */
+/* ?? シークバーのサイズ調整 */
 #seek-bar, #progress-bar {
     width: 30%; /* さらに短くしてスペースを確保 */
 }
 
-/* 🔽 ボタン間の間隔を縮小 */
-#player-controls {
-    gap: 8px; /* ボタン同士の間隔を縮める */
-}
+/* ?? ボタン間の間隔を縮小 */
+/*#player-controls {
+    gap: 8px;  ボタン同士の間隔を縮める 
+}*/
 
 #shuffle-toggle, #repeat-track {
     margin-left: 5px; /* 左側に少し寄せてはみ出しを防ぐ */
@@ -256,8 +263,64 @@ button {
     color: white;
 }
 
+/* 右側（音量調整） */
+#player-right {
+    display: flex;
+    align-items: center;
+    flex: 1; /* 右側を一定の幅に */
+    justify-content: flex-start; /* 左寄せ */
+    padding-left: 10px; /* 余白を追加 */
+}
 
+/* 左側（曲名）をもっと右に寄せる */
+#player-left {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    justify-content: flex-end; /* 右寄せ */
+}
 
+/* 曲名の表示 */
+#now-playing {
+    font-size: 14px;
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: right;
+}
+
+/* シークバーと時間をセンターの下側に配置 */
+#seek-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 80%;
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#seek-bar {
+    width: 50%;
+    appearance: none;
+    background: #555;
+    height: 4px;
+    border-radius: 4px;
+}
+
+/* コントロールボタンのサイズを大きく */
+#repeat-track,
+#prev,
+#play-pause,
+#next,
+#shuffle-toggle {
+    font-size: 20px; /* ボタンを大きく */
+    min-width: 40px; /* 幅を統一 */
+    height: 40px;
+}
 
 /* [仮] playlist.jspのボタン調整*/
 /* プレイリストのボタンのスタイル（黒色に設定） */

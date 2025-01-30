@@ -241,6 +241,35 @@ public class SpotifyControlServlet extends HttpServlet {
                     }
                     break;
 
+                case "getShuffleState":
+                    // セッションから現在のシャッフル状態を取得
+                    Boolean currentShuffleStatemanco = (Boolean) session.getAttribute("shuffle");
+                    if (currentShuffleStatemanco == null) {
+                        currentShuffleStatemanco = false; // デフォルトはOFF
+                    }
+
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    response.getWriter().write("{\"shuffleState\": " + currentShuffleStatemanco + "}");
+                    break;
+
+                    
+                case "syncShuffleState":
+                    try {
+                        boolean spotifyShuffleState = spotifyService.getSpotifyShuffleState(accessToken);
+                        session.setAttribute("shuffle", spotifyShuffleState);
+
+                        response.setContentType("application/json");
+                        response.setCharacterEncoding("UTF-8");
+                        response.getWriter().write("{\"shuffleState\": " + spotifyShuffleState + "}");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        response.getWriter().write("{\"error\": \"Failed to fetch shuffle state\"}");
+                    }
+                    break;
+
+
 
 
                 default:
