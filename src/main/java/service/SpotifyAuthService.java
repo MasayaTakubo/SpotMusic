@@ -119,7 +119,7 @@ public class SpotifyAuthService {
     }
 
 
-
+    //自分の登録しているプレイリストを取得？
     public JSONObject getSpotifyPlaylists(String accessToken) throws Exception {
         // Spotifyのプレイリスト情報を取得するURL
         URL url = new URL("https://api.spotify.com/v1/me/playlists");
@@ -139,8 +139,6 @@ public class SpotifyAuthService {
         return new JSONObject(response.toString());
     }
     
-    
-    
     public List<Map<String, Object>> convertJsonArrayToList(JSONArray jsonArray) {
         List<Map<String, Object>> list = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
@@ -154,6 +152,8 @@ public class SpotifyAuthService {
         return list;
     }
     
+    
+    //ユーザーがフォローしているアーティストを取得
     public JSONObject getFollowedArtists(String accessToken) throws Exception {
         // Spotifyのフォロー中アーティスト情報を取得するURL
         URL url = new URL("https://api.spotify.com/v1/me/following?type=artist");
@@ -497,9 +497,43 @@ public class SpotifyAuthService {
         return response.getJSONArray("items");
     }
     
-    //アーティストに紐づいたアルバムの中のtrackを取得
-    public List<JSONObject> getAllAlbumTracks(String accessToken, String albumId) throws Exception {
-        List<JSONObject> allTracks = new ArrayList<>();
+	/*//アーティストに紐づいたアルバムの中のtrackを取得
+	public List<JSONObject> getAllAlbumTracks(String accessToken, String albumId) throws Exception {
+	    List<JSONObject> allTracks = new ArrayList<>();
+	    String nextUrl = "https://api.spotify.com/v1/albums/" + albumId + "/tracks";
+	
+	    while (nextUrl != null) {
+	        URL url = new URL(nextUrl);
+	        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+	        connection.setRequestMethod("GET");
+	        connection.setRequestProperty("Authorization", "Bearer " + accessToken);
+	
+	        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+	        StringBuilder response = new StringBuilder();
+	        String inputLine;
+	        while ((inputLine = in.readLine()) != null) {
+	            response.append(inputLine);
+	        }
+	        in.close();
+	
+	        JSONObject responseJson = new JSONObject(response.toString());
+	        JSONArray items = responseJson.getJSONArray("items");
+	        for (int i = 0; i < items.length(); i++) {
+	            allTracks.add(items.getJSONObject(i));
+	        }
+	
+	        // 次のページがある場合、URLを取得
+	        nextUrl = responseJson.optString("next", null);
+	    }
+	
+	    return allTracks;
+	}
+	*/
+    
+    
+    
+    public JSONArray getAllAlbumTracks(String accessToken, String albumId) throws Exception {
+        JSONArray allTracks = new JSONArray();  // 変更：JSONArrayに変更
         String nextUrl = "https://api.spotify.com/v1/albums/" + albumId + "/tracks";
 
         while (nextUrl != null) {
@@ -519,16 +553,67 @@ public class SpotifyAuthService {
             JSONObject responseJson = new JSONObject(response.toString());
             JSONArray items = responseJson.getJSONArray("items");
             for (int i = 0; i < items.length(); i++) {
-                allTracks.add(items.getJSONObject(i));
+                allTracks.put(items.getJSONObject(i));  // 変更：JSONArrayに追加
+            }
+
+            // デバッグ用に最初の3件を出力
+            System.out.println("取得データ（最大3件）:");
+            for (int i = 0; i < Math.min(3, items.length()); i++) {
+                System.out.println(items.getJSONObject(i).toString(2)); // 2スペースのインデントで整形
             }
 
             // 次のページがある場合、URLを取得
             nextUrl = responseJson.optString("next", null);
         }
 
-        return allTracks;
+        return allTracks;  // 変更：JSONArrayを返す
     }
 
+	
+    
+    
+    public JSONObject getAlbumDetails(String accessToken, String albumId) throws Exception {
+        // アルバム詳細情報を格納するJSONObject
+        JSONObject albumDetails = new JSONObject();
+        
+        // アルバム詳細情報の取得URL
+        String albumDetailsUrl = "https://api.spotify.com/v1/albums/" + albumId;
+
+        // APIリクエストを送信してレスポンスを取得
+        URL url = new URL(albumDetailsUrl);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Authorization", "Bearer " + accessToken);
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        StringBuilder response = new StringBuilder();
+        String inputLine;
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        // レスポンスJSONをパース
+        JSONObject responseJson = new JSONObject(response.toString());
+
+        // アルバム情報を抽出
+        albumDetails.put("albumName", responseJson.getString("name"));
+        albumDetails.put("albumReleaseDate", responseJson.getString("release_date"));
+        
+        // 画像データの取得
+        JSONArray images = responseJson.getJSONArray("images");
+        if (images.length() > 0) {
+            // 最初の画像URLを使用
+            String imageUrl = images.getJSONObject(0).getString("url");
+            albumDetails.put("albumImageUrl", imageUrl);
+        }
+
+        return albumDetails;
+    }
+
+    
+    
+    
     
     
     

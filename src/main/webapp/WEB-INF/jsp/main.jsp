@@ -1,11 +1,15 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ page import="java.util.List"%>
 <%@ page import="bean.SpotifyPlayListBean"%>
-<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.ArrayList"%>
 <%@ page import="bean.TrackBean"%>
 <!DOCTYPE html>
 <html lang="ja">
+<!-- jQueryをCDNから読み込む -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,7 +25,6 @@
             height: 100vh;
             font-family: Arial, sans-serif;
             padding-top: 60px; /* ヘッダーの高さ分を確保 */
-            overflow: hidden;
         }
         .sidebar, .content, .property-panel {
             padding: 20px;
@@ -71,7 +74,7 @@
 		
 		.actions {
 		    display: flex;
-		    align-items: rigt;
+		    align-items: right;
 		    justify-content: flex-end; /* アクションエリアを右端揃え */
 		    gap: 10px; /* アイコン間のスペース */
 		}
@@ -137,7 +140,7 @@
             <img src="<c:url value='/img/Spotmusic.webp' />" alt="ロゴを配置" class="reload-icon">
         </a>
     </div>
-    <div class="action">
+    <div class="actions">
         <!-- アカウントアイコン -->
         <div class="account-container">
 <img src="<c:url value='/img/icon.png' />" alt="アイコン" class="account-icon" id="account-icon">
@@ -169,114 +172,137 @@
 
 
         <ul>
-            <c:forEach var="playlist" items="${playlistBeans}">
+                <c:forEach var="playlist" items="${playlistBeans}">
                 <li>
                     <!-- プレイリスト名をクリックした時に詳細を表示 -->
                     <button onclick="loadPlaylistPage('${playlist.playlistId}')">
-                        ${playlist.playlistName}
-                        ${playlist.playlistId}
-                        
-                    </button>
-                </li>
-            </c:forEach>
-        </ul>
-    </div>
+                       <strong>プレイリスト名：</strong> ${playlist.playlistName}<br>
+                       <strong>プレイリストID：</strong> ${playlist.playlistId}<br>
+                      </button>
+                       	<strong>イメージ画像：</strong><img src="${playlist.imageUrl}" alt="Playlist Image" width="100" /> 
+                       	
+   
+				</li>
+				</c:forEach>
+		</ul>
+</div>
+		
+			<!-- 中央: 人気のアーティスト -->
+	<div class="content">
+		<h2>フォロー中のアーティスト</h2>
+		<%
+		List<String> followedArtistNames = (List<String>) session.getAttribute("followedArtistNames");
+		List<String> followedArtistImages = (List<String>) session.getAttribute("followedArtistImages");
+		if (followedArtistNames == null) {
+			followedArtistNames = new java.util.ArrayList<>();
+		}
+		if (followedArtistImages == null) {
+			followedArtistImages = new java.util.ArrayList<>();
+		}
+		%>
 
-    <!-- 中央: コンテンツ -->
-    <div class="content">
-        <h2>フォロー中のアーティスト</h2>
-        <%
-            List<String> followedArtistNames = (List<String>) session.getAttribute("followedArtistNames");
-            if (followedArtistNames == null) {
-                followedArtistNames = new java.util.ArrayList<>();
-            }
-        %>
+		<c:choose>
+			<c:when test="${not empty followedArtistNames}">
+				<ul>
+					<!-- アーティストの情報をループで表示 -->
+					<c:forEach var="artistName" items="${followedArtistNames}"
+						varStatus="status">
+						<li>
+							<!-- アーティストの画像と名前を表示 --> <c:if
+								test="${not empty followedArtistImages[status.index]}">
+								<img src="${followedArtistImages[status.index]}"
+									alt="${artistName}" width="100" />
+							</c:if> <a href="javascript:void(0);"
+							onclick="loadArtistPage('${sessionScope.artistIds[status.index]}')">
+								${artistName} </a>
+						</li>
+					</c:forEach>
+				</ul>
+			</c:when>
+			<c:otherwise>
+				<p>フォロー中のアーティストが見つかりませんでした。</p>
+			</c:otherwise>
+		</c:choose>
 
-        <c:choose>
-            <c:when test="${not empty sessionScope.artistIds}">
-                <ul>
-                    <c:forEach var="artistId" items="${sessionScope.artistIds}" varStatus="status">
-                        <li>
-                            <a href="javascript:void(0);" onclick="loadArtistPage('${artistId}')">
-                                アーティスト名（ ${sessionScope.artistNames[status.index]} ）
-                            </a>
-                        </li>
-                    </c:forEach>
-                </ul>
-            </c:when>
-            <c:otherwise>
-                <p>フォロー中のアーティストが見つかりませんでした。</p>
-            </c:otherwise>
-        </c:choose>
 
-        <!-- デフォルトのコンテンツ (最近再生したトラックやレコメンドなど) -->
-        <h2>最近再生したトラック</h2>
-        <c:if test="${not empty recentryDatas}">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Track ID</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <c:forEach var="entry" items="${recentryDatas}">
-                        <tr>
-                            <td>${entry.key}</td>
-                        </tr>
-                    </c:forEach>
-                </tbody>
-            </table>
-        </c:if>
-        <c:if test="${empty recentryDatas}">
-            <p>No recently played tracks found.</p>
-        </c:if>
+		</ul>
 
-        <!-- Top Mix Tracksの表示 -->
-        <h2>Top Mix Tracks</h2>
-        <c:if test="${not empty topMixDatas}">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Track ID</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <c:forEach var="entry" items="${topMixDatas}">
-                        <tr>
-                            <td>${entry.key}</td>
-                        </tr>
-                    </c:forEach>
-                </tbody>
-            </table>
-        </c:if>
-        <c:if test="${empty topMixDatas}">
-            <p>No top mix tracks found.</p>
-        </c:if>
 
-        <!-- レコメンドデータの表示 -->
-        <h2>Recommended Tracks</h2>
-        <c:if test="${not empty recomendDatas}">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Track Name</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <c:forEach var="entry" items="${recomendDatas}">
-                        <tr>
-                            <td>${entry.value}</td>
-                        </tr>
-                    </c:forEach>
-                </tbody>
-            </table>
-        </c:if>
-        <c:if test="${empty recomendDatas}">
-            <p>No recommended tracks found.</p>
-        </c:if>
-    </div>
 
-    <!-- 右側: 詳細情報パネル -->
+		<h1>今回新たにしゅとくしようとしているもの</h1>
+		<!-- 最近再生履歴の表示 -->
+		<h2>Recently Played Tracks</h2>
+		<c:if test="${not empty recentryDatas}">
+			<table>
+				<thead>
+					<tr>
+						<th>Track ID</th>
+
+					</tr>
+				</thead>
+				<tbody>
+					<c:forEach var="entry" items="${recentryDatas}">
+						<tr>
+							<td>${entry.key}</td>
+
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+		</c:if>
+		<c:if test="${empty recentryDatas}">
+			<p>No recently played tracks found.</p>
+		</c:if>
+
+		<!-- Top Mix Tracksの表示 -->
+		<h2>Top Mix Tracks</h2>
+		<c:if test="${not empty topMixDatas}">
+			<table>
+				<thead>
+					<tr>
+						<th>Track ID</th>
+
+					</tr>
+				</thead>
+				<tbody>
+					<c:forEach var="entry" items="${topMixDatas}">
+						<tr>
+							<td>${entry.key}</td>
+
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+		</c:if>
+		<c:if test="${empty topMixDatas}">
+			<p>No top mix tracks found.</p>
+		</c:if>
+
+		<!-- レコメンドデータの表示 -->
+		<h2>Recommended Tracks</h2>
+		<c:if test="${not empty recomendDatas}">
+			<table>
+				<thead>
+					<tr>
+						<th>Track Name</th>
+					</tr>
+				</thead>
+				<tbody>
+					<c:forEach var="entry" items="${recomendDatas}">
+						<tr>
+							<td>${entry.value}</td>
+							<!-- トラック名だけ表示 -->
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+		</c:if>
+		<c:if test="${empty recomendDatas}">
+			<p>No recommended tracks found.</p>
+		</c:if>
+
+	</div>
+	    <!-- 右側: 詳細情報パネル -->
 	<div class="property-panel" id="propertyPanel">
 	    <h2>トラック詳細</h2>
 	    <p id="track-detail">再生中のトラック詳細が表示されます。</p>	    
@@ -337,7 +363,7 @@ function loadPlaylistPage(playlistId) {
     <script>
     //再生プレイヤー用JavaScript
         window.onSpotifyWebPlaybackSDKReady = () => {
-            const token = '<%= session.getAttribute("access_token") %>';
+            const token = '<%=session.getAttribute("access_token")%>';
 
             if (!token || token === "null") {
                 console.error("アクセストークンが無効です。再ログインしてください。");
@@ -605,7 +631,7 @@ function loadPlaylistPage(playlistId) {
 
         }
     </script>
-<script>
+	<script>
         // artist.jspを動的に読み込む関数
 function loadArtistPage(artistId) {
     var contentDiv = document.querySelector('.content');
@@ -624,37 +650,40 @@ function loadArtistPage(artistId) {
 }
 
     </script>
-    
-    <script>
+
+	<script>
     // アルバム情報を動的に読み込む関数
-    function loadAlbumPage(albumId) {
-        if (!albumId) {
-            console.error('albumId が指定されていません');
-            return;
-        }
+function loadAlbumPage(albumId) {
 
-        // サーバーにリクエストを送信
-        const url = "/SpotMusic/FrontServlet?command=AlbumDetails&albumId=" + encodeURIComponent(albumId);
-        const contentDiv = document.querySelector('.content');
+    // サーバーにリクエストを送信
+    const url = "/SpotMusic/FrontServlet?command=AlbumDetails&albumId=" + albumId;
+    const contentDiv = document.querySelector('.content');
 
-        // Fetch APIでリクエストを送信し、結果をページに埋め込む
-        fetch(url)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('サーバーエラー: ' + response.status);
-                }
-                return response.text();
-            })
-            .then(data => {
-                contentDiv.innerHTML = data; // 取得したHTMLを表示
-            })
-            .catch(error => {
-                console.error('エラー発生:', error);
-                contentDiv.innerHTML = '<p>アルバム情報の取得に失敗しました。</p>';
-            });
+    console.log("Fetch URL: ", url);
+
+    // Fetch APIでリクエストを送信し、結果をページに埋め込む
+    fetch(url)
+    .then(response => response.text())
+    .then(data => {
+        // 取得したデータを.content内に上書きする
+        contentDiv.innerHTML = data;
+    })
+    .catch(error => {
+        console.error('Error loading artist page:', error);
+        contentDiv.innerHTML = '<p>アーティスト情報の取得に失敗しました。</p>';
+    });
+}
+
+
+
+
+ // 再生中のトラックの情報を取得して画像を更新
+    function updateTrackInfo(track) {
+        document.getElementById('current-track').textContent = track.trackName;
+        document.getElementById('current-track-image').src = track.trackImageUrl; // 画像のURLを設定
     }
 </script>
-
+ 
 <script>
 //シークバー管理JavaScript
     const seekBar = document.getElementById('seek-bar');
@@ -759,6 +788,31 @@ document.addEventListener('click', (event) => {
             }
         });
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    $(document).on('click', '.load-album-link', function () {
+        const albumId = $(this).data('playlist-id'); // data-playlist-idを取得
+        console.log("Album ID clicked:", albumId);  // クリックしたIDを確認
+        loadAlbumPage(albumId);  // 関数を呼び出し
+    });
+});
 
+function loadAlbumPage(albumId) {
+    console.log("loadAlbumPage called with albumId:", albumId);  // デバッグ用
+    const url = "/SpotMusic/FrontServlet?command=AlbumDetails&albumId=" + albumId;
+    console.log("Fetch URL:", url);  // デバッグ用
+
+    const contentDiv = document.querySelector('.content');
+    fetch(url)
+    .then(response => response.text())
+    .then(data => {
+        contentDiv.innerHTML = data;
+    })
+    .catch(error => {
+        console.error('Error loading album page:', error);
+        contentDiv.innerHTML = '<p>アルバム情報の取得に失敗しました。</p>';
+    });
+}
+</script>
 </body>
 </html>

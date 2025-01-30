@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ArtistBean {
@@ -16,33 +17,48 @@ public class ArtistBean {
     private List<SpotifyPlayListBean> playlists = new ArrayList<>(); // アーティストのプレイリスト
 
     // コンストラクタでJSONをBeanに変換
-    public ArtistBean(JSONObject artist, JSONArray topTracksJson, JSONArray playlistsJson) {
-        this.artistId = artist.getString("id"); // アーティストID
-        this.artistName = artist.getString("name"); // アーティスト名
-        this.artistGenres = extractGenres(artist.getJSONArray("genres")); // ジャンル
-        this.followers = artist.getJSONObject("followers").getInt("total"); // フォロワー数
+    public ArtistBean(JSONObject artist, JSONArray topTracksJson, JSONArray playlistsJson, String trackImagesJson) {
+        this.artistId = artist.getString("id"); 
+        this.artistName = artist.getString("name"); 
+        this.artistGenres = extractGenres(artist.getJSONArray("genres")); 
+        this.followers = artist.getJSONObject("followers").getInt("total"); 
 
         // アーティスト画像URLの取得
         if (artist.has("images") && artist.getJSONArray("images").length() > 0) {
             this.artistImageUrl = artist.getJSONArray("images").getJSONObject(0).getString("url");
         }
 
-        // 人気曲のリストを取得
+        // 人気曲リストの取得
         for (int i = 0; i < topTracksJson.length(); i++) {
             JSONObject track = topTracksJson.getJSONObject(i);
             String trackId = track.getString("id");
             String trackName = track.getString("name");
-            String artistName = track.getJSONArray("artists").getJSONObject(0).getString("name");
-            topTracks.add(new TrackBean(trackId, trackName, artistName));
+            String trackArtistName = track.getJSONArray("artists").getJSONObject(0).getString("name");
+
+            JSONObject album = track.getJSONObject("album");
+            String trackImage = album.optString("url", "");
+
+            topTracks.add(new TrackBean(trackId, trackName, trackArtistName, trackImage));
         }
 
-        // プレイリスト情報のリストを取得
+        // プレイリスト情報の取得
         for (int i = 0; i < playlistsJson.length(); i++) {
             JSONObject playlist = playlistsJson.getJSONObject(i);
             SpotifyPlayListBean playlistBean = new SpotifyPlayListBean(playlist, this.artistId);
             playlists.add(playlistBean);
         }
+
+        // trackImagesJsonを処理
+        if (trackImagesJson != null && !trackImagesJson.isEmpty()) {
+            try {
+                JSONObject trackImagesJsonObject = new JSONObject(trackImagesJson);
+                // 必要な処理をここで行う
+            } catch (JSONException e) {
+                System.err.println("Invalid JSON format for trackImagesJson: " + trackImagesJson);
+            }
+        }
     }
+
 
     // アーティストIDを取得
     public String getArtistId() {

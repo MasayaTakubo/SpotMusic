@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import bean.TrackBean;
@@ -37,19 +38,34 @@ public class PlayListDetailsCommand extends AbstractCommand {
         }
 
         try {
-            SpotifyAuthService sas = new SpotifyAuthService();
+            SpotifyAuthService spotifyService = new SpotifyAuthService();
 
             // プレイリストのトラック情報を取得
             List<TrackBean> trackList = new ArrayList<>();
-            List<JSONObject> allTracks = sas.getAllPlaylistTracks(accessToken, playlistId);
+            List<JSONObject> allTracks = spotifyService.getAllPlaylistTracks(accessToken, playlistId);
 
             for (JSONObject trackJson : allTracks) {
                 JSONObject trackInfo = trackJson.getJSONObject("track");
+
+                // トラック情報取得
                 String trackId = trackInfo.getString("id");
                 String trackName = trackInfo.getString("name");
                 String artistName = trackInfo.getJSONArray("artists").getJSONObject(0).getString("name");
 
-                TrackBean track = new TrackBean(trackId, trackName, artistName);
+                // アルバム画像URLを取得
+                String trackImageUrl = "";
+                JSONArray images = trackInfo.getJSONObject("album").getJSONArray("images");
+                if (images.length() > 0) {
+                    trackImageUrl = images.getJSONObject(0).getString("url"); // 一番大きい画像を取得
+                }
+
+                // 画像URLが空ならデフォルト画像を設定
+                if (trackImageUrl.isEmpty()) {
+                    trackImageUrl = "/path/to/default/image.jpg";  // デフォルト画像パス
+                }
+
+                // TrackBean に追加
+                TrackBean track = new TrackBean(trackId, trackName, artistName, trackImageUrl);
                 trackList.add(track);
             }
 
@@ -62,7 +78,7 @@ public class PlayListDetailsCommand extends AbstractCommand {
         } catch (Exception e) {
             e.printStackTrace();
             responseContext.setResult("error");
-            responseContext.setTarget("playList");
+            responseContext.setTarget("error.jsp");
         }
 
         return responseContext;

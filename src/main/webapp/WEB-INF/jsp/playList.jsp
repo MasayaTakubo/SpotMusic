@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+
 <%@ page import="bean.TrackBean" %>
 <%@ page import="java.util.List" %>
 <!DOCTYPE html>
@@ -17,18 +19,27 @@
         List<TrackBean> trackList = (List<TrackBean>) session.getAttribute("trackList");
     %>
 
-    <c:if test="${not empty trackList}">
-        <ul class="track-list">
-            <c:forEach var="track" items="${trackList}">
-                <li>
-                    <strong>トラック名: ${track.trackName}</strong><br>
-                    <strong>アーティスト名：${track.artistName}</strong>
-					<button onclick="playTrack('${track.trackId}', '${track.trackName}')">再生</button>
+<c:if test="${not empty trackList}">
+    <ul class="track-list">
+        <c:forEach var="track" items="${trackList}">
+            <li>
+                <strong>トラック名:</strong> ${fn:escapeXml(track.trackName)}<br> 
+                <strong>アーティスト名:</strong> ${fn:escapeXml(track.artistName)}<br>
+                
+                <!-- 画像URLが設定されている場合のみ表示 -->
+                <c:if test="${not empty track.trackImageUrl and (fn:startsWith(track.trackImageUrl, 'http://') or fn:startsWith(track.trackImageUrl, 'https://'))}">
+                    <img src="${track.trackImageUrl}" alt="${fn:escapeXml(track.trackName)}" width="100" />
+                </c:if>
+                
+				<button onclick="playTrack('${track.trackId}', '${track.trackName}')">再生</button>
 
-                </li>
-            </c:forEach>
-        </ul>
-    </c:if>
+            </li>
+        </c:forEach>
+    </ul>
+</c:if>
+
+
+						
 
     <c:if test="${empty trackList}">
         <p>トラック情報が見つかりません。</p>

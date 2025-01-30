@@ -15,7 +15,7 @@ public class AlbumBean {
     private String albumCoverImageUrl;  // アルバムのカバー画像URL
 
     // コンストラクタでJSONをBeanに変換
-    public AlbumBean(JSONObject album, String artistName) {
+    public AlbumBean(JSONObject album, String artistName,String trackImagesJson) {
         this.albumId = album.getString("id");  // アルバムID
         this.albumName = album.getString("name");  // アルバム名
         this.artistName = artistName;  // アーティスト名
@@ -33,7 +33,7 @@ public class AlbumBean {
                     trackNames.add(trackName);  // トラック名
 
                     // TrackBeanを作成し、trackListに追加
-                    trackList.add(new TrackBean(trackId, trackName, artistName));
+                    trackList.add(new TrackBean(trackId, trackName, artistName,trackImagesJson));
                 }
             }
         } else {
