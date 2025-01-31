@@ -269,6 +269,18 @@ public class SpotifyControlServlet extends HttpServlet {
                     }
                     break;
 
+                case "getCurrentTrackImage":
+                    try {
+                        String trackImageJson = spotifyService.getCurrentTrackImage(accessToken);
+                        response.setContentType("application/json");
+                        response.setCharacterEncoding("UTF-8");
+                        response.getWriter().write(trackImageJson);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        response.getWriter().write("{\"error\": \"Failed to fetch current track image\"}");
+                    }
+                    break;
 
 
 

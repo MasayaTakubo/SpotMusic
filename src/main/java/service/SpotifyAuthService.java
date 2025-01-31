@@ -962,6 +962,41 @@ public class SpotifyAuthService {
         }
     }
 
+    public String getCurrentTrackImage(String accessToken) throws IOException {
+        String url = "https://api.spotify.com/v1/me/player/currently-playing";
+        
+        HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+        conn.setRequestMethod("GET");
+        conn.setRequestProperty("Authorization", "Bearer " + accessToken);
+        
+        int responseCode = conn.getResponseCode();
+        if (responseCode != HttpURLConnection.HTTP_OK) {
+            return "{}"; // 再生中の曲がない場合
+        }
+
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+            StringBuilder response = new StringBuilder();
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+
+            JSONObject jsonResponse = new JSONObject(response.toString());
+            JSONObject item = jsonResponse.getJSONObject("item");
+
+            // アルバム画像URLを取得
+            String imageUrl = item.getJSONObject("album")
+                                  .getJSONArray("images")
+                                  .getJSONObject(0) // 最も大きい画像を取得
+                                  .getString("url");
+
+            JSONObject responseJson = new JSONObject();
+            responseJson.put("imageUrl", imageUrl);
+
+            return responseJson.toString();
+        }
+    }
+
 
 
 
