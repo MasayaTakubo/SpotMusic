@@ -12,6 +12,7 @@
     <title>Spotify情報表示</title>
 
     <script src="https://sdk.scdn.co/spotify-player.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <style>
         body {
@@ -705,6 +706,55 @@ document.addEventListener('click', (event) => {
     }
 });
 </script>
+
+
+<script>
+$(document).ready(function(){
+    $("#commentForm").submit(function(event){
+        event.preventDefault(); // デフォルトのフォーム送信を防ぐ
+
+        $.ajax({
+            type: "POST",
+            url: "FrontServlet",
+            data: $(this).serialize(),
+            dataType: "json", // JSONを期待する
+            success: function(response) {
+                console.log("レスポンス:", response); // デバッグ用
+                $("#commentInput").val(""); // 入力欄をクリア
+                updateComments(response);  // コメントを画面更新
+            },
+            error: function(xhr, status, error) {
+                console.error("エラー:", xhr.responseText);
+                alert("コメントの送信に失敗しました。");
+            }
+        });
+    });
+
+    function updateComments(comments) {
+        let commentList = $("#commentList");
+        commentList.empty(); // 一旦リストをクリア
+
+        if (comments.length === 0) {
+            commentList.append("<p>まだコメントがありません。</p>");
+            return;
+        }
+
+        comments.forEach(comment => {
+            commentList.append(`
+                <li>
+                    <strong>${comment.userId}</strong>: ${comment.sendComment}<br>
+                    <small>${comment.sendTime}</small>
+                    </li>
+                    `);
+                });
+            }
+        });
+        
+</script>
+
+
+
+
 
 
 </body>
