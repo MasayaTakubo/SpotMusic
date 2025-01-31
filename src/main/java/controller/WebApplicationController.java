@@ -33,7 +33,6 @@ public class WebApplicationController implements ApplicationController {
 	    HttpServletResponse res = (HttpServletResponse)resc.getResponse();
 	    Object result = resc.getResult();
 	    String command = req.getParameter("command");
-	    String playlistId = req.getParameter("playlistId");
 	    try {
 		    if ("AddMessage".equals(command)) {
 		        res.setContentType("application/json");
@@ -47,21 +46,7 @@ public class WebApplicationController implements ApplicationController {
 		        String jsonResponse = new Gson().toJson(result);
 		        req.setAttribute("messages", jsonResponse);
 			    req.getRequestDispatcher(resc.getTarget()).forward(req, res);
-		    } else // サーバーサイドのレスポンスでJavaScriptを送信する例
-		    	if ("AddComment".equals(command)) {
-		    	    res.setContentType("text/html");
-		    	    PrintWriter out = res.getWriter();
-		    	    out.write("<script>");
-		    	    out.write("window.location.replace('FrontServlet?command=MyPlayListCommand');"); // 非同期に遷移
-		    	    
-		    	    out.write("window.onload = function() {");
-		    	    out.write("loadPlaylistPage('");  // シングルクォーテーションで囲む
-		    	    out.write(playlistId);  // 変数の内容
-		    	    out.write("')");  // 閉じのシングルクォーテーション
-		    	    out.write("};");
-		    	    out.write("</script>");
-		    	    out.flush();
-		    	}  else {
+		    }else {
 		    	req.setAttribute("messages", result);
 			    req.getRequestDispatcher(resc.getTarget()).forward(req, res);
 		    }

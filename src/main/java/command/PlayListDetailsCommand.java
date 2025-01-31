@@ -8,11 +8,9 @@ import javax.servlet.http.HttpSession;
 
 import org.json.JSONObject;
 
-import bean.CommentBean;
 import bean.TrackBean;
 import context.RequestContext;
 import context.ResponseContext;
-import dao.CommentDAO;
 import service.SpotifyAuthService;
 
 public class PlayListDetailsCommand extends AbstractCommand {
@@ -57,11 +55,6 @@ public class PlayListDetailsCommand extends AbstractCommand {
 
             // セッションにトラック情報を保存
             session.setAttribute("trackList", trackList);
-            
-            //コメントを取得
-            CommentDAO commentDAO = new CommentDAO();
-            List<CommentBean> comments = commentDAO.getComment(playlistId);
-            request.setAttribute("comments",comments);
 
             // リダイレクト先を設定
             responseContext.setTarget("playList");
