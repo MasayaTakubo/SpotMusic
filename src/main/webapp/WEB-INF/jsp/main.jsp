@@ -128,6 +128,7 @@
 }
 
     </style>
+
    
    
 </head>
@@ -348,6 +349,21 @@
 <script>
     // プレイリストの詳細を受け取った場合
 // プレイリストの詳細を表示する関数
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const params = new URLSearchParams(window.location.search);
+    const playlistId = params.get("playlistId");
+    const commentAdded = params.get("commentAdded");
+
+    if (commentAdded === "true" && playlistId) {
+        console.log("コメントが追加されました。プレイリストを再読み込みします。");
+        loadPlaylistPage(playlistId);
+    } else if (commentAdded === "true") {
+        console.warn("コメントは追加されましたが、playlistId が取得できませんでした。");
+    }
+});
+    
 function loadPlaylistPage(playlistId) {
     if (!playlistId) {
         console.error('playlistId が指定されていません');
@@ -933,5 +949,51 @@ function loadAlbumPage(albumId) {
     });
 }
 </script>
+
+<script>
+$(document).ready(function(){
+    $("#commentForm").submit(function(event){
+        event.preventDefault(); // デフォルトのフォーム送信を防ぐ
+
+        $.ajax({
+            type: "POST",
+            url: "FrontServlet",
+            data: $(this).serialize(),
+            dataType: "json", // JSONを期待する
+            success: function(response) {
+                console.log("レスポンス:", response); // デバッグ用
+                $("#commentInput").val(""); // 入力欄をクリア
+                updateComments(response);  // コメントを画面更新
+            },
+            error: function(xhr, status, error) {
+                console.error("エラー:", xhr.responseText);
+                alert("コメントの送信に失敗しました。");
+            }
+        });
+    });
+
+    function updateComments(comments) {
+        let commentList = $("#commentList");
+        commentList.empty(); // 一旦リストをクリア
+
+        if (comments.length === 0) {
+            commentList.append("<p>まだコメントがありません。</p>");
+            return;
+        }
+
+        comments.forEach(comment => {
+            commentList.append(`
+                <li>
+                    <strong>${comment.userId}</strong>: ${comment.sendComment}<br>
+                    <small>${comment.sendTime}</small>
+                    </li>
+                    `);
+                });
+            }
+        });
+        
+</script>
+
+
 </body>
 </html>

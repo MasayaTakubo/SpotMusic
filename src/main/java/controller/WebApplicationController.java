@@ -33,6 +33,8 @@ public class WebApplicationController implements ApplicationController {
 	    HttpServletResponse res = (HttpServletResponse)resc.getResponse();
 	    Object result = resc.getResult();
 	    String command = req.getParameter("command");
+	    String playlistId = req.getParameter("playlistId");
+	    
 	    try {
 		    if ("AddMessage".equals(command)) {
 		        res.setContentType("application/json");
@@ -46,7 +48,9 @@ public class WebApplicationController implements ApplicationController {
 		        String jsonResponse = new Gson().toJson(result);
 		        req.setAttribute("messages", jsonResponse);
 			    req.getRequestDispatcher(resc.getTarget()).forward(req, res);
-		    }else {
+		    }else if ("AddComment".equals(command)) {
+		    	res.sendRedirect("FrontServlet?command=MyPlayListCommand&playlistId=" + playlistId + "&commentAdded=true");
+	    	}else {
 		    	req.setAttribute("messages", result);
 			    req.getRequestDispatcher(resc.getTarget()).forward(req, res);
 		    }
