@@ -316,7 +316,7 @@
 <div id="player-container">
     <!-- 左側: 曲名表示 -->
     <div id="player-left">
-    	<h3>🤓</h3>
+	    <img id="current-track-image" src="" alt="トラック画像" style="display: none;">
         <p id="now-playing">現在再生中: <span id="current-track">なし</span></p>
     </div>
 
@@ -382,6 +382,21 @@ function loadPlaylistPage(playlistId) {
 
     
     <script>
+    //画像用JavaScript
+    	function updateCurrentTrackImage() {
+	    fetch("/SpotMusic/spotifyControl?action=getCurrentTrackImage")
+	        .then(response => response.json())
+	        .then(data => {
+	            if (data.imageUrl) {
+	                document.getElementById('current-track-image').src = data.imageUrl;
+	                document.getElementById('current-track-image').style.display = "block"; 
+	            } else {
+	                document.getElementById('current-track-image').style.display = "none";
+	            }
+	        })
+	        .catch(error => console.error("現在のトラック画像取得エラー:", error));
+	}
+	
     //再生プレイヤー用JavaScript
         window.onSpotifyWebPlaybackSDKReady = () => {
             const token = '<%= session.getAttribute("access_token") %>';
@@ -434,7 +449,9 @@ function loadPlaylistPage(playlistId) {
     	    } else {
     	        playPauseButton.innerHTML = `<i class="fas fa-pause"></i>`; // 再生中なら停止ボタンを表示
     	    }
-
+			/* 画像 */
+			
+			updateCurrentTrackImage(); // 再生中の曲の画像を更新
     	          
                 if (!state.paused && state.position > 0) {
                     trackStarted = true;

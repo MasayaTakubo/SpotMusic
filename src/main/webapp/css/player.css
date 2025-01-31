@@ -26,16 +26,24 @@
     max-width: 200px;
 }
 
-/* 中央（コントロールボタン: 幅を広げる） */
+/* プレイヤーコントロール（アイコンを中央固定） */
 #player-controls {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 20px; /* ボタンの間隔を均一に */
     flex: 3; /* 中央エリアを広げる */
-    position: relative; /* 相対位置指定 */
-    top: -5px; /* 5px分上に移動 */
+    
+    position: absolute; /* 親要素の中央に固定 */
+    left: 50%; /* 親要素の中央 */
+    transform: translateX(-50%); /* 水平方向の中心に配置 */
+    top: 50%; /* 垂直方向も中央 */
+    transform: translate(-50%, -50%); /* 完全に中央に固定 */
+    
+    width: max-content; /* ボタンの幅に合わせる */
+    white-space: nowrap; /* ボタンが折り返されないように */
 }
+
 
 button {
     background: none;
@@ -263,21 +271,32 @@ button {
     color: white;
 }
 
-/* 右側（音量調整） */
+/* 右側（音量調整: コントロールボタンの右側へ） */
 #player-right {
     display: flex;
     align-items: center;
-    flex: 1; /* 右側を一定の幅に */
-    justify-content: flex-start; /* 左寄せ */
-    padding-left: 10px; /* 余白を追加 */
+    flex: 1; /* 右側のエリアを一定の幅に */
+    justify-content: flex-end; /* 右寄せ */
+    padding-right: 10px; /* 余白を追加 */
+}
+
+/* シークバー（音量バー）の幅を狭くする */
+#player-right input[type="range"] {
+    width: 200px; /* シークバーの幅を狭くする */
+    max-width: 250px; /* 最大幅を設定 */
 }
 
 /* 左側（曲名）をもっと右に寄せる */
 #player-left {
     display: flex;
     align-items: center;
-    flex: 1;
-    justify-content: flex-end; /* 右寄せ */
+}
+
+#current-track-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+    margin-right: 10px;
 }
 
 /* 曲名の表示 */
