@@ -27,12 +27,25 @@
 	<h3>収録曲</h3>
 	<ul>
 	    <c:forEach var="track" items="${tracks}">
-	        <li>${track['track_number']}. ${track['name']}</li>
+	        <li>
+	            ${track['track_number']}. ${track['name']}
+	
+	            <!-- プレイリスト追加フォーム -->
+	            <form class="add-track-form" action="SpotifyAddTrackServlet" method="post" target="hidden_iframe">
+	                <input type="hidden" name="trackId" value="${track['id']}">
+	                <select name="playlistId">
+	                    <c:forEach var="playlist" items="${userPlaylists}">
+	                        <option value="${playlist['id']}">${playlist['name']}</option>
+	                    </c:forEach>
+	                </select>
+	                <button type="submit">追加</button>
+	            </form>
+	        </li>
 	    </c:forEach>
 	</ul>
-
     </c:if>
-
+<!-- 隠し iframe（リクエスト処理用） -->
+<iframe name="hidden_iframe" style="display: none;"></iframe>
     <c:if test="${empty album}">
         <p>アルバムが見つかりませんでした。</p>
     </c:if>
