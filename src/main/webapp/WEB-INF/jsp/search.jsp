@@ -1,0 +1,121 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>検索結果</title>
+    <link rel="stylesheet" type="text/css" href="<c:url value='/css/styles.css' />">
+</head>
+<body>
+
+    <h1>検索結果</h1>
+
+	<h3>曲</h3>
+	<c:if test="${not empty tracks}">
+	    <ul class="track-list">
+	        <c:forEach var="track" items="${tracks}">
+	            <li class="track-item">
+				<c:choose>
+				    <c:when test="${not empty track.image}">
+				        <img src="${track.image}" alt="アルバム画像" width="50">
+				    </c:when>
+				    <c:otherwise>
+				        <img src="no_image.png" alt="No Image" width="50">
+				    </c:otherwise>
+				</c:choose>
+
+	                ${track.track_number}. ${track.name}
+	
+	                <!-- ?? Java で処理するフォーム -->
+	                <form action="SpotifyAddTrackServlet" method="post" target="hidden_iframe">
+	                    <input type="hidden" name="trackId" value="${track.id}">
+	                    <select name="playlistId">
+	                        <c:forEach var="playlist" items="${userPlaylists}">
+	                            <option value="${playlist.id}">${playlist.name}</option>
+	                        </c:forEach>
+	                    </select>
+	                    <button type="submit">追加</button>
+	                </form>
+	            </li>
+	        </c:forEach>
+	    </ul>
+	</c:if>
+	
+	<!-- ?? 隠し iframe (リクエスト処理用) -->
+	<iframe name="hidden_iframe" style="display: none;"></iframe>
+	
+
+
+
+    <!-- ?? ユーザーのプレイリストを選択するモーダル -->
+    <div id="playlistModal" style="display: none;">
+        <h3>プレイリストを選択</h3>
+        <select id="playlistSelect">
+            <c:forEach var="playlist" items="${userPlaylists}">
+                <option value="${playlist.id}">${playlist.name}</option>
+            </c:forEach>
+        </select>
+        <button id="confirmAddButton">追加</button>
+    </div>
+
+    <h2>アーティスト</h2>
+    <c:if test="${not empty artists}">
+        <ul>
+            <c:forEach var="artist" items="${artists}">
+                <li>
+                    <a href="SpotifySearchServlet?action=artist&id=${artist['id']}">
+                        <img src="${not empty artist['images'] ? artist['images'][0]['url'] : 'no_image.png'}" 
+                             alt="${artist['name']}" width="100">
+                    </a>
+                    ${artist['name']}
+                </li>
+            </c:forEach>
+        </ul>
+    </c:if>
+    <c:if test="${empty artists}">
+        <p>アーティストが見つかりませんでした。</p>
+    </c:if>
+
+    <h2>アルバム</h2>
+    <c:if test="${not empty albums}">
+        <ul>
+            <c:forEach var="album" items="${albums}">
+                <li>
+                    <a href="SpotifySearchServlet?action=album&id=${album['id']}">
+                        <img src="${not empty album['images'] ? album['images'][0]['url'] : 'no_image.png'}" width="100">
+                        ${album['name']}
+                    </a>
+                </li>
+            </c:forEach>
+        </ul>
+    </c:if>
+    <c:if test="${empty albums}">
+        <p>アルバムが見つかりませんでした。</p>
+    </c:if>
+    
+    <h2>プレイリスト</h2>
+    <c:if test="${not empty playlists}">
+        <ul>
+            <c:forEach var="playlist" items="${playlists}">
+                <li>
+                    <a href="SpotifySearchServlet?action=playlist&id=${playlist['id']}">
+                        <img src="${not empty playlist['images'] ? playlist['images'][0]['url'] : 'no_image.png'}" width="100">
+                        ${playlist['name']}
+                    </a>
+                </li>
+            </c:forEach>
+        </ul>
+    </c:if>
+    <c:if test="${empty playlists}">
+        <p>プレイリストが見つかりませんでした。</p>
+    </c:if>
+
+    <a href="javascript:history.back()" class="back-button">戻る</a>
+    
+        <!-- メッセージ表示 -->
+    <c:if test="${not empty message}">
+        <p>${message}</p>
+    </c:if>
+
+</body>
+</html>
