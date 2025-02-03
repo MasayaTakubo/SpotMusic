@@ -29,25 +29,38 @@
         </c:if>
     </div>
 
-	<h3>収録曲</h3>
-	<c:if test="${not empty tracks}">
-	    <ul>
-	        <c:forEach var="track" items="${tracks}">
-	            <li>
-	                <c:if test="${not empty track['image']}">
-	                    <img src="${track['image']}" alt="アルバム画像" width="50">
-	                </c:if>
-	                <c:if test="${empty track['image']}">
-	                    <img src="no_image.png" alt="No Image" width="50">
-	                </c:if>
-	                ${track['track_number']}. ${track['name']}
-	            </li>
-	        </c:forEach>
-	    </ul>
-	</c:if>
-	<c:if test="${empty tracks}">
-	    <p>収録曲が見つかりませんでした。</p>
-	</c:if>
+<h3>収録曲</h3>
+<c:if test="${not empty tracks}">
+    <ul>
+        <c:forEach var="track" items="${tracks}">
+            <li>
+                <c:if test="${not empty track['image']}">
+                    <img src="${track['image']}" alt="アルバム画像" width="50">
+                </c:if>
+                <c:if test="${empty track['image']}">
+                    <img src="no_image.png" alt="No Image" width="50">
+                </c:if>
+                ${track['track_number']}. ${track['name']}
+
+                <!-- プレイリスト追加フォーム -->
+                <form class="add-track-form" action="SpotifyAddTrackServlet" method="post" target="hidden_iframe">
+                    <input type="hidden" name="trackId" value="${track['id']}">
+                    <select name="playlistId">
+                        <c:forEach var="playlist" items="${userPlaylists}">
+                            <option value="${playlist.id}">${playlist.name}</option>
+                        </c:forEach>
+                    </select>
+                    <button type="submit">追加</button>
+                </form>
+            </li>
+        </c:forEach>
+    </ul>
+</c:if>
+<!-- 隠し iframe（リクエスト処理用） -->
+<iframe name="hidden_iframe" style="display: none;"></iframe>
+<c:if test="${empty tracks}">
+    <p>収録曲が見つかりませんでした。</p>
+</c:if>
 
 
     <a href="javascript:history.back()" class="back-button">戻る</a>

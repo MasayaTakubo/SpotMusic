@@ -123,13 +123,21 @@ public class SpotifySearchServlet extends HttpServlet {
                 JSONArray tracksArray = playlist.optJSONObject("tracks").optJSONArray("items");
                 List<Map<String, Object>> trackList = convertPlaylistTracks(tracksArray);
 
-                // ?? 変換されたデータをリクエストにセット
+             // ✅ ユーザーのプレイリストを取得してセット
+                String userPlaylistsUrl = "https://api.spotify.com/v1/me/playlists";
+                JSONObject playlistResponse = new JSONObject(sendSpotifyRequest(userPlaylistsUrl, accessToken));
+                JSONArray userPlaylistsArray = playlistResponse.optJSONArray("items");
+                List<Map<String, Object>> userPlaylists = JsonToListConverter.convertJSONArrayToList(userPlaylistsArray);
+                
+                System.out.println("DEBUG: ユーザーのプレイリスト - " + userPlaylists);
+
+                // ✅ JSP にデータを渡す
                 request.setAttribute("playlist", playlistInfo);
                 request.setAttribute("tracks", trackList);
+                request.setAttribute("userPlaylists", userPlaylists); // 追加
 
-                request.getRequestDispatcher("/WEB-INF/jsp/searchplaylist.jsp").forward(request, response);
-            } 
-            else if ("artist".equals(action)) {
+                request.getRequestDispatcher("/WEB-INF/jsp/searchplaylist.jsp").forward(request, response);            
+                } else if ("artist".equals(action)) {
                 // アーティスト詳細を取得
                 System.out.println("DEBUG: アーティスト詳細取得 - ID: " + id);
                 JSONObject artistJson = getSpotifyDetails("artists", id, accessToken);
@@ -152,14 +160,22 @@ public class SpotifySearchServlet extends HttpServlet {
                 List<Map<String, Object>> topTracks = JsonToListConverter.convertJSONArrayToList(topTracksArray);
                 List<Map<String, Object>> albums = JsonToListConverter.convertJSONArrayToList(albumsArray);
 
-                // JSP にデータを渡す
+                // ✅ ユーザーのプレイリストを取得
+                String userPlaylistsUrl = "https://api.spotify.com/v1/me/playlists";
+                JSONObject playlistResponse = new JSONObject(sendSpotifyRequest(userPlaylistsUrl, accessToken));
+                JSONArray userPlaylistsArray = playlistResponse.optJSONArray("items");
+                List<Map<String, Object>> userPlaylists = JsonToListConverter.convertJSONArrayToList(userPlaylistsArray);
+
+                System.out.println("DEBUG: ユーザーのプレイリスト - " + userPlaylists);
+
+                // ✅ JSP にデータを渡す
                 request.setAttribute("artist", artist);
                 request.setAttribute("top_tracks", topTracks);
                 request.setAttribute("albums", albums);
+                request.setAttribute("userPlaylists", userPlaylists); // 追加
 
                 request.getRequestDispatcher("/WEB-INF/jsp/searchartist.jsp").forward(request, response);
-            } 
-            else if ("album".equals(action)) {
+            } else if ("album".equals(action)) {
                 // アルバム詳細を取得
                 System.out.println("DEBUG: アルバム詳細取得 - ID: " + id);
                 JSONObject albumJson = getSpotifyDetails("albums", id, accessToken);
@@ -172,13 +188,21 @@ public class SpotifySearchServlet extends HttpServlet {
                 JSONArray tracksArray = albumJson.optJSONObject("tracks").optJSONArray("items");
                 List<Map<String, Object>> tracks = JsonToListConverter.convertJSONArrayToList(tracksArray);
 
-                // JSP にデータを渡す
+                // ✅ ユーザーのプレイリストを取得
+                String userPlaylistsUrl = "https://api.spotify.com/v1/me/playlists";
+                JSONObject playlistResponse = new JSONObject(sendSpotifyRequest(userPlaylistsUrl, accessToken));
+                JSONArray userPlaylistsArray = playlistResponse.optJSONArray("items");
+                List<Map<String, Object>> userPlaylists = JsonToListConverter.convertJSONArrayToList(userPlaylistsArray);
+
+                System.out.println("DEBUG: ユーザーのプレイリスト - " + userPlaylists);
+
+                // ✅ JSP にデータを渡す
                 request.setAttribute("album", album);
                 request.setAttribute("tracks", tracks);
+                request.setAttribute("userPlaylists", userPlaylists); // 追加
 
                 request.getRequestDispatcher("/WEB-INF/jsp/searchalbum.jsp").forward(request, response);
-            } 
-            else {
+            } else {
                 request.getRequestDispatcher("/WEB-INF/jsp/search.jsp").forward(request, response);
             }
         } catch (Exception e) {
