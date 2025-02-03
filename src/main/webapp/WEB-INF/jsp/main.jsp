@@ -141,6 +141,14 @@
             <img src="<c:url value='/img/Spotmusic.webp' />" alt="ロゴを配置" class="reload-icon">
         </a>
     </div>
+    
+    <!--  検索ボックス -->
+    <form action="SpotifySearchServlet" method="get">
+    	<input type="text" name="query" placeholder="何を再生したいですか？" required>
+    	<button class="search-button" type="submit">検索</button>
+	</form>
+    <!-- ここまで　　　　　  -->
+    
     <div class="actions">
         <!-- アカウントアイコン -->
         <div class="account-container">

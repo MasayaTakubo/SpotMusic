@@ -1,0 +1,158 @@
+/* 共通設定 */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #121212; /* Spotify のようなダークモード */
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+/* ヘッダー */
+h1 {
+    font-size: 28px;
+    color: #1DB954; /* Spotify のグリーン */
+    margin-top: 20px;
+}
+
+/* セクションのタイトル */
+h2 {
+    border-bottom: 2px solid #1DB954;
+    padding-bottom: 5px;
+    display: inline-block;
+    margin-top: 20px;
+}
+
+/* リストのスタイル */
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    background-color: #181818;
+    padding: 15px;
+    margin: 10px auto;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 500px;
+    transition: 0.3s;
+}
+
+li:hover {
+    background-color: #282828;
+}
+
+/* リンクスタイル */
+a {
+    text-decoration: none;
+    color: #1DB954;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* 画像のスタイル */
+img {
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+/* ボタン */
+button, .button {
+    background-color: #1DB954;
+    border: none;
+    padding: 10px 15px;
+    color: white;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover, .button:hover {
+    background-color: #1ed760;
+}
+
+/* プレイリスト詳細ページの調整 */
+div {
+    padding: 20px;
+}
+
+p {
+    margin: 5px 0;
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 600px) {
+    li {
+        width: 95%;
+    }
+}
+
+/* 曲リストのデザイン */
+.track-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.track-item {
+    background-color: #181818;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* 追加ボタンのスタイル */
+.add-to-playlist-btn {
+    background-color: #1DB954;
+    border: none;
+    padding: 8px 12px;
+    color: white;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.add-to-playlist-btn:hover {
+    background-color: #1ed760;
+}
+
+/* モーダルのスタイル */
+#playlistModal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #282828;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    text-align: center;
+}
+
+#playlistModal select {
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+#playlistModal button {
+    background-color: #1DB954;
+    padding: 8px 12px;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#playlistModal button:hover {
+    background-color: #1ed760;
+}
+
