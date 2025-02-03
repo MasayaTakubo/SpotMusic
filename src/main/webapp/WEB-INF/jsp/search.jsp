@@ -1,14 +1,16 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html>
 <head>
     <title>検索結果</title>
     <link rel="stylesheet" type="text/css" href="<c:url value='/css/styles.css' />">
+	
 </head>
 <body>
-
 <!-- タブメニュー -->
+<c:set var="noImageUrl" value="${fn:escapeXml(pageContext.request.contextPath)}/img/no_image.png" />
 <div class="tab-menu">
     <button class="active" onclick="showTab('all')">すべて</button>
     <button onclick="showTab('tracks')">曲</button>
@@ -32,7 +34,7 @@
                             <img src="${track.image}" alt="アルバム画像" width="50">
                         </c:when>
                         <c:otherwise>
-                            <img src="no_image.png" alt="No Image" width="50">
+                            <img src="<c:url value='/img/no_image.png' />" alt="No Image" width="50">
                         </c:otherwise>
                     </c:choose>
 
@@ -60,7 +62,7 @@
             <c:forEach var="album" items="${albums}">
                 <li class="album-item">
                     <a href="SpotifySearchServlet?action=album&id=${album.id}">
-                        <img src="${not empty album.images ? album.images[0].url : 'no_image.png'}" width="100">
+                        <img src="${not empty album.images ? album.images[0].url : noImageUrl}" width="100">
                         ${album.name}
                     </a>
                 </li>
@@ -75,7 +77,7 @@
             <c:forEach var="artist" items="${artists}">
                 <li class="artist-item">
                     <a href="SpotifySearchServlet?action=artist&id=${artist.id}">
-                        <img src="${not empty artist.images ? artist.images[0].url : 'no_image.png'}" width="100">
+                        <img src="${not empty artist.images ? artist.images[0].url : noImageUrl}" width="100">
                         ${artist.name}
                     </a>
                 </li>
@@ -90,7 +92,7 @@
             <c:forEach var="playlist" items="${playlists}">
                 <li class="playlist-item">
                     <a href="SpotifySearchServlet?action=playlist&id=${playlist.id}">
-                        <img src="${not empty playlist.images ? playlist.images[0].url : 'no_image.png'}" width="100">
+                        <img src="${not empty playlist.images ? playlist.images[0].url : noImageUrl}" width="100">
                         ${playlist.name}
                     </a>
                 </li>
@@ -111,7 +113,7 @@
                             <img src="${track.image}" alt="アルバム画像" width="50">
                         </c:when>
                         <c:otherwise>
-                            <img src="no_image.png" alt="No Image" width="50">
+                            <img src="<c:url value='/img/no_image.png' />" alt="No Image" width="50">
                         </c:otherwise>
                     </c:choose>
 
@@ -141,7 +143,7 @@
             <c:forEach var="album" items="${albums}">
                 <li class="album-item">
                     <a href="SpotifySearchServlet?action=album&id=${album.id}">
-                        <img src="${not empty album.images ? album.images[0].url : 'no_image.png'}" width="100">
+                        <img src="${not empty album.images ? album.images[0].url : noImageUrl}" width="100">
                         ${album.name}
                     </a>
                 </li>
@@ -161,7 +163,7 @@
             <c:forEach var="artist" items="${artists}">
                 <li class="artist-item">
                     <a href="SpotifySearchServlet?action=artist&id=${artist.id}">
-                        <img src="${not empty artist.images ? artist.images[0].url : 'no_image.png'}" width="100">
+                        <img src="${not empty artist.images ? artist.images[0].url : noImageUrl}" width="100">
                         ${artist.name}
                     </a>
                 </li>
@@ -181,7 +183,7 @@
             <c:forEach var="playlist" items="${playlists}">
                 <li class="playlist-item">
                     <a href="SpotifySearchServlet?action=playlist&id=${playlist.id}">
-                        <img src="${not empty playlist.images ? playlist.images[0].url : 'no_image.png'}" width="100">
+                        <img src="${not empty playlist.images ? playlist.images[0].url : noImageUrl}" width="100">
                         ${playlist.name}
                     </a>
                 </li>

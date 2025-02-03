@@ -15,7 +15,7 @@
             <img src="${playlist['images'][0]['url']}" alt="プレイリスト画像" width="200">
         </c:if>
         <c:if test="${empty playlist['images']}">
-            <img src="no_image.png" alt="No Image" width="200">
+            <img src="<c:url value='/img/no_image.png' />" alt="No Image" width="200">
         </c:if>
 
         <h2>${playlist.name}</h2>
@@ -38,7 +38,7 @@
                     <img src="${track['image']}" alt="アルバム画像" width="50">
                 </c:if>
                 <c:if test="${empty track['image']}">
-                    <img src="no_image.png" alt="No Image" width="50">
+                    <img src="<c:url value='/img/no_image.png' />" alt="No Image" width="50">
                 </c:if>
                 ${track['track_number']}. ${track['name']}
 

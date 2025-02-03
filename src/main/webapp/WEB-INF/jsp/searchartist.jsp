@@ -17,7 +17,7 @@
 			</c:if>
 
             <c:if test="${empty artist['images']}">
-                <img src="no_image.png" alt="No Image" width="200">
+                <img src="<c:url value='/img/no_image.png' />" alt="No Image" width="200">
             </c:if>
 
             <h2>${artist['name']}</h2>
