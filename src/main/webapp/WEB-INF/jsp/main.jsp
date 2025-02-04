@@ -11,185 +11,193 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SpotMusic - Web Player：すべての人に音楽を</title>
-	<link rel="stylesheet" type="text/css" href="<c:url value='/css/player.css' />">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <script src="https://sdk.scdn.co/spotify-player.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpotMusic - Web Player：すべての人に音楽を</title>
+<link rel="stylesheet" type="text/css"
+	href="<c:url value='/css/player.css' />">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<script src="https://sdk.scdn.co/spotify-player.js"></script>
 
-    <style>
-        body {
-            margin: 0;
-            display: flex;
-            height: 100vh;
-            font-family: Arial, sans-serif;
-            padding-top: 60px; /* ヘッダーの高さ分を確保 */
-        }
-        .sidebar, .content, .property-panel {
-            padding: 20px;
-            overflow-y: auto;
-        }
-        .sidebar {
-            width: 25%;
-            background-color: #f4f4f4;
-            border-right: 1px solid #ddd;
-        }
-        .content {
-            width: 50%;
-            background-color: #ffffff;
-            text-align: center;
-        }
-        .property-panel {
-            width: 25%;
-            background-color: #f9f9f9;
-            border-left: 1px solid #ddd;
-            display: none; /* デフォルトでは非表示 */
-        }
-        .property-panel.active {
-            display: block; /* 音楽再生時に表示 */
-        }
-        h2 {
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 10px;
-        }
-        
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    background-color: #f8f9fa;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 1000; /* ヘッダーを最上位に表示 */
+<style>
+body {
+	margin: 0;
+	display: flex;
+	height: 100vh;
+	font-family: Arial, sans-serif;
+	padding-top: 60px; /* ヘッダーの高さ分を確保 */
 }
-		
-		/* ロゴのスタイル */
-		.logo-icon {
-		    height: 40px;
-		}
-		
-		.actions {
-		    display: flex;
-		    align-items: right;
-		    justify-content: flex-end; /* アクションエリアを右端揃え */
-		    gap: 10px; /* アイコン間のスペース */
-		}
-		
-		/* リロードアイコンのスタイル */
-		.reload-icon {
-		    width: 32px;
-		    height: 32px;
-		    cursor: pointer;
-		}
-		
-		.account-container {
-		    position: relative;
-		    margin-right: 50px; /* 必要に応じて右の余白を調整 */
-		}
-		.account-icon {
-		    width: 40px;
-		    height: 40px;
-		    border-radius: 50%;
-		    cursor: pointer;
-		
-		}
 
-		
+.sidebar, .content, .property-panel {
+	padding: 20px;
+	overflow-y: auto;
+}
+
+.sidebar {
+	width: 25%;
+	background-color: #f4f4f4;
+	border-right: 1px solid #ddd;
+}
+
+.content {
+	width: 50%;
+	background-color: #ffffff;
+	text-align: center;
+}
+
+.property-panel {
+	width: 25%;
+	background-color: #f9f9f9;
+	border-left: 1px solid #ddd;
+	display: none; /* デフォルトでは非表示 */
+}
+
+.property-panel.active {
+	display: block; /* 音楽再生時に表示 */
+}
+
+h2 {
+	border-bottom: 2px solid #ddd;
+	padding-bottom: 10px;
+}
+
+.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px 20px;
+	background-color: #f8f9fa;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	position: fixed;
+	top: 0;
+	width: 100%;
+	z-index: 1000; /* ヘッダーを最上位に表示 */
+}
+
+/* ロゴのスタイル */
+.logo-icon {
+	height: 40px;
+}
+
+.actions {
+	display: flex;
+	align-items: right;
+	justify-content: flex-end; /* アクションエリアを右端揃え */
+	gap: 10px; /* アイコン間のスペース */
+}
+
+/* リロードアイコンのスタイル */
+.reload-icon {
+	width: 32px;
+	height: 32px;
+	cursor: pointer;
+}
+
+.account-container {
+	position: relative;
+	margin-right: 50px; /* 必要に応じて右の余白を調整 */
+}
+
+.account-icon {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	cursor: pointer;
+}
+
 .account-menu {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 50px;
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    list-style: none;
-    padding: 10px 0;
-    margin: 0;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    min-width: 150px; /* 最低幅を設定 */
-    white-space: nowrap; /* 折り返しを防止 */
+	display: none;
+	position: absolute;
+	right: 0;
+	top: 50px;
+	background-color: white;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	list-style: none;
+	padding: 10px 0;
+	margin: 0;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	z-index: 1000;
+	min-width: 150px; /* 最低幅を設定 */
+	white-space: nowrap; /* 折り返しを防止 */
 }
 
 .account-menu li {
-    padding: 10px 20px;
-    text-align: left; /* テキストを左揃え */
+	padding: 10px 20px;
+	text-align: left; /* テキストを左揃え */
 }
 
 .account-menu a {
-    text-decoration: none;
-    color: #333;
-    display: block; /* リンク全体をクリック可能に */
+	text-decoration: none;
+	color: #333;
+	display: block; /* リンク全体をクリック可能に */
 }
+</style>
 
-    </style>
-   
-   
+
 </head>
 <body>
-<div class="header">
+	<div class="header">
 
-    <div class="logo">
-        <!-- リロード用アイコン -->
-        <a href="javascript:void(0)" onclick="location.reload()" class="reload-link">
-            <img src="<c:url value='/img/Spotmusic.webp' />" alt="ロゴを配置" class="reload-icon">
-        </a>
-    </div>
-    <div class="actions">
-        <!-- アカウントアイコン -->
-        <div class="account-container">
-<img src="<c:url value='/img/icon.png' />" alt="アイコン" class="account-icon" id="account-icon">
-            <ul class="account-menu" id="account-menu">
-            	<li>ログイン中のユーザー:<%= session.getAttribute("user_name") %></li>
-                <li><a href="/xxx">アカウント</a></li>
-                <li><a href="/xxx">プロフィール</a></li>
-                <li><a href="/xxx">フレンドリスト</a></li>
-                <li><a href="javascript:void(0);" onclick="logout()">ログアウト</a></li>
-            </ul>
-        </div>
-    </div>
-</div>
-    <!-- 左側: プレイリスト -->
-    <div class="sidebar">
-        <h2>プレイリスト</h2>
-<%
-    List<SpotifyPlayListBean> playlistBeans = (List<SpotifyPlayListBean>) session.getAttribute("playlistBeans");
-    List<String> trackIds = new ArrayList<>();
-    if (playlistBeans != null) {
-        for (SpotifyPlayListBean playlist : playlistBeans) {
-            for (TrackBean track : playlist.getTrackList()) {
-                trackIds.add(track.getTrackId());
-            }
-        }
-    }
-    session.setAttribute("trackIds", trackIds);
-    session.setAttribute("currentTrackIndex", 0);
-    
-%>
+		<div class="logo">
+			<!-- リロード用アイコン -->
+			<a href="javascript:void(0)" onclick="location.reload()"
+				class="reload-link"> <img
+				src="<c:url value='/img/Spotmusic.webp' />" alt="ロゴを配置"
+				class="reload-icon">
+			</a>
+		</div>
+		<div class="actions">
+			<!-- アカウントアイコン -->
+			<div class="account-container">
+				<img src="<c:url value='/img/icon.png' />" alt="アイコン"
+					class="account-icon" id="account-icon">
+				<ul class="account-menu" id="account-menu">
+					<li>ログイン中のユーザー:<%=session.getAttribute("user_name")%></li>
+					<li><a href="/xxx">アカウント</a></li>
+					<li><a href="/xxx">プロフィール</a></li>
+					<li><a href="/xxx">フレンドリスト</a></li>
+					<li><a href="javascript:void(0);" onclick="logout()">ログアウト</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<!-- 左側: プレイリスト -->
+	<div class="sidebar">
+		<h2>プレイリスト</h2>
+		<%
+		List<SpotifyPlayListBean> playlistBeans = (List<SpotifyPlayListBean>) session.getAttribute("playlistBeans");
+		List<String> trackIds = new ArrayList<>();
+		if (playlistBeans != null) {
+			for (SpotifyPlayListBean playlist : playlistBeans) {
+				for (TrackBean track : playlist.getTrackList()) {
+			trackIds.add(track.getTrackId());
+				}
+			}
+		}
+		session.setAttribute("trackIds", trackIds);
+		session.setAttribute("currentTrackIndex", 0);
+		%>
 
 
-        <ul>
-                <c:forEach var="playlist" items="${playlistBeans}">
-                <li>
-                    <!-- プレイリスト名をクリックした時に詳細を表示 -->
-                    <button onclick="loadPlaylistPage('${playlist.playlistId}')">
-                       <strong>プレイリスト名：</strong> ${playlist.playlistName}<br>
-                       <strong>プレイリストID：</strong> ${playlist.playlistId}<br>
-                      </button>
-                       	<strong>イメージ画像：</strong><img src="${playlist.imageUrl}" alt="Playlist Image" width="100" /> 
-                       	
-   
+		<ul>
+			<c:forEach var="playlist" items="${playlistBeans}">
+				<li>
+					<!-- プレイリスト名をクリックした時に詳細を表示 -->
+					<button onclick="loadPlaylistPage('${playlist.playlistId}')">
+						<strong>プレイリスト名：</strong> ${playlist.playlistName}<br> <strong>プレイリストID：</strong>
+						${playlist.playlistId}<br>
+					</button> <strong>イメージ画像：</strong><img src="${playlist.imageUrl}"
+					alt="Playlist Image" width="100" />
+
+
 				</li>
-				</c:forEach>
+			</c:forEach>
 		</ul>
-</div>
-		
-			<!-- 中央: 人気のアーティスト -->
+	</div>
+
+	<!-- 中央: 人気のアーティスト -->
 	<div class="content">
 		<h2>フォロー中のアーティスト</h2>
 		<%
@@ -238,15 +246,21 @@
 			<table>
 				<thead>
 					<tr>
+						<th>Track Name</th>
 						<th>Track ID</th>
-
+						<th>Image</th>
 					</tr>
 				</thead>
 				<tbody>
 					<c:forEach var="entry" items="${recentryDatas}">
 						<tr>
 							<td>${entry.key}</td>
-
+							<!-- トラック名 -->
+							<td>${entry.value.id}</td>
+							<!-- トラックID -->
+							<td><c:if test="${not empty entry.value.image}">
+									<img src="${entry.value.image}" alt="Track Image" width="100">
+								</c:if></td>
 						</tr>
 					</c:forEach>
 				</tbody>
@@ -256,77 +270,114 @@
 			<p>No recently played tracks found.</p>
 		</c:if>
 
+
 		<!-- Top Mix Tracksの表示 -->
-		<h2>Top Mix Tracks</h2>
-		<c:if test="${not empty topMixDatas}">
+		<h2>Top Artist(ログインユーザーが聞いている回数が多いアーティスト過去6か月分？)</h2>
+		<h2>Recently Played Artists</h2>
+		<c:if test="${not empty artistDetails}">
 			<table>
 				<thead>
 					<tr>
-						<th>Track ID</th>
-
+						<th>Artist Name</th>
+						<th>Artist ID</th>
+						<th>Image</th>
 					</tr>
 				</thead>
 				<tbody>
-					<c:forEach var="entry" items="${topMixDatas}">
+					<c:forEach var="entry" items="${artistDetails}">
 						<tr>
-							<td>${entry.key}</td>
+							<!-- アーティスト名 -->
+							<td><a href="javascript:void(0);"
+								onclick="loadArtistPage('${entry.value.id}')"> ${entry.key}
+							</a></td>
 
+							<!-- アーティストID -->
+							<td>${entry.value.id}</td>
+
+							<!-- 画像URL -->
+							<td><c:if test="${not empty entry.value.image}">
+									<img src="${entry.value.image}" alt="Artist Image"
+										style="width: 100px; height: 100px;">
+								</c:if></td>
 						</tr>
 					</c:forEach>
 				</tbody>
 			</table>
 		</c:if>
-		<c:if test="${empty topMixDatas}">
-			<p>No top mix tracks found.</p>
+
+		<c:if test="${empty artistDetails}">
+			<p>No recently played artists found.</p>
 		</c:if>
 
-		<!-- レコメンドデータの表示 -->
-		<h2>Recommended Tracks</h2>
-		<c:if test="${not empty recomendDatas}">
+
+
+
+		<!-- 新着のデータの表示 -->
+		<h2>新着アルバム</h2>
+		<c:if test="${not empty newRelease}">
 			<table>
 				<thead>
 					<tr>
+						<th>Cover</th>
 						<th>Track Name</th>
 					</tr>
 				</thead>
 				<tbody>
-					<c:forEach var="entry" items="${recomendDatas}">
+					<c:forEach var="entry" items="${newRelease}">
 						<tr>
-							<td>${entry.value}</td>
-							<!-- トラック名だけ表示 -->
+							<td><img src="${entry.value.image}" alt="Cover Image"
+								width="100"></td>
+							<td><a href="javascript:void(0);" class="load-album-link"
+								data-playlist-id="${entry.value.id}"> ${entry.key} </a></td>
 						</tr>
 					</c:forEach>
 				</tbody>
 			</table>
 		</c:if>
-		<c:if test="${empty recomendDatas}">
+		<c:if test="${empty newRelease}">
 			<p>No recommended tracks found.</p>
 		</c:if>
 
 	</div>
-	    <!-- 右側: 詳細情報パネル -->
+	<!-- 右側: 詳細情報パネル -->
 	<div class="property-panel" id="propertyPanel">
-	    <h2>トラック詳細</h2>
-	    <p id="track-detail">再生中のトラック詳細が表示されます。</p>	    
-    </div>
-    <div id="player-container">
-        <div id="player-controls">
-            <h2>🤓</h2> 
-            <p><span id="current-time">0:00</span> / <span id="total-time">0:00</span></p>
-            <input type="range" id="seek-bar" value="0" min="0" max="100">            
-            <p id="now-playing">現在再生中: <span id="current-track">なし</span></p>
-            <button id="prev"><i class="fas fa-step-backward"></i></button>
-			<button id="play-pause"><i class="fas fa-play"></i></button>	
-			<button id="next"><i class="fas fa-step-forward"></i></button>
-            <button id="mute-toggle"><i class="fas fa-volume-up"></i></button>
-            <input type="range" id="progress-bar" value="50" min="0" max="100">
-            <button id="repeat-track"><i class="fas fa-redo"></i></button>
-			<button id="shuffle-toggle"><i class="fas fa-random"></i></button>
-        </div>
+		<h2>トラック詳細</h2>
+		<p id="track-detail">再生中のトラック詳細が表示されます。</p>
 	</div>
-    <!-- ここまで -->
+	<div id="player-container">
+		<div id="player-controls">
+			<h2>🤓</h2>
+			<p>
+				<span id="current-time">0:00</span> / <span id="total-time">0:00</span>
+			</p>
+			<input type="range" id="seek-bar" value="0" min="0" max="100">
+			<p id="now-playing">
+				現在再生中: <span id="current-track">なし</span>
+			</p>
+			<button id="prev">
+				<i class="fas fa-step-backward"></i>
+			</button>
+			<button id="play-pause">
+				<i class="fas fa-play"></i>
+			</button>
+			<button id="next">
+				<i class="fas fa-step-forward"></i>
+			</button>
+			<button id="mute-toggle">
+				<i class="fas fa-volume-up"></i>
+			</button>
+			<input type="range" id="progress-bar" value="50" min="0" max="100">
+			<button id="repeat-track">
+				<i class="fas fa-redo"></i>
+			</button>
+			<button id="shuffle-toggle">
+				<i class="fas fa-random"></i>
+			</button>
+		</div>
+	</div>
+	<!-- ここまで -->
 
-<script>
+	<script>
     // プレイリストの詳細を受け取った場合
 // プレイリストの詳細を表示する関数
 function loadPlaylistPage(playlistId) {
@@ -361,11 +412,11 @@ function loadPlaylistPage(playlistId) {
 
 </script>
 
-    
-    <script>
+
+	<script>
     //再生プレイヤー用JavaScript
         window.onSpotifyWebPlaybackSDKReady = () => {
-            const token = '<%= session.getAttribute("access_token") %>';
+            const token = '<%=session.getAttribute("access_token")%>';
 
             if (!token || token === "null") {
                 console.error("アクセストークンが無効です。再ログインしてください。");
@@ -662,7 +713,7 @@ function loadPlaylistPage(playlistId) {
 
         }
     </script>
-<script>
+	<script>
         // artist.jspを動的に読み込む関数
 function loadArtistPage(artistId) {
     var contentDiv = document.querySelector('.content');
@@ -681,8 +732,8 @@ function loadArtistPage(artistId) {
 }
 
     </script>
-    
-    <script>
+
+	<script>
     // アルバム情報を動的に読み込む関数
     function loadAlbumPage(albumId) {
         if (!albumId) {
@@ -712,7 +763,7 @@ function loadArtistPage(artistId) {
     }
 </script>
 
-<script>
+	<script>
 //シークバー管理JavaScript
     const seekBar = document.getElementById('seek-bar');
     const currentTimeDisplay = document.getElementById('current-time');
@@ -780,7 +831,7 @@ function loadArtistPage(artistId) {
      
 </script>
 
-<script>
+	<script>
 //アカウントメニューの開閉
 document.getElementById('account-icon').addEventListener('click', () => {
     const menu = document.getElementById('account-menu');
@@ -797,7 +848,7 @@ document.addEventListener('click', (event) => {
     }
 });
 </script>
-<script>
+	<script>
 //再生プレイヤー　シャッフルCSS用JavaScript
         document.getElementById('shuffle-toggle').addEventListener('click', function() {
             this.classList.toggle('active');
@@ -845,7 +896,7 @@ document.addEventListener('click', (event) => {
 	    }
 	});
  </script>
- <script>
+	<script>
 document.addEventListener('DOMContentLoaded', function () {
     $(document).on('click', '.load-album-link', function () {
         const albumId = $(this).data('playlist-id'); // data-playlist-idを取得
@@ -871,5 +922,6 @@ function loadAlbumPage(albumId) {
     });
 }
 </script>
+<script src="script.js"></script>
 </body>
 </html>
