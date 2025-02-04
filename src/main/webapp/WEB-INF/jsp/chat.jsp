@@ -47,7 +47,7 @@
         Map<String, String> userMap = (Map<String, String>) request.getAttribute("userMap");
     %>
     <h1>Chat Room</h1>
-    <h1>ログインユーザー：${sessionScope.userId }</h1>
+    <h1>ログインユーザー：${sessionScope.userName }</h1>
     <div id="chat-box" name="chat-box" style="border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; "></div>
 	<!-- css修正する、後でやる -->
 	<c:set var="isBlock" value="${param.isBlock}" />
