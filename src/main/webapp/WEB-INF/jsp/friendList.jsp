@@ -12,7 +12,7 @@
     <p>申請中のユーザー</p>
     <table border="1">
         <tr>
-            <th>ユーザーID</th>
+            <th>ユーザー名</th>
             <th>状態</th>
             <th>ボタン</th>
         </tr>
@@ -147,10 +147,11 @@
     <p>フレンド申請をキャンセルしたユーザー</p>
 	<table border="1">
 	    <tr>
-	        <th>ユーザーID</th>
+	        <th>ユーザー名</th>
 	    </tr>
 	    <c:forEach var="relation" items="${messages.relations}">
 	        <c:if test="${relation.status eq 'CANCEL'}">
+	        <tr>
 	            <c:choose>
 	                <c:when test="${relation.user1Id != sessionScope.userId}">
 	                    <td>
@@ -171,10 +172,10 @@
 	                    </td>
 	                </c:when>
 	            </c:choose>
+	        </tr>
 	        </c:if>
 	    </c:forEach>
 	</table>
-	<h2>ユーザーリスト</h2>  
     <form action="FrontServlet" method="POST">
         <input type="hidden" name="userId" value="${sessionScope.userId}"><br><br>
         <input type="hidden" name="command" value="UsersList">
