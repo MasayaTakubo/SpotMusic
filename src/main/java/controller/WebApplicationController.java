@@ -1,6 +1,7 @@
 package controller;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -43,9 +44,12 @@ public class WebApplicationController implements ApplicationController {
 		        out.write(jsonResponse);
 		        out.flush();
 		    }else if( "ChatCommand".equals(command)){
+		    	WebResponseContext wresc = (WebResponseContext)resc;
+		    	Map<String,String> userMap = (Map)wresc.getResult("userMap");
 		        res.setContentType("application/json");
 		        PrintWriter out = res.getWriter();
 		        String jsonResponse = new Gson().toJson(result);
+		        req.setAttribute("userMap",userMap);
 		        req.setAttribute("messages", jsonResponse);
 			    req.getRequestDispatcher(resc.getTarget()).forward(req, res);
 		    }else if ("AddComment".equals(command)) {
