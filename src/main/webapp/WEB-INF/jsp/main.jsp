@@ -1125,7 +1125,7 @@ $(document).ready(function(){
         });
         
 </script>
-<!-- <script>
+<script>
 function deletePlaylist(playlistId) {
     if (!confirm("本当にこのプレイリストを削除しますか？")) {
         return;
@@ -1145,6 +1145,6 @@ function deletePlaylist(playlistId) {
     })
     .catch(error => console.error("エラー:", error));
 }
-</script> -->
+</script> 
 </body>
 </html>
