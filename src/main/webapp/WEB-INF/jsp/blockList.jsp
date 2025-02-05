@@ -9,15 +9,20 @@
 </head>
 <body>
 <h1>ブロックリスト</h1>
-<h1>${sessionScope.userId}がブロックしている相手のリスト</h1>
+
+<h1>${sessionScope.userName}がブロックしている相手のリスト</h1>
     <table border="1">
         <tr>
-            <th>ブロックした相手のユーザーId</th>
+            <th>ブロックした相手のユーザー名</th>
             <th>ブロック解除</th>
         </tr>
-        <c:forEach var="block" items="${messages}">
+        <c:forEach var="block" items="${messages.blockusers}">
 		<tr>
-			<th>${block.blockedId}</th>
+			<c:forEach var="user" items="${messages.users}">
+                <c:if test="${user.userId eq block.blockedId}">
+                    <th>${user.userName}</th>
+                </c:if>
+            </c:forEach>
 			<th>
 			    <form action="FrontServlet" method="POST">
 			    	<input type="hidden" name="userId" value="${sessionScope.userId}">

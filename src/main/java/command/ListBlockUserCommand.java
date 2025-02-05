@@ -35,7 +35,7 @@ public class ListBlockUserCommand extends AbstractCommand {
         List<blockBean> blockusers = blockDAO.getBlockList(userId);
         Map<String, List<?>> data = new HashMap<>();
         data.put("users",users);
-        data.put("isfriend",isfriend);
+        data.put("relations",isfriend);
         data.put("blockusers", blockusers);
     	return data;
     }

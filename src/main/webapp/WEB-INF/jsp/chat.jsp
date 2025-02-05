@@ -1,5 +1,8 @@
 <%@ page language="java" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.HashMap" %>
+
 <html>
 <head>
     <meta charset="UTF-8">
@@ -41,9 +44,10 @@
         String userId = (String) session.getAttribute("userId");
         // リクエストからレスポンスに渡されたメッセージリスト（JSON形式）を取得
         String jsonResponse = (String) request.getAttribute("messages");
+        Map<String, String> userMap = (Map<String, String>) request.getAttribute("userMap");
     %>
     <h1>Chat Room</h1>
-    <h1>ログインユーザー：${sessionScope.userId }</h1>
+    <h1>ログインユーザー：${sessionScope.userName }</h1>
     <div id="chat-box" name="chat-box" style="border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; "></div>
 	<!-- css修正する、後でやる -->
 	<c:set var="isBlock" value="${param.isBlock}" />
@@ -64,6 +68,7 @@
         // サーバーから受け取ったJSONメッセージをパースして表示
         //ChatCommandからのデータ
         const messages = <%= jsonResponse != null ? jsonResponse : "[]" %>;
+        const userMap = <%= new org.json.JSONObject(userMap) %>;
         // チャットウィンドウにメッセージを表示
 	    const chatBox = document.getElementById('chat-box');
 		messages.forEach(message => {
@@ -128,19 +133,17 @@
 	        `;
 	        chatBox.appendChild(messageElement);
 	        chatBox.scrollTop = chatBox.scrollHeight;
-	        console.log('UserId:', message.userId);
-	        console.log('Message:', message.sendMessage);
-	        console.log('Time:', message.sendTime);
 	    }*/
 	    function addMessageToBox(message) {
 	        const messageContainer = document.createElement('div');
 	        messageContainer.classList.add('chat-message');
 	        const userSpan = document.createElement('span');
 	        userSpan.classList.add('user');
-	        userSpan.textContent = message.userId;
+	     	// ユーザーIDをユーザー名に置き換え
+	        userSpan.textContent = userMap[message.userId] || message.userId;
 	        const messageSpan = document.createElement('span');
 	        messageSpan.classList.add('message');
-	        messageSpan.textContent = message.sendMessage;
+	        messageSpan.innerHTML = message.sendMessage.replace(/\n/g, '<br>');
 	        const timeSpan = document.createElement('span');
 	        timeSpan.classList.add('time');
 	        timeSpan.textContent = message.sendTime;

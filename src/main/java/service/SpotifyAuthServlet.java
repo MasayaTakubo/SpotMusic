@@ -75,13 +75,15 @@ public class SpotifyAuthServlet extends HttpServlet {
                 
                 
                 //再生履歴
-                Map<String, String> recentryDatas = spotifyAuthService.getRecentlyPlayedTrackNamesAndIds(accessToken, 20);
-                //Map<String, String> topMixDatas = spotifyAuthService.getTopMixTracks(accessToken, 20);
-                //Map<String, String> recomendDatas = spotifyAuthService.getRecommendedTracks(accessToken, 20);
+                //アーティスト名がキー、値が、IDと画像イメージのセット
+                Map<String, Map<String, String>> recentlyDatas = spotifyAuthService.getRecentlyPlayedTrackDetails(accessToken, 25);
+                Map<String, Map<String, String>> topArtistsDatas = spotifyAuthService.getTopArtists(accessToken, 25);
+                
+                Map<String, Map<String, String>> newRelease = spotifyAuthService.getNewReleases(accessToken, 25);
 
-                session.setAttribute("recentryDatas", recentryDatas);
-                //session.setAttribute("topMixDatas", topMixDatas);
-                //session.setAttribute("recomendDatas", recomendDatas);
+                session.setAttribute("recentryDatas", recentlyDatas);
+                session.setAttribute("artistDetails", topArtistsDatas);
+                session.setAttribute("newRelease",newRelease);
                 
                 
                 // Mapを保存する

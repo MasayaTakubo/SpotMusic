@@ -9,7 +9,7 @@
 </head>
 <body>
     <h1>ユーザーリスト</h1>
-    <h1>${sessionScope.userId}</h1>
+    <h1>${sessionScope.userName}</h1>
     
     <table border="1">
         <tr>

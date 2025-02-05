@@ -662,8 +662,7 @@ public class SpotifyAuthService {
     }
     
     
-    
-    public Map<String, String> getRecentlyPlayedTrackNamesAndIds(String accessToken, int limit) throws IOException {
+    public Map<String, Map<String, String>> getRecentlyPlayedTrackDetails(String accessToken, int limit) throws IOException {
         // Spotify APIのエンドポイントURL
         URL url = new URL("https://api.spotify.com/v1/me/player/recently-played?limit=" + limit);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -688,14 +687,60 @@ public class SpotifyAuthService {
         // デバッグ用：取得したJSONレスポンスを出力
         System.out.println("Recently Played JSON Response: " + response.toString());
 
-        // JSONからトラック名とIDを抽出
-        Map<String, String> trackData = extractTrackNamesAndIds(response.toString());
+        // JSONからトラック名・ID・画像URLを抽出
+        Map<String, Map<String, String>> trackDetails = extractTrackDetails(response.toString());
 
         // デバッグ用：抽出したデータを出力
-        trackData.forEach((key, value) -> System.out.println("Track Name: " + key + ", Track ID: " + value));
+        trackDetails.forEach((name, details) -> 
+            System.out.println("Track Name: " + name + ", Track ID: " + details.get("id") + ", Image URL: " + details.get("image"))
+        );
 
-        return trackData;
+        return trackDetails;
     }
+
+
+    
+    //ログインユーザーが聞いているアーティストの情報
+    public Map<String, Map<String, String>> getTopArtists(String accessToken, int limit) throws IOException {
+        // Spotify APIのエンドポイントURL
+        URL url = new URL("https://api.spotify.com/v1/me/top/artists?limit=" + limit);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Authorization", "Bearer " + accessToken);
+
+        // ステータスコードを確認
+        int responseCode = connection.getResponseCode();
+        if (responseCode != 200) {
+            throw new IOException("Failed to get top artists: HTTP code " + responseCode);
+        }
+
+        // レスポンスを読み取る
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        StringBuilder response = new StringBuilder();
+        String inputLine;
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        // デバッグ用：取得したJSONレスポンスを出力
+        System.out.println("Top Artists JSON Response: " + response.toString());
+
+        // JSONからアーティスト名・ID・画像URLを抽出
+        Map<String, Map<String, String>> artistDetails = extractArtistDetails(response.toString());
+
+        // デバッグ用：抽出したデータを出力
+        artistDetails.forEach((name, details) -> 
+            System.out.println("Artist Name: " + name + ", Artist ID: " + details.get("id") + ", Image URL: " + details.get("image"))
+        );
+
+        return artistDetails;
+    }
+
+    
+    
+    
+    
 
     // TopMixの中の曲を取得
     public Map<String, String> getTopMixTracks(String accessToken, int limit) throws IOException {
@@ -733,9 +778,17 @@ public class SpotifyAuthService {
     }
 
     // 再生履歴に基づくおすすめ曲取得
-    public Map<String, String> getRecommendedTracks(String accessToken, int limit) throws IOException {
-        // Spotify APIのエンドポイントURL
-        URL url = new URL("https://api.spotify.com/v1/recommendations?limit=" + limit);
+    
+    
+    
+    
+    
+    public Map<String, Map<String, String>> getNewReleases(String accessToken, int limit) throws IOException {
+        // Spotify APIのエンドポイントURL（新しいリリース）
+        String apiUrl = "https://api.spotify.com/v1/browse/new-releases?limit=" + limit;
+
+        System.out.println("APIURL:::" + apiUrl);
+        URL url = new URL(apiUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.setRequestProperty("Authorization", "Bearer " + accessToken);
@@ -743,7 +796,7 @@ public class SpotifyAuthService {
         // ステータスコードを確認
         int responseCode = connection.getResponseCode();
         if (responseCode != 200) {
-            throw new IOException("Failed to get recommended tracks: HTTP code " + responseCode);
+            throw new IOException("Failed to get new releases: HTTP code " + responseCode);
         }
 
         // レスポンスを読み取る
@@ -756,16 +809,41 @@ public class SpotifyAuthService {
         in.close();
 
         // デバッグ用：取得したJSONレスポンスを出力
-        System.out.println("Recommended Tracks JSON Response: " + response.toString());
+        System.out.println("New Releases JSON Response: " + response.toString());
 
-        // JSONからトラック名とIDを抽出
-        Map<String, String> trackData = extractTrackNamesAndIds(response.toString());
-
-        // デバッグ用：抽出したデータを出力
-        trackData.forEach((key, value) -> System.out.println("Track Name: " + key + ", Track ID: " + value));
-
-        return trackData;
+        // JSONから新しいリリース情報を抽出
+        return extractReleaseData(response.toString());
     }
+
+    private Map<String, Map<String, String>> extractReleaseData(String jsonResponse) {
+        Map<String, Map<String, String>> releaseData = new LinkedHashMap<>();
+
+        JSONObject jsonObject = new JSONObject(jsonResponse);
+        JSONArray albumsArray = jsonObject.getJSONObject("albums").getJSONArray("items");
+
+        for (int i = 0; i < albumsArray.length(); i++) {
+            JSONObject album = albumsArray.getJSONObject(i);
+            String albumName = album.getString("name");
+            String albumId = album.getString("id");
+
+            // アルバムの画像URL取得
+            JSONArray images = album.getJSONArray("images");
+            String imageUrl = images.length() > 0 ? images.getJSONObject(0).getString("url") : null;
+
+            // 格納形式: Map<"アルバム名", Map<"ID", "画像URL">>
+            Map<String, String> albumInfo = new HashMap<>();
+            albumInfo.put("id", albumId);
+            albumInfo.put("image", imageUrl);
+
+            releaseData.put(albumName, albumInfo);
+        }
+
+        return releaseData;
+    }
+
+    
+    
+    
 
     /**
      * JSONレスポンスからトラック名とIDを抽出するメソッド
@@ -813,6 +891,83 @@ public class SpotifyAuthService {
 
         return trackNamesAndIds;
     }
+    
+    
+
+    public Map<String, Map<String, String>> extractArtistDetails(String jsonResponse) {
+        Map<String, Map<String, String>> artistDetails = new HashMap<>();
+
+        // JSONレスポンスの解析
+        JSONObject jsonObject = new JSONObject(jsonResponse);
+
+        // "items" 配列を取得
+        if (jsonObject.has("items")) {
+            JSONArray items = jsonObject.getJSONArray("items");
+
+            for (int i = 0; i < items.length(); i++) {
+                JSONObject item = items.getJSONObject(i);
+
+                // アーティスト情報を取得
+                String artistName = item.getString("name");
+                String artistId = item.getString("id");
+
+                // アーティストの画像URL（画像が存在する場合）
+                String imageUrl = "";
+                if (item.has("images") && item.getJSONArray("images").length() > 0) {
+                    JSONObject image = item.getJSONArray("images").getJSONObject(0);  // 最初の画像
+                    imageUrl = image.getString("url");
+                }
+
+                // アーティスト情報をMapに格納
+                Map<String, String> details = new HashMap<>();
+                details.put("id", artistId);
+                details.put("image", imageUrl);
+
+                // アーティスト名をキーとしてMapに格納
+                artistDetails.put(artistName, details);
+            }
+        }
+
+        return artistDetails;
+    }
+
+
+    
+    
+    
+    
+    public Map<String, Map<String, String>> extractTrackDetails(String jsonResponse) {
+        Map<String, Map<String, String>> trackDetails = new HashMap<>();
+        
+        JSONObject jsonObject = new JSONObject(jsonResponse);
+        JSONArray items = jsonObject.getJSONArray("items");
+
+        for (int i = 0; i < items.length(); i++) {
+            JSONObject trackObject = items.getJSONObject(i).getJSONObject("track");
+
+            String trackName = trackObject.getString("name");
+            String trackId = trackObject.getString("id");
+
+            // アルバムの画像URLを取得
+            JSONArray images = trackObject.getJSONObject("album").getJSONArray("images");
+            String imageUrl = images.length() > 0 ? images.getJSONObject(0).getString("url") : null;
+
+            // トラックの詳細情報を格納
+            Map<String, String> details = new HashMap<>();
+            details.put("id", trackId);
+            details.put("image", imageUrl);
+
+            trackDetails.put(trackName, details);
+        }
+
+        return trackDetails;
+    }
+    
+    
+    
+    
+ 
+    
 
     private void sendPutRequest(String urlString, String accessToken) throws IOException {
         HttpURLConnection connection = null;
