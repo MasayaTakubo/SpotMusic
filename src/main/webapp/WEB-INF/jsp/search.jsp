@@ -5,10 +5,11 @@
 <html>
 <head>
     <title>検索結果</title>
-    <link rel="stylesheet" type="text/css" href="<c:url value='/css/styles.css' />">
+<!-- <link rel="stylesheet" type="text/css" href="<c:url value='/css/styles.css' />"> -->    
 	
 </head>
 <body>
+<div class="content">
 <!-- タブメニュー -->
 <c:set var="noImageUrl" value="${fn:escapeXml(pageContext.request.contextPath)}/img/no_image.png" />
 <div class="tab-menu">
@@ -48,7 +49,8 @@
                                 <option value="${playlist.id}">${playlist.name}</option>
                             </c:forEach>
                         </select>
-                        <button type="submit">追加</button>
+                        <button type="button" onclick="playTrack('${track.id}', '${track.name}')">再生</button>
+                        <button class="add-button" type="submit">追加</button>
                     </form>
                 </li>
             </c:forEach>
@@ -59,14 +61,16 @@
     <c:if test="${not empty albums}">
         <h3>アルバム</h3>
         <ul class="album-list">
-            <c:forEach var="album" items="${albums}">
-                <li class="album-item">
-                    <a href="SpotifySearchServlet?action=album&id=${album.id}">
-                        <img src="${not empty album.images ? album.images[0].url : noImageUrl}" width="100">
-                        ${album.name}
-                    </a>
-                </li>
-            </c:forEach>
+			<c:forEach var="album" items="${albums}">
+			    <li class="album-item">
+			        <a href="javascript:void(0);" 
+			           onclick="loadAlbumDetail('${album.id}')">
+			            <img src="${not empty album.images ? album.images[0].url : noImageUrl}" width="100">
+			            ${album.name}
+			        </a>
+			    </li>
+			</c:forEach>
+
         </ul>
     </c:if>
 
@@ -74,14 +78,16 @@
     <c:if test="${not empty artists}">
         <h3>アーティスト</h3>
         <ul class="artist-list">
-            <c:forEach var="artist" items="${artists}">
-                <li class="artist-item">
-					<a href="SpotifyCheckFollowStatusServlet?artistId=${artist.id}">
-					    <img src="${not empty artist.images ? artist.images[0].url : noImageUrl}" width="100">
-					    ${artist.name}
-					</a>
-                </li>
-            </c:forEach>
+			<c:forEach var="artist" items="${artists}">
+			    <li class="artist-item">
+			        <a href="javascript:void(0);" 
+			           onclick="loadArtistDetail('${artist.id}')">
+			            <img src="${not empty artist.images ? artist.images[0].url : noImageUrl}" width="100">
+			            ${artist.name}
+			        </a>
+			    </li>
+			</c:forEach>
+
         </ul>
     </c:if>
 
@@ -89,14 +95,16 @@
     <c:if test="${not empty playlists}">
         <h3>プレイリスト</h3>
         <ul class="playlist-list">
-            <c:forEach var="playlist" items="${playlists}">
-                <li class="playlist-item">
-                    <a href="SpotifySearchServlet?action=playlist&id=${playlist.id}">
-                        <img src="${not empty playlist.images ? playlist.images[0].url : noImageUrl}" width="100">
-                        ${playlist.name}
-                    </a>
-                </li>
-            </c:forEach>
+			<c:forEach var="playlist" items="${playlists}">
+			    <li class="playlist-item">
+			        <a href="javascript:void(0);" 
+			           onclick="loadPlaylistDetail('${playlist.id}')">
+			            <img src="${not empty playlist.images ? playlist.images[0].url : noImageUrl}" width="100">
+			            ${playlist.name}
+			        </a>
+			    </li>
+			</c:forEach>
+
         </ul>
     </c:if>
 </div>
@@ -128,6 +136,8 @@
                             </c:forEach>
                         </select>
                         <button type="submit">追加</button>
+
+                        
                     </form>
                 </li>
             </c:forEach>
@@ -140,14 +150,16 @@
     <h2>アルバム</h2>
     <c:if test="${not empty albums}">
         <ul class="album-list">
-            <c:forEach var="album" items="${albums}">
-                <li class="album-item">
-                    <a href="SpotifySearchServlet?action=album&id=${album.id}">
-                        <img src="${not empty album.images ? album.images[0].url : noImageUrl}" width="100">
-                        ${album.name}
-                    </a>
-                </li>
-            </c:forEach>
+			<c:forEach var="album" items="${albums}">
+			    <li class="album-item">
+			        <a href="javascript:void(0);" 
+			           onclick="loadAlbumDetail('${album.id}')">
+			            <img src="${not empty album.images ? album.images[0].url : noImageUrl}" width="100">
+			            ${album.name}
+			        </a>
+			    </li>
+			</c:forEach>
+
         </ul>
     </c:if>
     <c:if test="${empty albums}">
@@ -160,14 +172,16 @@
     <h2>アーティスト</h2>
     <c:if test="${not empty artists}">
         <ul class="artist-list">
-            <c:forEach var="artist" items="${artists}">
-                <li class="artist-item">
-					<a href="SpotifyCheckFollowStatusServlet?artistId=${artist.id}">
-					    <img src="${not empty artist.images ? artist.images[0].url : noImageUrl}" width="100">
-					    ${artist.name}
-					</a>
-                </li>
-            </c:forEach>
+			<c:forEach var="artist" items="${artists}">
+			    <li class="artist-item">
+			        <a href="javascript:void(0);" 
+			           onclick="loadArtistDetail('${artist.id}')">
+			            <img src="${not empty artist.images ? artist.images[0].url : noImageUrl}" width="100">
+			            ${artist.name}
+			        </a>
+			    </li>
+			</c:forEach>
+
         </ul>
     </c:if>
     <c:if test="${empty artists}">
@@ -180,14 +194,16 @@
     <h2>プレイリスト</h2>
     <c:if test="${not empty playlists}">
         <ul class="playlist-list">
-            <c:forEach var="playlist" items="${playlists}">
-                <li class="playlist-item">
-                    <a href="SpotifySearchServlet?action=playlist&id=${playlist.id}">
-                        <img src="${not empty playlist.images ? playlist.images[0].url : noImageUrl}" width="100">
-                        ${playlist.name}
-                    </a>
-                </li>
-            </c:forEach>
+			<c:forEach var="playlist" items="${playlists}">
+			    <li class="playlist-item">
+			        <a href="javascript:void(0);" 
+			           onclick="loadPlaylistDetail('${playlist.id}')">
+			            <img src="${not empty playlist.images ? playlist.images[0].url : noImageUrl}" width="100">
+			            ${playlist.name}
+			            
+			        </a>
+			    </li>
+			</c:forEach>
         </ul>
     </c:if>
     <c:if test="${empty playlists}">
@@ -249,6 +265,60 @@ document.addEventListener("DOMContentLoaded", function () {
     showTab('all');
 });
 
+function loadAlbumDetail(albumId) {
+    console.log("loadAlbumDetail called with ID:", albumId);  // デバッグ用
+    const url = "/SpotMusic/SpotifySearchServlet?action=album&id=" + encodeURIComponent(albumId);
+
+    console.log("Fetch URL:", url);  // デバッグ用
+
+    const contentDiv = document.querySelector('.content');
+    fetch(url)
+    .then(response => response.text())
+    .then(data => {
+        contentDiv.innerHTML = data;
+    })
+    .catch(error => {
+        console.error('Error loading album details:', error);
+        contentDiv.innerHTML = '<p>アルバム情報の取得に失敗しました。</p>';
+    });
+}
+function loadArtistDetail(artistId) {
+    console.log("loadArtistDetail called with ID:", artistId);  // デバッグ用
+    const url = "/SpotMusic/SpotifyCheckFollowStatusServlet?action=artist&id=" + encodeURIComponent(artistId);
+
+    console.log("Fetch URL:", url);  // デバッグ用
+
+    const contentDiv = document.querySelector('.content');
+    fetch(url)
+    .then(response => response.text())
+    .then(data => {
+        contentDiv.innerHTML = data;
+    })
+    .catch(error => {
+        console.error('Error loading artist details:', error);
+        contentDiv.innerHTML = '<p>アーティスト情報の取得に失敗しました。</p>';
+    });
+}
+
+function loadPlaylistDetail(playlistId) {
+    console.log("loadPlaylistDetail called with ID:", playlistId);  // デバッグ用
+    const url = "/SpotMusic/SpotifySearchServlet?action=playlist&id=" + encodeURIComponent(playlistId);
+
+    console.log("Fetch URL:", url);  // デバッグ用
+
+    const contentDiv = document.querySelector('.content');
+    fetch(url)
+    .then(response => response.text())
+    .then(data => {
+        contentDiv.innerHTML = data;
+    })
+    .catch(error => {
+        console.error('Error loading playlist details:', error);
+        contentDiv.innerHTML = '<p>プレイリスト情報の取得に失敗しました。</p>';
+    });
+}
+
+	
 </script>
 
 

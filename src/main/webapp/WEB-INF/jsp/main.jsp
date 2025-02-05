@@ -147,11 +147,10 @@ h2 {
         </a>
     </div>
     
-    <!--  検索ボックス -->
-    <form action="SpotifySearchServlet" method="get">
-    	<input type="text" name="query" placeholder="何を再生したいですか？" required>
-    	<button class="search-button" type="submit">検索</button>
-	</form>
+<form onsubmit="event.preventDefault(); loadSearchPage();">
+    <input type="text" id="searchQuery" name="query" placeholder="何を再生したいですか？" required>
+    <button class="search-button" type="submit">検索</button>
+</form>
     <!-- ここまで　　　　　  -->
     
     <div class="actions">
@@ -281,6 +280,7 @@ h2 {
 						<th>Track Name</th>
 						<th>Track ID</th>
 						<th>Image</th>
+						<th>☺</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -292,7 +292,11 @@ h2 {
 							<!-- トラックID -->
 							<td><c:if test="${not empty entry.value.image}">
 									<img src="${entry.value.image}" alt="Track Image" width="100">
+									
 								</c:if></td>
+							<td><button onclick="playTrack('${entry.value.id}', '${entry.key}')">再生</button></td>	
+									
+							
 						</tr>
 					</c:forEach>
 				</tbody>
@@ -1126,7 +1130,80 @@ $(document).ready(function(){
                 });
             }
         });
-        
+
+
+function loadSearchPage() {
+    console.log("loadSearchPage called");  // デバッグ用
+    const query = document.getElementById("searchQuery").value;
+    const url = "/SpotMusic/SpotifySearchServlet?query=" + encodeURIComponent(query);
+
+    console.log("Fetch URL:", url);  // デバッグ用
+
+    const contentDiv = document.querySelector('.content');
+    fetch(url)
+    .then(response => response.text())
+    .then(data => {
+        contentDiv.innerHTML = data;
+    })
+    .catch(error => {
+        console.error('Error loading search page:', error);
+        contentDiv.innerHTML = '<p>検索ページの取得に失敗しました。</p>';
+    });
+}
+
+function loadAlbumDetail(albumId) {
+    console.log("loadAlbumDetail called with ID:", albumId);  // デバッグ用
+    const url = "/SpotMusic/SpotifySearchServlet?action=album&id=" + encodeURIComponent(albumId);
+
+    console.log("Fetch URL:", url);  // デバッグ用
+
+    const contentDiv = document.querySelector('.content');
+    fetch(url)
+    .then(response => response.text())
+    .then(data => {
+        contentDiv.innerHTML = data;
+    })
+    .catch(error => {
+        console.error('Error loading album details:', error);
+        contentDiv.innerHTML = '<p>アルバム情報の取得に失敗しました。</p>';
+    });
+}
+function loadArtistDetail(artistId) {
+    console.log("loadArtistDetail called with ID:", artistId);  // デバッグ用
+    const url = "/SpotMusic/SpotifySearchServlet?action=artist&id=" + encodeURIComponent(artistId);
+
+    console.log("Fetch URL:", url);  // デバッグ用
+
+    const contentDiv = document.querySelector('.content');
+    fetch(url)
+    .then(response => response.text())
+    .then(data => {
+        contentDiv.innerHTML = data;
+    })
+    .catch(error => {
+        console.error('Error loading artist details:', error);
+        contentDiv.innerHTML = '<p>アーティスト情報の取得に失敗しました。</p>';
+    });
+}
+
+function loadPlaylistDetail(playlistId) {
+    console.log("loadPlaylistDetail called with ID:", playlistId);  // デバッグ用
+    const url = "/SpotMusic/SpotifySearchServlet?action=playlist&id=" + encodeURIComponent(playlistId);
+
+    console.log("Fetch URL:", url);  // デバッグ用
+
+    const contentDiv = document.querySelector('.content');
+    fetch(url)
+    .then(response => response.text())
+    .then(data => {
+        contentDiv.innerHTML = data;
+    })
+    .catch(error => {
+        console.error('Error loading playlist details:', error);
+        contentDiv.innerHTML = '<p>プレイリスト情報の取得に失敗しました。</p>';
+    });
+}
+
 </script>
 <script>
 //プレイリスト削除JavaScript
@@ -1135,9 +1212,9 @@ function deletePlaylist(playlistId) {
         return;
     }
 
+
     let formData = new FormData();
     formData.append("playlistId", playlistId);
-
     fetch("SpotifyDeletePlaylistServlet", {
         method: "POST",
         body: formData
@@ -1149,6 +1226,41 @@ function deletePlaylist(playlistId) {
     })
     .catch(error => console.error("エラー:", error));
 }
+
+function showTab(tabName) {
+    // すべてのタブコンテンツを非表示にする
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.style.display = "none";
+    });
+
+    // すべてのタブボタンのアクティブ状態を解除
+    document.querySelectorAll('.tab-menu button').forEach(button => {
+        button.classList.remove('active');
+    });
+
+    // タブが存在するかチェック
+    let targetTab = document.getElementById(tabName);
+    if (targetTab) {
+        targetTab.style.display = "block";
+    } else {
+        console.error(`showTab: タブ '${tabName}' が見つかりません。`);
+        return;
+    }
+
+    // クリックされたタブボタンをアクティブにする
+    let activeButton = document.querySelector(`[onclick="showTab('${tabName}')"]`);
+    if (activeButton) {
+        activeButton.classList.add('active');
+    }
+}
+
+// 初期表示（デフォルトで「すべて」を表示）
+document.addEventListener("DOMContentLoaded", function () {
+    showTab('all');
+});
+
+
+
 </script> 
 <script>
 //プレイリスト作成ボタン
