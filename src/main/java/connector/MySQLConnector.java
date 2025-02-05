@@ -19,7 +19,7 @@ public class MySQLConnector {
         try{
             // 接続URLに文字エンコーディングの設定を追加
             conn = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/spotmusic?useSSL=false&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8", 
+                "jdbc:mysql://localhost:3306/spotmusic?useSSL=false&serverTimezone=Asia/Tokyo&useUnicode=true&characterEncoding=UTF-8", 
                 "info", "pro");
         }catch(SQLException e){
             e.printStackTrace();

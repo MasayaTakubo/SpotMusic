@@ -10,7 +10,7 @@
 <body>
 <h1>ブロックリスト</h1>
 
-<h1>${sessionScope.userName}がブロックしている相手のリスト</h1>
+<h1>${sessionScope.user_name}がブロックしている相手のリスト</h1>
     <table border="1">
         <tr>
             <th>ブロックした相手のユーザー名</th>

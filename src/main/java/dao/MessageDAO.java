@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,17 +15,17 @@ import connector.MySQLConnector;
 public class MessageDAO {
 
     public void addMessage(MessageBean messageBean) {
-        String sql = "INSERT INTO MESSAGE (RELATION_ID, USER_ID, SEND_MESSAGE, SEND_TIME) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO MESSAGE (RELATION_ID, USER_ID, SEND_MESSAGE) VALUES (?, ?, ?)";
         try (Connection conn = MySQLConnector.getConn();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             // 現在の時刻を設定
-            Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-            
+            //Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+            //↑は日本時間じゃないことが分かったのでDBのDEFAULTを使う
             stmt.setInt(1, messageBean.getRelationId());  // relationIdはint型
             stmt.setString(2, messageBean.getUserId()); 
             stmt.setString(3, messageBean.getSendMessage());
-            stmt.setTimestamp(4, currentTime);  // 投稿時間を追加
+            //stmt.setTimestamp(4, currentTime);  // 
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

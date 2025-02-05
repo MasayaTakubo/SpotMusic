@@ -1,6 +1,7 @@
 package bean;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 public class blockBean implements Serializable{
 	String userId;
@@ -8,6 +9,7 @@ public class blockBean implements Serializable{
 	String blockId;
 	String blockerId;
 	String blockedId;
+	Timestamp blockTime;
 	public blockBean() {}
 	public blockBean(String blockerId, String blockedId) {
 		this.blockerId = blockerId;
@@ -44,4 +46,11 @@ public class blockBean implements Serializable{
 	public void setBlockedId(String blockedId) {
 		this.blockedId = blockedId;
 	}
+	public Timestamp getBlockTime() {
+		return blockTime;
+	}
+	public void setBlockTime(Timestamp blockTime) {
+		this.blockTime = blockTime;
+	}
+	
 }

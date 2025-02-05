@@ -32,6 +32,7 @@ public abstract class CommandFactory {
 	        if (className == null) {
 	            throw new RuntimeException("コマンド名に対応するクラスが見つかりません: " + commandName);
 	        }
+	        System.out.println(className);
 
 	        // クラスが存在するか確認
 	        Class<?> c = Class.forName(className);

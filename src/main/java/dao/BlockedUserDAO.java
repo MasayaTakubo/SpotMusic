@@ -61,7 +61,7 @@ public class BlockedUserDAO {
         return blockedId;
     }
     public List<blockBean> getBlockList(String userId) {
-    	String sql = "Select block_id,blocked_id from blocked_user where blocker_ID = ?";
+    	String sql = "Select block_id,blocked_id,block_time from blocked_user where blocker_ID = ?";
     	List<blockBean> blocklist = new ArrayList<>();
         try (Connection conn = MySQLConnector.getConn();
                 PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -71,6 +71,7 @@ public class BlockedUserDAO {
            		blockBean blockBean = new blockBean();
            		blockBean.setBlockId(rs.getString("block_id"));
                 blockBean.setBlockedId(rs.getString("blocked_id"));  // 自分がブロックしている相手のIDをリストに追加
+                blockBean.setBlockTime(rs.getTimestamp("block_time"));
                 blocklist.add(blockBean);
             }
            } catch (SQLException e) {
