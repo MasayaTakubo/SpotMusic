@@ -174,6 +174,16 @@ h2 {
     <!-- 左側: プレイリスト -->
     <div class="sidebar">
         <h2>プレイリスト</h2>
+<!-- プレイリスト作成フォーム -->
+<!-- 非表示の iframe を用意し、フォーム送信をその中で処理 -->
+<iframe name="hidden_iframe" style="display: none;"></iframe>
+<form id="playlistForm" action="SpotifyCreatePlaylistServlet" method="post" target="hidden_iframe">
+    <label for="playlistName">新しいプレイリスト名:</label>
+    <input type="text" id="playlistName" name="playlistName" required>
+    <button type="submit">作成</button>
+</form>
+
+
 <%
     List<SpotifyPlayListBean> playlistBeans = (List<SpotifyPlayListBean>) session.getAttribute("playlistBeans");
     List<String> trackIds = new ArrayList<>();
@@ -451,7 +461,7 @@ function loadPlaylistPage(playlistId) {
 
 console.log("toggleMenu スクリプトが実行されました！");
 
-//✅ 事前にグローバルで登録
+//? 事前にグローバルで登録
  window.toggleMenu = function(button) {
      console.log("toggleMenu が呼ばれました");
 
@@ -475,7 +485,7 @@ console.log("toggleMenu スクリプトが実行されました！");
      console.log("適用後のスタイル:", menu.style.display);
  };
 
- // ✅ `document` にクリックイベントを適用
+ // ? `document` にクリックイベントを適用
  document.addEventListener("click", function(event) {
      // メニューを開くボタン（menu-btn）がクリックされたら通常のトグル処理
      if (event.target.classList.contains("menu-btn")) {
@@ -1109,6 +1119,5 @@ $(document).ready(function(){
         });
         
 </script>
-<script src="script.js"></script>
 </body>
 </html>
