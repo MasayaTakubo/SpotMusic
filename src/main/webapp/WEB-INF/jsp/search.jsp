@@ -5,7 +5,7 @@
 <html>
 <head>
     <title>検索結果</title>
-    <link rel="stylesheet" type="text/css" href="<c:url value='/css/styles.css' />">
+<!-- <link rel="stylesheet" type="text/css" href="<c:url value='/css/styles.css' />"> -->    
 	
 </head>
 <body>
@@ -49,7 +49,8 @@
                                 <option value="${playlist.id}">${playlist.name}</option>
                             </c:forEach>
                         </select>
-                        <button type="submit">追加</button>
+                        <button type="button" onclick="playTrack('${track.id}', '${track.name}')">再生</button>
+                        <button class="add-button" type="submit">追加</button>
                     </form>
                 </li>
             </c:forEach>
