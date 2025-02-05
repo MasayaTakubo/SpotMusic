@@ -196,6 +196,8 @@ h2 {
 						${playlist.playlistId}<br>
 					</button> <strong>イメージ画像：</strong><img src="${playlist.imageUrl}"
 					alt="Playlist Image" width="100" />
+				</li>
+			</c:forEach>
 
 
 <ul>
