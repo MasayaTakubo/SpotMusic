@@ -6,7 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import bean.MessageBean;
 import connector.MySQLConnector;
@@ -76,4 +78,27 @@ public class MessageDAO {
             e.printStackTrace();
         }
     }
+    public Map<String, String> getUserMap(int relationId) {
+        Map<String, String> userMap = new HashMap<>();
+        String sql = "SELECT u1.user_id AS user1_id, u1.user_name AS user1_name, " +
+                     "       u2.user_id AS user2_id, u2.user_name AS user2_name " +
+                     "FROM relation r " +
+                     "JOIN users u1 ON r.user1_id = u1.user_id " +
+                     "JOIN users u2 ON r.user2_id = u2.user_id " +
+                     "WHERE r.relation_id = ?";
+
+        try (Connection conn = MySQLConnector.getConn();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, relationId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                userMap.put(rs.getString("user1_id"), rs.getString("user1_name"));
+                userMap.put(rs.getString("user2_id"), rs.getString("user2_name"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return userMap;
+    }
+
 }

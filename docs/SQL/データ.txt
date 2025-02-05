@@ -23,13 +23,13 @@ rerationがCancelで手動ブロック
 
 
 ■データ
-INSERT INTO USERS (USER_ID, ACCESS_TOKEN, REFRESH_TOKEN, EXPIRES_IN) VALUES
-('31rqkz3mglwnl47b2g4thwqfih4a', NULL, NULL, NULL), -- satou
-('31iu3d27fuexgadotnfmmv3knrhu', NULL, NULL, NULL), -- saino
-('31psxtlyvyd6jh2bypyeg7zd4hym', NULL, NULL, NULL), -- chou
-('31gqpyn64ycd6uq37qkbmtngl26q', NULL, NULL, NULL), -- thau
-('31wkx6w4l6ijxbqwg5hugipeeazi', NULL, NULL, NULL), -- takubo
-('l3t4fygmdhchwz9yh3lpgkqhf', NULL, NULL, NULL);    -- koike
+INSERT INTO USERS (USER_ID, ACCESS_TOKEN, REFRESH_TOKEN, EXPIRES_IN,USER_NAME) VALUES
+('31rqkz3mglwnl47b2g4thwqfih4a', NULL, NULL, NULL,'佐藤択弥'),
+('31iu3d27fuexgadotnfmmv3knrhu', NULL, NULL, NULL, 'kohei'),
+('31psxtlyvyd6jh2bypyeg7zd4hym', NULL, NULL, NULL,'張'),
+('31gqpyn64ycd6uq37qkbmtngl26q', NULL, NULL, NULL, 'チャウ'),
+('31wkx6w4l6ijxbqwg5hugipeeazi', NULL, NULL, NULL,'田久保 雅也'),
+('l3t4fygmdhchwz9yh3lpgkqhf', NULL, NULL, NULL,'reima');
 
 
 

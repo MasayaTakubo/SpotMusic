@@ -1,10 +1,12 @@
 package command;
 
 import java.util.List;
+import java.util.Map;
 
 import bean.MessageBean;
 import context.RequestContext;
 import context.ResponseContext;
+import context.WebResponseContext;
 import dao.MessageDAO;
 
 public class ChatCommand extends AbstractCommand {
@@ -18,8 +20,11 @@ public class ChatCommand extends AbstractCommand {
         MessageDAO messageDAO = new MessageDAO();
         List<MessageBean> messages = messageDAO.getMessages(relationId);
 
+        Map<String,String> userMap = messageDAO.getUserMap(relationId);
         // 結果をレスポンスに設定
         resc.setResult(messages);
+        WebResponseContext wresc = (WebResponseContext)resc;
+        wresc.setResult("userMap",userMap);
         resc.setTarget("chat"); // レスポンスターゲットを設定
         return resc;
     }

@@ -8,7 +8,7 @@
 </head>
 <body>
     <h1>フレンドリスト</h1>
-    <h1>${sessionScope.userId}</h1>
+    <h1>${sessionScope.userName}</h1>
     <p>申請中のユーザー</p>
     <table border="1">
         <tr>
