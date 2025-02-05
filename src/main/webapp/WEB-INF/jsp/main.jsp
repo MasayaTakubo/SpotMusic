@@ -173,15 +173,18 @@ h2 {
 </div>
     <!-- 左側: プレイリスト -->
     <div class="sidebar">
+		<!-- (プレイリスト作成用)非表示の iframe を用意し、フォーム送信をその中で処理 -->
+		<iframe name="hidden_iframe" style="display: none;"></iframe>
         <h2>プレイリスト</h2>
-<!-- プレイリスト作成フォーム -->
-<!-- 非表示の iframe を用意し、フォーム送信をその中で処理 -->
-<iframe name="hidden_iframe" style="display: none;"></iframe>
-<form id="playlistForm" action="SpotifyCreatePlaylistServlet" method="post" target="hidden_iframe">
-    <label for="playlistName">新しいプレイリスト名:</label>
-    <input type="text" id="playlistName" name="playlistName" required>
-    <button type="submit">作成</button>
-</form>
+        <!-- プレイリスト作成ボタン -->
+		<button id="showPlaylistForm" class="plus-button">[+]</button>
+		<!-- プレイリスト作成フォーム (デフォルトは非表示) -->
+		<form id="playlistForm" action="SpotifyCreatePlaylistServlet" method="post" target="hidden_iframe" style="display: none;">
+		    <label for="playlistName">新しいプレイリスト名:</label>
+		    <input type="text" id="playlistName" name="playlistName" required>
+		    <button type="submit">作成</button>
+		</form>
+		<!--  ここまで -->
 
 
 <%
@@ -1126,6 +1129,7 @@ $(document).ready(function(){
         
 </script>
 <script>
+//プレイリスト削除JavaScript
 function deletePlaylist(playlistId) {
     if (!confirm("本当にこのプレイリストを削除しますか？")) {
         return;
@@ -1146,5 +1150,19 @@ function deletePlaylist(playlistId) {
     .catch(error => console.error("エラー:", error));
 }
 </script> 
+<script>
+//プレイリスト作成ボタン
+document.getElementById("showPlaylistForm").addEventListener("click", function() {
+    document.getElementById("playlistForm").style.display = "block";
+    this.style.display = "none"; // ボタンを非表示にする
+});
+
+document.getElementById("playlistForm").addEventListener("submit", function() {
+    setTimeout(() => {
+        document.getElementById("playlistForm").style.display = "none";
+        document.getElementById("showPlaylistForm").style.display = "block"; // 「＋」ボタンを再表示
+    }, 500); // 送信後少し待って閉じる
+});
+</script>
 </body>
 </html>
