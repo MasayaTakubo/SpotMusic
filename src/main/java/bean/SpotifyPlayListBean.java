@@ -52,21 +52,21 @@ public class SpotifyPlayListBean {
             System.out.println("このプレイリストにはトラック情報がありません");
         }
 
-        // プレイリストのカバー画像URLを取得
-        if (playlist.has("images")) {
-            JSONArray images = playlist.getJSONArray("images");
-            if (images.length() > 0) {
-                JSONObject image = images.getJSONObject(0);  // 最初の画像（一般的には最大サイズのもの）
-                this.playlistCoverImageUrl = image.optString("url", "");  // 画像URLを取得
-                this.albumImageUrl = this.playlistCoverImageUrl; // アルバム画像URLとしてカバー画像を設定
-            } else {
-                this.playlistCoverImageUrl = "";  // 画像がない場合は空文字列
-                this.albumImageUrl = "";  // 画像がない場合
-            }
+
+     // プレイリストのカバー画像URLを取得
+        JSONArray images = playlist.optJSONArray("images");
+        if (images != null && images.length() > 0) {
+            this.playlistCoverImageUrl = images.getJSONObject(0).optString("url", null); // null ならデフォルト適用
         } else {
-            this.playlistCoverImageUrl = "";  // 画像が存在しない場合
-            this.albumImageUrl = "";  // 画像が存在しない場合
+            this.playlistCoverImageUrl = null; // ここでは null にしておく
         }
+
+        // `null` または `""`（空文字）の場合は `JSP` 側で `no_image.png` を適用
+
+
+        // アルバム画像URLも同じように設定
+        this.albumImageUrl = this.playlistCoverImageUrl;
+
     }
 
     // 以下、GetterとSetter（省略なし）

@@ -12,7 +12,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
    	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
+    <link rel="stylesheet" type="text/css" href="<c:url value='/css/delete.css' />">
     <title>プレイリスト詳細</title>
     <style>
 	    #sendButton {
@@ -50,20 +50,29 @@
 
 <c:if test="${not empty trackList}">
     <ul class="track-list">
-        <c:forEach var="track" items="${trackList}">
-            <li>
-                <strong>トラック名:</strong> ${fn:escapeXml(track.trackName)}<br> 
-                <strong>アーティスト名:</strong> ${fn:escapeXml(track.artistName)}<br>
-                
-                <!-- 画像URLが設定されている場合のみ表示 -->
-                <c:if test="${not empty track.trackImageUrl and (fn:startsWith(track.trackImageUrl, 'http://') or fn:startsWith(track.trackImageUrl, 'https://'))}">
-                    <img src="${track.trackImageUrl}" alt="${fn:escapeXml(track.trackName)}" width="100" />
-                </c:if>
-                
-				<button onclick="playTrack('${track.trackId}', '${track.trackName}')">再生</button>
+	<c:forEach var="track" items="${trackList}">
+	    <li>
+	        <strong>トラック名:</strong> ${fn:escapeXml(track.trackName)}<br> 
+	        <strong>アーティスト名:</strong> ${fn:escapeXml(track.artistName)}<br>
+	
+	        <!-- 画像がある場合のみ表示 -->
+	        <c:if test="${not empty track.trackImageUrl}">
+	            <img src="${track.trackImageUrl}" alt="${fn:escapeXml(track.trackName)}" width="100" />
+	        </c:if>
+	
+	        <button onclick="playTrack('${track.trackId}', '${track.trackName}')">再生</button>
+	
+	        <!-- メニュー用のボタン -->
+	        <div class="track-menu">
+	            <button class="menu-btn" onclick="toggleMenu(this)">&#x22EE;</button>
+	            <div class="menu-content">
+	                <button onclick="removeTrack('${param.playlistId}', '${track.trackId}', this)">削除</button>
+	            </div>
+	        </div>
+	    </li>
+	</c:forEach>
 
-            </li>
-        </c:forEach>
+
     </ul>
 </c:if>
 
@@ -146,6 +155,42 @@ $(document).ready(function(){
         });
         
 </script>
+<script>
+//main.jspでの処理を呼び出される側でも記述(JSが動かない)
+function loadPlaylistPage(playlistId) {
+    if (!playlistId) {
+        console.error('playlistId が指定されていません');
+        return;
+    }
 
+    const url = "/SpotMusic/FrontServlet?command=PlayListDetails&playlistId=" + encodeURIComponent(playlistId);
+    const contentDiv = document.querySelector('.content');
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('サーバーエラー: ' + response.status);
+            }
+            return response.text();
+        })
+        .then(data => {
+            contentDiv.innerHTML = data;
+            console.log("プレイリストページがロードされました！");
+
+            // **イベントリスナーを再適用**
+            document.querySelectorAll(".menu-btn").forEach(button => {
+                button.addEventListener("click", function() {
+                    toggleMenu(this);
+                });
+            });
+
+            console.log("toggleMenu イベントを再適用しました");
+        })
+        .catch(error => {
+            console.error('エラー発生:', error);
+            contentDiv.innerHTML = '<p>プレイリスト情報の取得に失敗しました。</p>';
+        });
+}
+</script>
 </body>
 </html>

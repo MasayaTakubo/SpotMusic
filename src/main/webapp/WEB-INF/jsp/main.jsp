@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ page import="java.util.List"%>
 <%@ page import="bean.SpotifyPlayListBean"%>
 <%@ page import="java.util.ArrayList"%>
@@ -15,6 +16,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SpotMusic - Web Player：すべての人に音楽を</title>
 	<link rel="stylesheet" type="text/css" href="<c:url value='/css/player.css' />">
+	<link rel="stylesheet" type="text/css" href="<c:url value='/css/delete.css' />">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://sdk.scdn.co/spotify-player.js"></script>
 
@@ -185,20 +187,29 @@
 %>
 
 
-        <ul>
-                <c:forEach var="playlist" items="${playlistBeans}">
-                <li>
-                    <!-- プレイリスト名をクリックした時に詳細を表示 -->
-                    <button onclick="loadPlaylistPage('${playlist.playlistId}')">
-                       <strong>プレイリスト名：</strong> ${playlist.playlistName}<br>
-                       <strong>プレイリストID：</strong> ${playlist.playlistId}<br>
-                      </button>
-                       	<strong>イメージ画像：</strong><img src="${playlist.imageUrl}" alt="Playlist Image" width="100" /> 
-                       	
-   
-				</li>
-				</c:forEach>
-		</ul>
+<ul>
+    <c:forEach var="playlist" items="${playlistBeans}">
+        <li>
+            <button onclick="loadPlaylistPage('${playlist.playlistId}')">
+                <strong>プレイリスト名：</strong> ${playlist.playlistName}<br>
+                <strong>プレイリストID：</strong> ${playlist.playlistId}<br>
+            </button>
+            <strong>イメージ画像：</strong>
+			<c:choose>
+			    <c:when test="${not empty playlist.imageUrl and fn:length(playlist.imageUrl) > 0}">
+			        <img src="${playlist.imageUrl}" alt="Playlist Image" width="100" />
+			    </c:when>
+			    <c:otherwise>
+			        <img src="${pageContext.request.contextPath}/img/no_image.png" alt="No Image" width="100" />
+			    </c:otherwise>
+			</c:choose>
+
+
+
+        </li>
+    </c:forEach>
+</ul>
+
 </div>
 		
 			<!-- 中央: 人気のアーティスト -->
@@ -355,7 +366,7 @@
 
 
 <script>
-    // プレイリストの詳細を受け取った場合
+// プレイリストの詳細を受け取った場合
 // プレイリストの詳細を表示する関数
 
 
@@ -378,20 +389,28 @@ function loadPlaylistPage(playlistId) {
         return;
     }
 
-    // サーバーにリクエストを送信
     const url = "/SpotMusic/FrontServlet?command=PlayListDetails&playlistId=" + encodeURIComponent(playlistId);
     const contentDiv = document.querySelector('.content');
 
-    // Fetch APIでリクエストを送信し、結果をページに埋め込む
     fetch(url)
         .then(response => {
             if (!response.ok) {
                 throw new Error('サーバーエラー: ' + response.status);
             }
-            return response.text(); // レスポンスとしてHTMLを受け取る
+            return response.text();
         })
         .then(data => {
-            contentDiv.innerHTML = data; // 取得したHTMLを表示
+            contentDiv.innerHTML = data;
+            console.log("プレイリストページがロードされました！");
+
+            // **イベントリスナーを再適用**
+            document.querySelectorAll(".menu-btn").forEach(button => {
+                button.addEventListener("click", function() {
+                    toggleMenu(this);
+                });
+            });
+
+            console.log("toggleMenu イベントを再適用しました");
         })
         .catch(error => {
             console.error('エラー発生:', error);
@@ -401,7 +420,99 @@ function loadPlaylistPage(playlistId) {
 
 
 
+</script>
 
+<script>
+
+//プレイリスト曲削除用
+
+
+console.log("toggleMenu スクリプトが実行されました！");
+
+/* //✅ 事前にグローバルで登録
+window.toggleMenu = function(button) {
+    console.log("toggleMenu が呼ばれました");
+
+    let menu = button.nextElementSibling;
+    console.log("メニュー要素:", menu);
+    
+    // 既に表示されている場合は隠し、そうでなければ表示する
+    if (menu.style.display === "none" || menu.style.display === "") {
+        menu.style.display = "block";
+    } else {
+        menu.style.display = "none";
+    }
+
+    console.log("適用後のスタイル:", menu.style.display);
+};
+
+
+
+// ✅ `document` にクリックイベントを適用
+document.addEventListener("click", function(event) {
+    if (event.target.classList.contains("menu-btn")) {
+        toggleMenu(event.target);
+    }
+});
+ */
+//✅ 事前にグローバルで登録
+ window.toggleMenu = function(button) {
+     console.log("toggleMenu が呼ばれました");
+
+     let menu = button.nextElementSibling;
+     console.log("メニュー要素:", menu);
+
+     // すべてのメニューを閉じる（他のメニューが開いている場合に備える）
+     document.querySelectorAll(".menu-content").forEach(m => {
+         if (m !== menu) {
+             m.style.display = "none";
+         }
+     });
+
+     // クリックしたメニューをトグル
+     if (menu.style.display === "none" || menu.style.display === "") {
+         menu.style.display = "block";
+     } else {
+         menu.style.display = "none";
+     }
+
+     console.log("適用後のスタイル:", menu.style.display);
+ };
+
+ // ✅ `document` にクリックイベントを適用
+ document.addEventListener("click", function(event) {
+     // メニューを開くボタン（menu-btn）がクリックされたら通常のトグル処理
+     if (event.target.classList.contains("menu-btn")) {
+         toggleMenu(event.target);
+         return; // ここで処理を終了（他の処理を実行しない）
+     }
+
+     // クリックされた要素が `.menu-content` の内部でない場合、すべてのメニューを閉じる
+     document.querySelectorAll(".menu-content").forEach(menu => {
+         if (!menu.contains(event.target)) {
+             menu.style.display = "none";
+         }
+     });
+ });
+
+
+//曲削除
+
+window.removeTrack = function(playlistId, trackId, button) {
+    console.log("removeTrack が呼ばれました");
+    $.ajax({
+        type: "POST",
+        url: "SpotifyRemoveTrackServlet",
+        data: { playlistId: playlistId, trackId: trackId },
+        success: function(response) {
+            alert("削除しました！");
+            $(button).closest("li").remove();
+        },
+        error: function() {
+            alert("削除に失敗しました。");
+        }
+    });
+};
 </script>
 
     
@@ -1001,7 +1112,5 @@ $(document).ready(function(){
         });
         
 </script>
-
-
 </body>
 </html>

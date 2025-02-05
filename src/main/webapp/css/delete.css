@@ -1,0 +1,38 @@
+/* ★曲削除機能★★★★★★★★★★★★★★★★★★★★★★★★★★★ */
+.track-menu {
+    display: inline-block;
+    position: relative;
+}
+
+.menu-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.menu-content {
+    display: none;
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    z-index: 1000;
+    transition: all 0.3s ease-in-out;
+}
+
+.menu-content button {
+    display: block;
+    width: 100%;
+    border: none;
+    background: none;
+    padding: 5px;
+    cursor: pointer;
+}
+
+/* ✅ 追加: `display` が `none` から `block` へ */
+.menu-content.show {
+    display: block !important; /* 重要: 強制的に適用 */
+}
+
+/* ★ここまで★★★★★★★★★★★★★★★★★★★★★★★★★★★ */

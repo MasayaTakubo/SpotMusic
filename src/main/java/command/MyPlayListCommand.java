@@ -49,12 +49,10 @@ public class MyPlayListCommand extends AbstractCommand {
                 JSONObject playlistJson = playlistArray.getJSONObject(i);
                 SpotifyPlayListBean bean = new SpotifyPlayListBean(playlistJson, userId);
 
-                // 画像URLを取得
-                JSONArray images = playlistJson.getJSONArray("images");
-                if (images.length() > 0) {
-                    String imageUrl = images.getJSONObject(0).getString("url"); // 最初の画像を取得
-                    bean.setImageUrl(imageUrl); // Beanに画像URLを設定
-                }
+             // プレイリスト画像の取得
+                JSONArray images = playlistJson.optJSONArray("images");
+
+
                 
                 // 各プレイリストに対するトラック情報を取得し、Track Beanに格納
                 List<TrackBean> trackList = new ArrayList<>();
@@ -65,10 +63,12 @@ public class MyPlayListCommand extends AbstractCommand {
                     String trackName = trackInfo.getString("name");
                     String artistName = trackInfo.getJSONArray("artists").getJSONObject(0).getString("name");
 
-                    // トラック画像URLを取得
-                    JSONObject albumInfo = trackInfo.getJSONObject("album");  // albumはJSONObject
-                    JSONArray trackImages = albumInfo.getJSONArray("images");  // imagesはJSONArray
-                    String trackImageUrl = trackImages.length() > 0 ? trackImages.getJSONObject(0).getString("url") : null;
+                 // トラック画像の取得
+                    JSONObject albumInfo = trackInfo.optJSONObject("album"); // アルバム情報がnullの場合を考慮
+                    JSONArray trackImages = (albumInfo != null) ? albumInfo.optJSONArray("images") : null;
+                    String trackImageUrl = (trackImages != null && trackImages.length() > 0)
+                        ? trackImages.getJSONObject(0).optString("url", "/img/no_image.png")
+                        : "/img/no_image.png"; // デフォルト画像を設定
 
                     TrackBean track = new TrackBean(trackId, trackName, artistName, trackImageUrl); // TrackBeanに画像URLを追加
                     trackList.add(track);
@@ -89,11 +89,13 @@ public class MyPlayListCommand extends AbstractCommand {
                 JSONObject artistJson = artistArray.getJSONObject(i);
                 followedArtistNames.add(artistJson.getString("name"));
 
-                // アーティストの画像を取得
-                JSONArray artistImages = artistJson.getJSONArray("images");
-                if (artistImages.length() > 0) {
-                    String artistImageUrl = artistImages.getJSONObject(0).getString("url"); // 最初の画像を取得
-                    followedArtistImages.add(artistImageUrl); // アーティストの画像URLを追加
+             // アーティスト画像の取得
+                JSONArray artistImages = artistJson.optJSONArray("images");
+                if (artistImages != null && artistImages.length() > 0) {
+                    String artistImageUrl = artistImages.getJSONObject(0).optString("url", "/img/no_image.png"); // デフォルト画像
+                    followedArtistImages.add(artistImageUrl);
+                } else {
+                    followedArtistImages.add("/img/no_image.png"); // 画像がない場合のデフォルト
                 }
             }
 
