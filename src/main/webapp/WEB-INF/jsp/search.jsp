@@ -76,10 +76,10 @@
         <ul class="artist-list">
             <c:forEach var="artist" items="${artists}">
                 <li class="artist-item">
-                    <a href="SpotifySearchServlet?action=artist&id=${artist.id}">
-                        <img src="${not empty artist.images ? artist.images[0].url : noImageUrl}" width="100">
-                        ${artist.name}
-                    </a>
+					<a href="SpotifyCheckFollowStatusServlet?artistId=${artist.id}">
+					    <img src="${not empty artist.images ? artist.images[0].url : noImageUrl}" width="100">
+					    ${artist.name}
+					</a>
                 </li>
             </c:forEach>
         </ul>
@@ -162,10 +162,10 @@
         <ul class="artist-list">
             <c:forEach var="artist" items="${artists}">
                 <li class="artist-item">
-                    <a href="SpotifySearchServlet?action=artist&id=${artist.id}">
-                        <img src="${not empty artist.images ? artist.images[0].url : noImageUrl}" width="100">
-                        ${artist.name}
-                    </a>
+					<a href="SpotifyCheckFollowStatusServlet?artistId=${artist.id}">
+					    <img src="${not empty artist.images ? artist.images[0].url : noImageUrl}" width="100">
+					    ${artist.name}
+					</a>
                 </li>
             </c:forEach>
         </ul>

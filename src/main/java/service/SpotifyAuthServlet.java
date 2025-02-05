@@ -30,7 +30,7 @@ public class SpotifyAuthServlet extends HttpServlet {
                     + "?client_id=" + SpotifyAuthService.CLIENT_ID
                     + "&response_type=code"
                     + "&redirect_uri=" + java.net.URLEncoder.encode(SpotifyAuthService.REDIRECT_URI, "UTF-8")
-                    + "&scope=streaming user-read-playback-state user-modify-playback-state playlist-read-private playlist-read-collaborative user-follow-read user-read-private user-read-email user-top-read user-read-recently-played playlist-modify-private playlist-modify-public";
+                    + "&scope=streaming user-read-playback-state user-modify-playback-state playlist-read-private playlist-read-collaborative user-follow-read user-read-private user-read-email user-top-read user-read-recently-played playlist-modify-private playlist-modify-public user-follow-modify";
             response.sendRedirect(authUrl);
             return;
         }
