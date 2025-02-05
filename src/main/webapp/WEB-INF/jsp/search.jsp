@@ -284,7 +284,7 @@ function loadAlbumDetail(albumId) {
 }
 function loadArtistDetail(artistId) {
     console.log("loadArtistDetail called with ID:", artistId);  // デバッグ用
-    const url = "/SpotMusic/SpotifySearchServlet?action=artist&id=" + encodeURIComponent(artistId);
+    const url = "/SpotMusic/SpotifyCheckFollowStatusServlet?action=artist&id=" + encodeURIComponent(artistId);
 
     console.log("Fetch URL:", url);  // デバッグ用
 

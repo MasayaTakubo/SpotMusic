@@ -343,6 +343,7 @@ button {
     font-size: 20px; /* ボタンを大きく */
     min-width: 40px; /* 幅を統一 */
     height: 40px;
+    margin-bottom :10px;
 }
 
 /* [仮] playlist.jspのボタン調整*/
