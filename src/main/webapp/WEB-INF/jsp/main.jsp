@@ -205,6 +205,10 @@ h2 {
                 <strong>プレイリスト名：</strong> ${playlist.playlistName}<br>
                 <strong>プレイリストID：</strong> ${playlist.playlistId}<br>
             </button>
+            <form action="SpotifyDeletePlaylistServlet" method="post" target="hidden_iframe">
+                <input type="hidden" name="playlistId" value="${playlist.playlistId}">
+                <button type="submit">削除</button>
+            </form>
             <strong>イメージ画像：</strong>
             <c:choose>
                 <c:when test="${not empty playlist.imageUrl and fn:length(playlist.imageUrl) > 0}">
@@ -217,6 +221,8 @@ h2 {
         </li>
     </c:forEach>
 </ul>
+<iframe name="hidden_iframe" style="display: none;"></iframe>
+
 
 </div>
 		
@@ -1119,5 +1125,26 @@ $(document).ready(function(){
         });
         
 </script>
+<!-- <script>
+function deletePlaylist(playlistId) {
+    if (!confirm("本当にこのプレイリストを削除しますか？")) {
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append("playlistId", playlistId);
+
+    fetch("SpotifyDeletePlaylistServlet", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.text())
+    .then(data => {
+        alert(data); // 削除結果を表示
+        location.reload(); // ページをリロードして変更を反映
+    })
+    .catch(error => console.error("エラー:", error));
+}
+</script> -->
 </body>
 </html>
