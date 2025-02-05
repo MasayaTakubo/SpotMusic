@@ -1169,22 +1169,32 @@ function loadAlbumDetail(albumId) {
     });
 }
 function loadArtistDetail(artistId) {
-    console.log("loadArtistDetail called with ID:", artistId);  // デバッグ用
-    const url = "/SpotMusic/SpotifySearchServlet?action=artist&id=" + encodeURIComponent(artistId);
-
-    console.log("Fetch URL:", url);  // デバッグ用
+    console.log("loadArtistDetail called with ID:", artistId);
+    const url = "/SpotMusic/SpotifyCheckFollowStatusServlet?action=artist&id=" + artistId;
 
     const contentDiv = document.querySelector('.content');
     fetch(url)
     .then(response => response.text())
     .then(data => {
         contentDiv.innerHTML = data;
+        return fetch("/SpotMusic/SpotifyFollowStatusServlet"); // フォロー状態を取得
+    })
+    .then(response => response.json())  // JSONレスポンスを取得
+    .then(data => {
+        if (data.isFollowed) {
+            document.getElementById("followButton").innerText = "リフォロー解除";
+            document.getElementById("followForm").action = "SpotifyFollowArtistServlet?action=unfollow";
+        } else {
+            document.getElementById("followButton").innerText = "フォロー";
+            document.getElementById("followForm").action = "SpotifyFollowArtistServlet?action=follow";
+        }
     })
     .catch(error => {
         console.error('Error loading artist details:', error);
         contentDiv.innerHTML = '<p>アーティスト情報の取得に失敗しました。</p>';
     });
 }
+
 
 function loadPlaylistDetail(playlistId) {
     console.log("loadPlaylistDetail called with ID:", playlistId);  // デバッグ用
