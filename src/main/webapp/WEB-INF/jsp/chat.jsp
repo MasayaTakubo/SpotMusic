@@ -2,41 +2,79 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.HashMap" %>
-
+<%@ page import="java.util.Date" %>
 <html>
 <head>
     <meta charset="UTF-8">
     <title>Chat</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
-        }
-        .chat-box {
-            border: 1px solid #ccc;
-            padding: 10px;
-            height: 300px;
-            overflow-y: scroll;
-        }
-        .chat-message {
-            margin-bottom: 10px;
-        }
-        .chat-message .user {
-            font-weight: bold;
-        }
-        .chat-message .time {
-            font-size: 0.8em;
-            color: #888;
-        }
-        .message-input {
-            margin-top: 10px;
-        }
-        .message-input textarea {
-            width: 100%;
-            height: 50px;
-        }
-    </style>
+		body {
+		    font-family: Arial, sans-serif;
+		    margin: 20px;
+		    padding: 20px;
+		}
+		
+		.chat-box {
+		    border: 1px solid #ccc;
+		    padding: 10px;
+		    height: 300px;
+		    overflow-y: scroll;
+		    display: flex;
+		    flex-direction: column;
+		    background-color: #f8f9fa; /* チャット全体の背景 */
+		}
+		
+		/* メッセージの1行全体を左右に寄せる */
+		.chat-message {
+		    display: flex;
+		    width: 100%;
+		    margin: 5px 0;
+		}
+		
+		/* 他のユーザーのメッセージ（左寄せ） */
+		.chat-message.left {
+		    justify-content: flex-start;
+		}
+		
+		/* 自分のメッセージ（右寄せ） */
+		.chat-message.right {
+		    justify-content: flex-end;
+		}
+		
+		/* メッセージの内容部分 */
+		.chat-message .message {
+		    max-width: 70%;
+		    padding: 10px;
+		    border-radius: 10px;
+		    word-break: break-word;
+		    font-size: 14px;
+		}
+		
+		/* 他のユーザーのメッセージ */
+		.chat-message.left .message {
+		    background-color: #e0e0e0; /* ライトグレー */
+		    color: #333;
+		}
+		
+		/* 自分のメッセージ */
+		.chat-message.right .message {
+		    background-color: #a0e7ff; /* ライトブルー */
+		    color: #004466;
+		}
+		
+		/* ユーザー名 */
+		.chat-message .user {
+		    font-weight: bold;
+		    color: #007bff; /* 青 */
+		}
+		
+		/* 送信時間 */
+		.chat-message .time {
+		    font-size: 0.8em;
+		    color: #888; /* グレー */
+		    margin-left: 5px;
+		}
+	</style>
 </head>
 <body>
     <%
@@ -47,7 +85,7 @@
         Map<String, String> userMap = (Map<String, String>) request.getAttribute("userMap");
     %>
     <h1>Chat Room</h1>
-    <h1>ログインユーザー：${sessionScope.userName }</h1>
+    <h1>ログインユーザー：${sessionScope.user_name }</h1>
     <div id="chat-box" name="chat-box" style="border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; "></div>
 	<!-- css修正する、後でやる -->
 	<c:set var="isBlock" value="${param.isBlock}" />
@@ -74,6 +112,7 @@
 		messages.forEach(message => {
 	        addMessageToBox(message);
 	    });
+        chatBox.scrollTop = chatBox.scrollHeight;
         // BroadcastChannelの作成
         const channel = new BroadcastChannel('chat_channel');
         const messageInput = document.getElementById('messageInput');
@@ -121,41 +160,58 @@
 		        console.error('Received data is not an object:', event.data);
 		    }
 		};
-        // 画面にメッセージを追加
-        /*
-		function addMessageToBox(message) {
-	        const messageElement = document.createElement('div');
-	        messageElement.classList.add('chat-message');
-	        messageElement.innerHTML = `
-	            <span class="user">${message.userId}</span> <br>
-	            <span class="message">${message.sendMessage}</span><br>
-	            <span class="time">${message.sendTime}</span><br>
-	        `;
-	        chatBox.appendChild(messageElement);
-	        chatBox.scrollTop = chatBox.scrollHeight;
-	    }*/
-	    function addMessageToBox(message) {
-	        const messageContainer = document.createElement('div');
-	        messageContainer.classList.add('chat-message');
-	        const userSpan = document.createElement('span');
-	        userSpan.classList.add('user');
-	     	// ユーザーIDをユーザー名に置き換え
-	        userSpan.textContent = userMap[message.userId] || message.userId;
-	        const messageSpan = document.createElement('span');
-	        messageSpan.classList.add('message');
-	        messageSpan.innerHTML = message.sendMessage.replace(/\n/g, '<br>');
-	        const timeSpan = document.createElement('span');
-	        timeSpan.classList.add('time');
-	        timeSpan.textContent = message.sendTime;
-	        messageContainer.appendChild(userSpan);
-	        messageContainer.appendChild(document.createElement('br'));
-	        messageContainer.appendChild(messageSpan);
-	        messageContainer.appendChild(document.createElement('br'));
-	        messageContainer.appendChild(timeSpan);
-	        messageContainer.appendChild(document.createElement('br'));
-	        chatBox.appendChild(messageContainer);
-	        chatBox.scrollTop = chatBox.scrollHeight;
+		function escapeHTML(str) {
+		    return str.replace(/&/g, "&amp;")
+		              .replace(/</g, "&lt;")
+		              .replace(/>/g, "&gt;")
+		              .replace(/"/g, "&quot;")
+		              .replace(/'/g, "&#039;");
 		}
+
+		function addMessageToBox(message) {
+		    const blockTime = new Date("${param.blockTime}");
+		    const messageTime = new Date(message.sendTime);
+		    
+		    if (messageTime > blockTime) {
+		        return;
+		    }
+
+		    const messageContainer = document.createElement('div');
+		    messageContainer.classList.add('chat-message');
+
+		    // ログインユーザーの ID を取得（JSP から埋め込む）
+		    const loggedInUserId = "${sessionScope.userId}";
+
+		    // ログインユーザーのメッセージなら右寄せ、それ以外は左寄せ
+		    if (message.userId === loggedInUserId) {
+		        messageContainer.classList.add('right');
+		    } else {
+		        messageContainer.classList.add('left');
+		    }
+
+		    const userSpan = document.createElement('span');
+		    userSpan.classList.add('user');
+		    userSpan.textContent = userMap[message.userId] || message.userId;
+
+		    const messageSpan = document.createElement('span');
+		    messageSpan.classList.add('message');
+		    messageSpan.innerHTML = escapeHTML(message.sendMessage).replace(/\n/g, '<br>');
+
+		    const timeSpan = document.createElement('span');
+		    timeSpan.classList.add('time');
+		    timeSpan.textContent = message.sendTime;
+
+		    messageContainer.appendChild(userSpan);
+		    messageContainer.appendChild(document.createElement('br'));
+		    messageContainer.appendChild(messageSpan);
+		    messageContainer.appendChild(document.createElement('br'));
+		    messageContainer.appendChild(timeSpan);
+		    messageContainer.appendChild(document.createElement('br'));
+
+		    chatBox.appendChild(messageContainer);
+		}
+
+
 		//ロード時にisBlockがtrueならチャットの送信ボタンが押せないようにする
 		document.addEventListener("DOMContentLoaded", function () {
 	        var isBlock = "${isBlock}";

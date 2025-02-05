@@ -165,7 +165,7 @@ h2 {
 				</li>
 
                 <li><a href="/xxx">プロフィール</a></li>
-                <li><a href="/xxx">フレンドリスト</a></li>
+                <li><a href="javascript:void(0);" onclick="friendlist()">フレンドリスト</a></li>
                 <li><a href="javascript:void(0);" onclick="logout()">ログアウト</a></li>
             </ul>
         </div>
@@ -1108,6 +1108,11 @@ $(document).ready(function(){
             }
         });
         
+</script>
+<script>
+function friendlist() {
+    window.location.href = '/SpotMusic/FrontServlet?command=FriendList&userId=${sessionScope.user_id}';
+}
 </script>
 <script src="script.js"></script>
 </body>

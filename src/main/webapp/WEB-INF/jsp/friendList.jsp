@@ -8,7 +8,7 @@
 </head>
 <body>
     <h1>フレンドリスト</h1>
-    <h1>${sessionScope.userName}</h1>
+    <h1>${sessionScope.user_name}</h1>
     <p>申請中のユーザー</p>
     <table border="1">
         <tr>
@@ -90,6 +90,7 @@
 	                              (relation.user2Id == sessionScope.userId and relation.user1Id == block.blockedId)}">
 	                    <c:set var="blocked" value="true"/>
 	                    <c:set var="blockId" value="${block.blockId}"/>
+	                    <c:set var="blockTime" value="${block.blockTime}" />
 	                </c:if>
 	            </c:forEach>
 	            <tr>
@@ -136,6 +137,7 @@
 	                        <input type="hidden" name="userId" value="${sessionScope.userId}"/>
 	                        <input type="hidden" name="command" value="ChatCommand"/>
 	                        <input type="hidden" name="isBlock" value="${blocked}"/>
+	                        <input type="hidden" name="blockTime" value="${blockTime}">
 	                        <button type="submit">ログイン</button>
 	                    </form>
 	                </td>
