@@ -174,6 +174,16 @@ h2 {
     <!-- 左側: プレイリスト -->
     <div class="sidebar">
         <h2>プレイリスト</h2>
+<!-- プレイリスト作成フォーム -->
+<!-- 非表示の iframe を用意し、フォーム送信をその中で処理 -->
+<iframe name="hidden_iframe" style="display: none;"></iframe>
+<form id="playlistForm" action="SpotifyCreatePlaylistServlet" method="post" target="hidden_iframe">
+    <label for="playlistName">新しいプレイリスト名:</label>
+    <input type="text" id="playlistName" name="playlistName" required>
+    <button type="submit">作成</button>
+</form>
+
+
 <%
     List<SpotifyPlayListBean> playlistBeans = (List<SpotifyPlayListBean>) session.getAttribute("playlistBeans");
     List<String> trackIds = new ArrayList<>();
@@ -195,6 +205,10 @@ h2 {
                 <strong>プレイリスト名：</strong> ${playlist.playlistName}<br>
                 <strong>プレイリストID：</strong> ${playlist.playlistId}<br>
             </button>
+            <form action="SpotifyDeletePlaylistServlet" method="post" target="hidden_iframe">
+                <input type="hidden" name="playlistId" value="${playlist.playlistId}">
+                <button type="submit">削除</button>
+            </form>
             <strong>イメージ画像：</strong>
             <c:choose>
                 <c:when test="${not empty playlist.imageUrl and fn:length(playlist.imageUrl) > 0}">
@@ -207,6 +221,8 @@ h2 {
         </li>
     </c:forEach>
 </ul>
+<iframe name="hidden_iframe" style="display: none;"></iframe>
+
 
 </div>
 		
@@ -451,7 +467,7 @@ function loadPlaylistPage(playlistId) {
 
 console.log("toggleMenu スクリプトが実行されました！");
 
-//✅ 事前にグローバルで登録
+//? 事前にグローバルで登録
  window.toggleMenu = function(button) {
      console.log("toggleMenu が呼ばれました");
 
@@ -475,7 +491,7 @@ console.log("toggleMenu スクリプトが実行されました！");
      console.log("適用後のスタイル:", menu.style.display);
  };
 
- // ✅ `document` にクリックイベントを適用
+ // ? `document` にクリックイベントを適用
  document.addEventListener("click", function(event) {
      // メニューを開くボタン（menu-btn）がクリックされたら通常のトグル処理
      if (event.target.classList.contains("menu-btn")) {
@@ -1109,6 +1125,26 @@ $(document).ready(function(){
         });
         
 </script>
+<script>
+function deletePlaylist(playlistId) {
+    if (!confirm("本当にこのプレイリストを削除しますか？")) {
+        return;
+    }
 
+    let formData = new FormData();
+    formData.append("playlistId", playlistId);
+
+    fetch("SpotifyDeletePlaylistServlet", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => response.text())
+    .then(data => {
+        alert(data); // 削除結果を表示
+        location.reload(); // ページをリロードして変更を反映
+    })
+    .catch(error => console.error("エラー:", error));
+}
+</script> 
 </body>
 </html>
