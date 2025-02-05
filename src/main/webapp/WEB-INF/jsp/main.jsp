@@ -188,16 +188,6 @@ h2 {
     session.setAttribute("currentTrackIndex", 0);
     
 %>
-			<c:forEach var="playlist" items="${playlistBeans}">
-				<li>
-					<!-- プレイリスト名をクリックした時に詳細を表示 -->
-					<button onclick="loadPlaylistPage('${playlist.playlistId}')">
-						<strong>プレイリスト名：</strong> ${playlist.playlistName}<br> <strong>プレイリストID：</strong>
-						${playlist.playlistId}<br>
-					</button> <strong>イメージ画像：</strong><img src="${playlist.imageUrl}"
-					alt="Playlist Image" width="100" />
-
-
 <ul>
     <c:forEach var="playlist" items="${playlistBeans}">
         <li>
@@ -206,17 +196,14 @@ h2 {
                 <strong>プレイリストID：</strong> ${playlist.playlistId}<br>
             </button>
             <strong>イメージ画像：</strong>
-			<c:choose>
-			    <c:when test="${not empty playlist.imageUrl and fn:length(playlist.imageUrl) > 0}">
-			        <img src="${playlist.imageUrl}" alt="Playlist Image" width="100" />
-			    </c:when>
-			    <c:otherwise>
-			        <img src="${pageContext.request.contextPath}/img/no_image.png" alt="No Image" width="100" />
-			    </c:otherwise>
-			</c:choose>
-
-
-
+            <c:choose>
+                <c:when test="${not empty playlist.imageUrl and fn:length(playlist.imageUrl) > 0}">
+                    <img src="${playlist.imageUrl}" alt="Playlist Image" width="100" />
+                </c:when>
+                <c:otherwise>
+                    <img src="${pageContext.request.contextPath}/img/no_image.png" alt="No Image" width="100" />
+                </c:otherwise>
+            </c:choose>
         </li>
     </c:forEach>
 </ul>
@@ -261,7 +248,7 @@ h2 {
 		</c:choose>
 
 
-		</ul>
+	
 
 
 
