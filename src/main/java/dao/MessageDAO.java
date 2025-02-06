@@ -34,7 +34,7 @@ public class MessageDAO {
 
     public List<MessageBean> getMessages(int relationId) {
         List<MessageBean> messages = new ArrayList<>();
-        String sql = "SELECT * FROM MESSAGE WHERE RELATION_ID = ? ORDER BY SEND_TIME";
+        String sql = "SELECT * FROM MESSAGE WHERE RELATION_ID = ? ORDER BY SEND_TIME DESC";
         try (Connection conn = MySQLConnector.getConn();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, relationId);  // relationIdはint型
