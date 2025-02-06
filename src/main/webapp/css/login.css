@@ -1,0 +1,206 @@
+@keyframes glowing {
+    0% { box-shadow: 0 0 10px rgb(0, 255, 64); }
+    50% { box-shadow: 0 0 30px rgb(0, 255, 64); }
+    100% { box-shadow: 0 0 10px rgb(0, 255, 64); }
+}
+
+
+.logo{
+	margin-top:0.8cm;
+	width: 5cm;
+	height: 5cm;
+}
+	
+.login{
+	
+	margin-top:1cm;
+}
+.loginButton{
+	margin-top:2cm;
+	font-size: 43px;
+	border:none;
+	display: flex;
+    align-items: center;
+    cursor: pointer;
+    background: none;
+    color: white;
+    font-weight: bold;
+    text-shadow: 0 0 10px #1DB954;
+    
+}
+
+.loginButton:hover{
+	
+	color: #1DB954;
+	font-size: 45px;
+	display: inline-block;
+    border-bottom: 3px solid #1DB954 ;
+    padding-bottom: 0.05px;
+}
+.loginButton i{
+	font-size: 50px;
+}
+.signup{
+	display: flex;
+    justify-content: center;
+}
+.signup p{
+	font-size: 23px;
+	font-weight: bold;
+	color: white;
+	margin-left: 4.5cm;
+	display: inline-block;
+    border-bottom: 2px solid white ;
+    padding-bottom: 0.5px;
+    
+}
+
+.signup button{
+	font-size: 25px;
+	border:none;
+	background: none;
+	color:#1DB954;
+	text-decoration: none;
+	font-weight: bold;
+	
+}
+.signup button:hover{
+	font-size: 28px;
+	text-decoration: underline;
+	color: white;
+	
+}
+
+.line{
+	width: 80%;
+	background-color:rgba(255,255,255,0.2);
+	height: 2px;
+	margin: 50px;
+	margin-bottom: 5px;
+	box-shadow: 0 0 10px rgba(255,255,255,0.4);
+	
+}
+.friendList form{
+	display: flex;
+    justify-content: center;
+}
+
+.friendList input {
+    background-color: rgba(0, 0, 0, 0.6);
+    width: 12cm;
+    height: 1.5cm;
+    border-radius: 10px;
+    outline: none;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    border: 2px solid transparent;
+    padding: 5px 10px; 
+    box-shadow: 0 0 10px rgba(255,255,255,0.8); 
+    
+     
+}
+
+
+.friendList input:focus {
+    box-shadow:0 0 10px #1DB954;
+}
+.friendList input:-webkit-autofill,
+.friendList input:-webkit-autofill:hover,
+.friendList input:-webkit-autofill:focus,
+.friendList input:-webkit-autofill:active {
+    background-color: rgba(0, 0, 0, 0.6) !important;
+    -webkit-box-shadow: 0 0 0px 1000px rgba(0, 0, 0, 0.6) inset !important;
+    -webkit-text-fill-color: white !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+.friendListButton{
+	background: none;
+	border: none;
+}
+.friendListButton i{
+	font-size: 50px;
+	color: rgba(255,255,255,0.8);
+	margin-left: 0.5cm;
+	text-shadow: 0 0 10px rgba(255,255,255,0.4); 
+	
+}
+.friendListButton i:hover{
+	font-size: 52px;
+	
+	text-shadow:0 0 10px #1DB954;
+}
+h2{
+	font-size:30px;
+	color: white;
+    font-weight: bold;
+    text-shadow: 0 0 10px #1DB954;
+}
+
+
+.userList form{
+	display: flex;
+    justify-content: center;
+}
+
+.userList input {
+    background-color: rgba(0, 0, 0, 0.6);
+    width: 12cm;
+    height: 1.5cm;
+    border-radius: 10px;
+    outline: none;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    border: 2px solid transparent;
+    padding: 5px 10px; 
+    box-shadow: 0 0 10px rgba(255,255,255,0.8); 
+    
+     
+}
+
+
+.userList input:focus {
+    box-shadow:0 0 10px #1DB954;
+}
+.userList input:-webkit-autofill,
+.userList input:-webkit-autofill:hover,
+.userList input:-webkit-autofill:focus,
+.userList input:-webkit-autofill:active {
+    background-color: rgba(0, 0, 0, 0.6) !important;
+    -webkit-box-shadow: 0 0 0px 1000px rgba(0, 0, 0, 0.6) inset !important;
+    -webkit-text-fill-color: white !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+.userListButton{
+	background: none;
+	border: none;
+}
+.userListButton i{
+	font-size: 50px;
+	color: rgba(255,255,255,0.8);
+	margin-left: 0.5cm;
+	text-shadow: 0 0 10px rgba(255,255,255,0.4); 
+	
+}
+.userListButton i:hover{
+	font-size: 52px;
+	
+	text-shadow:0 0 10px #1DB954;
+}
+
+.formLogin{
+	background-color: rgba(0,0,0,0.5);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	border-radius: 2%;
+	width: 22cm;
+	height: 26cm;
+	margin-top: 1cm;
+	animation:glowing 1.5s infinite alternate;
+	
+	
+}
