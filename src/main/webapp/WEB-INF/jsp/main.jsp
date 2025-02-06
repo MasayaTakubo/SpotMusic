@@ -15,88 +15,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SpotMusic - Web Player：すべての人に音楽を</title>
 	<link rel="stylesheet" type="text/css" href="<c:url value='/css/player.css' />">
+	<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://sdk.scdn.co/spotify-player.js"></script>
 
     <style>
-        body {
-            margin: 0;
-            display: flex;
-            height: 100vh;
-            font-family: Arial, sans-serif;
-            padding-top: 60px; /* ヘッダーの高さ分を確保 */
-        }
-        .sidebar, .content, .property-panel {
-            padding: 20px;
-            overflow-y: auto;
-        }
-        .sidebar {
-            width: 25%;
-            background-color: #f4f4f4;
-            border-right: 1px solid #ddd;
-        }
-        .content {
-            width: 50%;
-            background-color: #ffffff;
-            text-align: center;
-        }
-        .property-panel {
-            width: 25%;
-            background-color: #f9f9f9;
-            border-left: 1px solid #ddd;
-            display: none; /* デフォルトでは非表示 */
-        }
-        .property-panel.active {
-            display: block; /* 音楽再生時に表示 */
-        }
-        h2 {
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 10px;
-        }
+
+
+
+body {
+	background-color:black;
+    margin: 0;
+    display: flex;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    padding-top: 60px; /* ヘッダーの高さ分を確保 */
+}
+
+
+
+.property-panel.active {
+    display: block; /* 音楽再生時に表示 */
+}
+       
         
 .header {
+	background-color:black;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
-    background-color: #f8f9fa;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     position: fixed;
     top: 0;
     width: 100%;
     z-index: 1000; /* ヘッダーを最上位に表示 */
+    height: 2cm;
+    
 }
 		
-		/* ロゴのスタイル */
-		.logo-icon {
-		    height: 40px;
-		}
-		
-		.actions {
-		    display: flex;
-		    align-items: right;
-		    justify-content: flex-end; /* アクションエリアを右端揃え */
-		    gap: 10px; /* アイコン間のスペース */
-		}
-		
-		/* リロードアイコンのスタイル */
-		.reload-icon {
-		    width: 32px;
-		    height: 32px;
-		    cursor: pointer;
-		}
-		
-		.account-container {
-		    position: relative;
-		    margin-right: 50px; /* 必要に応じて右の余白を調整 */
-		}
-		.account-icon {
-		    width: 40px;
-		    height: 40px;
-		    border-radius: 50%;
-		    cursor: pointer;
-		
-		}
+/* ロゴのスタイル */
+.logo-icon {
+    height: 40px;
+    
+}
+
+.actions {
+    display: flex;
+    align-items: right;
+    justify-content: flex-end; /* アクションエリアを右端揃え */
+    gap: 10px; /* アイコン間のスペース */
+}
+
+/* リロードアイコンのスタイル */
+.reload-icon {
+    cursor: pointer;
+    width:50px;
+    height:50px;
+    
+}
+
+.account-container {
+    position: relative;
+    margin-right: 50px; /* 必要に応じて右の余白を調整 */
+}
+.account-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+
+}
 
 		
 .account-menu {
@@ -106,7 +95,7 @@
     top: 50px;
     background-color: white;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 10px;
     list-style: none;
     padding: 10px 0;
     margin: 0;
@@ -138,15 +127,17 @@
     <div class="logo">
         <!-- リロード用アイコン -->
         <a href="javascript:void(0)" onclick="location.reload()" class="reload-link">
-            <img src="<c:url value='/img/Spotmusic.webp' />" alt="ロゴを配置" class="reload-icon">
+            <img src="<c:url value='/img/spotify.png' />" alt="ロゴを配置" class="reload-icon">
         </a>
     </div>
     
     <!--  検索ボックス -->
-    <form action="SpotifySearchServlet" method="get">
-    	<input type="text" name="query" placeholder="何を再生したいですか？" required>
-    	<button class="search-button" type="submit">検索</button>
-	</form>
+    <div class="find">
+	    <form action="SpotifySearchServlet" method="get" class="findForm">
+	    	<input type="text" name="query" class="search" placeholder="何を再生したいですか？" required>
+	    	<button class="search-button" type="submit"><i class='bx bx-search'></i></button>
+		</form>
+	</div>
     <!-- ここまで　　　　　  -->
     
     <div class="actions">
@@ -167,8 +158,12 @@
     </div>
 </div>
     <!-- 左側: プレイリスト -->
-    <div class="sidebar">
-        <h2>プレイリスト</h2>
+<div class="main">
+<div class="sidebar">
+
+<div class="libList">
+        <div class="listIcon"><i class='bx bxs-playlist' ></i><h2>プレイリスト</h2></div>
+        
 <%
     List<SpotifyPlayListBean> playlistBeans = (List<SpotifyPlayListBean>) session.getAttribute("playlistBeans");
     List<String> trackIds = new ArrayList<>();
@@ -184,25 +179,33 @@
     
 %>
 
-
-        <ul>
+	<div>
+        
                 <c:forEach var="playlist" items="${playlistBeans}">
-                <li>
+                
+                	
+                	
                     <!-- プレイリスト名をクリックした時に詳細を表示 -->
-                    <button onclick="loadPlaylistPage('${playlist.playlistId}')">
-                       <strong>プレイリスト名：</strong> ${playlist.playlistName}<br>
-                       <strong>プレイリストID：</strong> ${playlist.playlistId}<br>
+                    <button class="playlistButton" onclick="loadPlaylistPage('${playlist.playlistId}')">
+                    <img src="${playlist.imageUrl}" alt="Playlist Image"/> 
+                    <div class="info">
+                      <div> ${playlist.playlistName}</div>
+                      <div> ${playlist.playlistId}</div>
+                    </div>
                       </button>
-                       	<strong>イメージ画像：</strong><img src="${playlist.imageUrl}" alt="Playlist Image" width="100" /> 
-                       	
-   
-				</li>
+   					
+				
 				</c:forEach>
-		</ul>
+		
+		</div>
+	</div>
 </div>
+
+<div class="resizer resizer-1"></div>
 		
 			<!-- 中央: 人気のアーティスト -->
 	<div class="content">
+	
 		<h2>フォロー中のアーティスト</h2>
 		<%
 		List<String> followedArtistNames = (List<String>) session.getAttribute("followedArtistNames");
@@ -316,11 +319,14 @@
 		</c:if>
 
 	</div>
+	<div class="resizer resizer-2"></div>
 	    <!-- 右側: 詳細情報パネル -->
 	<div class="property-panel" id="propertyPanel">
+	
 	    <h2>トラック詳細</h2>
 	    <p id="track-detail">再生中のトラック詳細が表示されます。</p>	    
     </div>
+</div>
 
 <div id="player-container">
     <!-- 左側: 曲名表示 -->
@@ -1001,7 +1007,63 @@ $(document).ready(function(){
         });
         
 </script>
+<script>
+const sidebar = document.querySelector('.sidebar');
+const content = document.querySelector('.content');
+const propertyPanel = document.querySelector('.property-panel');
+const resizer1 = document.querySelector('.resizer-1');
+const resizer2 = document.querySelector('.resizer-2');
 
+let startX, startWidth, startContentWidth;
+
+resizer1.addEventListener('mousedown', (e) => {
+    startX = e.clientX;
+    startWidth = sidebar.offsetWidth;
+    startContentWidth = content.offsetWidth;
+    document.addEventListener('mousemove', resizeSidebar);
+    document.addEventListener('mouseup', stopResize);
+});
+
+function resizeSidebar(e) {
+    let delta = e.clientX - startX;
+    let newSidebarWidth = startWidth + delta;
+    let newContentWidth = startContentWidth - delta;
+    let maxSidebar = window.innerWidth * 0.5;
+    let minSidebar = window.innerWidth * 0.05;
+    
+    if (newSidebarWidth >= minSidebar && newSidebarWidth <= maxSidebar) {
+        sidebar.style.width = (newSidebarWidth / window.innerWidth * 100) + '%';
+        content.style.width = (newContentWidth / window.innerWidth * 100) + '%';
+    }
+}
+
+resizer2.addEventListener('mousedown', (e) => {
+    startX = e.clientX;
+    startWidth = propertyPanel.offsetWidth;
+    startContentWidth = content.offsetWidth;
+    document.addEventListener('mousemove', resizePropertyPanel);
+    document.addEventListener('mouseup', stopResize);
+});
+
+function resizePropertyPanel(e) {
+    let delta = startX - e.clientX;
+    let newPropertyWidth = startWidth + delta;
+    let newContentWidth = startContentWidth - delta;
+    let maxProperty = window.innerWidth * 0.35;
+    let minProperty = window.innerWidth * 0.05;
+    
+    if (newPropertyWidth >= minProperty && newPropertyWidth <= maxProperty) {
+        propertyPanel.style.width = (newPropertyWidth / window.innerWidth * 100) + '%';
+        content.style.width = (newContentWidth / window.innerWidth * 100) + '%';
+    }
+}
+
+function stopResize() {
+    document.removeEventListener('mousemove', resizeSidebar);
+    document.removeEventListener('mousemove', resizePropertyPanel);
+    document.removeEventListener('mouseup', stopResize);
+}
+    </script>
 
 </body>
 </html>
