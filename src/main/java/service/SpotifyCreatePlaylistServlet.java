@@ -58,7 +58,7 @@ public class SpotifyCreatePlaylistServlet extends HttpServlet {
         System.out.println("DEBUG: プレイリスト作成結果 = " + success);
 
         response.setContentType("text/html; charset=UTF-8");
-        response.getWriter().write("<script>parent.alert('" + (success ? "プレイリスト作成成功！" : "プレイリスト作成に失敗しました。") + "'); parent.location.reload();</script>");
+        response.getWriter().write("<script>parent.location.reload();</script>");
     }
 
 
