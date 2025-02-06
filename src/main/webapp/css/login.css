@@ -12,11 +12,10 @@
 }
 	
 .login{
-	
-	margin-top:1cm;
+	margin-top:2cm;
 }
 .loginButton{
-	margin-top:2cm;
+	
 	font-size: 43px;
 	border:none;
 	display: flex;
@@ -26,16 +25,17 @@
     color: white;
     font-weight: bold;
     text-shadow: 0 0 10px #1DB954;
+    transition: transform 0.2s ease;
+    border-bottom: 3px solid transparent;
     
 }
 
 .loginButton:hover{
-	
+	transform: scale(1.1);
 	color: #1DB954;
-	font-size: 45px;
-	display: inline-block;
-    border-bottom: 3px solid #1DB954 ;
-    padding-bottom: 0.05px;
+	border-bottom: 3px solid #1DB954;
+	
+    
 }
 .loginButton i{
 	font-size: 50px;
@@ -56,19 +56,18 @@
 }
 
 .signup button{
-	font-size: 25px;
+	font-size: 27px;
 	border:none;
 	background: none;
 	color:#1DB954;
-	text-decoration: none;
 	font-weight: bold;
+	transition: transform 0.2s ease;
+	
 	
 }
 .signup button:hover{
-	font-size: 28px;
-	text-decoration: underline;
+	transform: scale(1.2);
 	color: white;
-	
 }
 
 .line{
