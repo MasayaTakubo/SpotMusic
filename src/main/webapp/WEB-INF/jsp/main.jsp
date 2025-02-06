@@ -10,6 +10,7 @@
 <html lang="ja">
 <!-- jQueryをCDNから読み込む -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" type="text/css" href="<c:url value='/css/styles.css' />">
 
 <head>
 <meta charset="UTF-8">
@@ -22,117 +23,27 @@
 <script src="https://sdk.scdn.co/spotify-player.js"></script>
 
 <style>
-body {
+/*body {
 	margin: 0;
 	display: flex;
 	height: 100vh;
 	font-family: Arial, sans-serif;
-	padding-top: 60px; /* ヘッダーの高さ分を確保 */
-}
+	
+} */
 
-.sidebar, .content, .property-panel {
-	padding: 20px;
-	overflow-y: auto;
-}
 
-.sidebar {
-	width: 25%;
-	background-color: #f4f4f4;
-	border-right: 1px solid #ddd;
-}
 
-.content {
-	width: 50%;
-	background-color: #ffffff;
-	text-align: center;
-}
-
-.property-panel {
-	width: 25%;
-	background-color: #f9f9f9;
-	border-left: 1px solid #ddd;
-	display: none; /* デフォルトでは非表示 */
-}
-
-.property-panel.active {
-	display: block; /* 音楽再生時に表示 */
-}
-
-h2 {
+/*h2 {
 	border-bottom: 2px solid #ddd;
 	padding-bottom: 10px;
-}
-.header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 10px 20px;
-	background-color: #f8f9fa;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	position: fixed;
-	top: 0;
-	width: 100%;
-	z-index: 1000; /* ヘッダーを最上位に表示 */
-}
+}*/
 
-/* ロゴのスタイル */
-.logo-icon {
-	height: 40px;
-}
 
-.actions {
-	display: flex;
-	align-items: right;
-	justify-content: flex-end; /* アクションエリアを右端揃え */
-	gap: 10px; /* アイコン間のスペース */
-}
 
-/* リロードアイコンのスタイル */
-.reload-icon {
-	width: 32px;
-	height: 32px;
-	cursor: pointer;
-}
 
-.account-container {
-	position: relative;
-	margin-right: 50px; /* 必要に応じて右の余白を調整 */
-}
 
-.account-icon {
-	width: 40px;
-	height: 40px;
-	border-radius: 50%;
-	cursor: pointer;
-}
 
-.account-menu {
-	display: none;
-	position: absolute;
-	right: 0;
-	top: 50px;
-	background-color: white;
-	border: 1px solid #ccc;
-	border-radius: 4px;
-	list-style: none;
-	padding: 10px 0;
-	margin: 0;
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-	z-index: 1000;
-	min-width: 150px; /* 最低幅を設定 */
-	white-space: nowrap; /* 折り返しを防止 */
-}
 
-.account-menu li {
-	padding: 10px 20px;
-	text-align: left; /* テキストを左揃え */
-}
-
-.account-menu a {
-	text-decoration: none;
-	color: #333;
-	display: block; /* リンク全体をクリック可能に */
-}
 </style>
 
 

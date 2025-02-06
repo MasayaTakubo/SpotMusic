@@ -4,7 +4,7 @@
 <html>
 <head>
     <title>アーティスト詳細</title>
-    <link rel="stylesheet" type="text/css" href="<c:url value='/css/styles.css' />">
+    <!--  <link rel="stylesheet" type="text/css" href="<c:url value='/css/styles.css' />"> -->
 </head>
 <body>
     <h1>アーティスト詳細</h1>

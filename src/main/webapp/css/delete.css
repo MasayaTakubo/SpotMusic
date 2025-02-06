@@ -14,7 +14,7 @@
 .menu-content {
     display: none;
     position: absolute;
-    background-color: white;
+    background-color: #181818;
     border: 1px solid #ccc;
     padding: 10px;
     z-index: 1000;

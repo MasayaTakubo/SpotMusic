@@ -1,9 +1,0 @@
-diff a/src/main/webapp/WEB-INF/jsp/main.jsp b/src/main/webapp/WEB-INF/jsp/main.jsp	(rejected hunks)
-@@ -3,6 +3,7 @@
- <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
- <%@ page import="java.util.List"%>
- <%@ page import="bean.SpotifyPlayListBean"%>
-+<%@ page import="java.util.ArrayList" %>
- <%@ page import="bean.TrackBean"%>
- <!DOCTYPE html>
- <html lang="ja">
