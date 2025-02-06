@@ -23,6 +23,9 @@ public class SpotifyAddTrackServlet extends HttpServlet {
     private static final String SPOTIFY_API_URL = "https://api.spotify.com/v1/playlists";
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	response.setContentType("text/html; charset=UTF-8");
+    	response.setCharacterEncoding("UTF-8");
+    	
         HttpSession session = request.getSession();
         String accessToken = (String) session.getAttribute("access_token");
 
