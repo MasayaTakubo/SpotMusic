@@ -8,73 +8,152 @@
     <meta charset="UTF-8">
     <title>Chat</title>
     <style>
-		body {
-		    font-family: Arial, sans-serif;
-		    margin: 20px;
-		    padding: 20px;
-		}
-		
-		.chat-box {
-		    border: 1px solid #ccc;
-		    padding: 10px;
-		    height: 300px;
-		    overflow-y: scroll;
-		    display: flex;
-		    flex-direction: column;
-		    background-color: #f8f9fa; /* チャット全体の背景 */
-		}
-		
-		/* メッセージの1行全体を左右に寄せる */
-		.chat-message {
-		    display: flex;
-		    width: 100%;
-		    margin: 5px 0;
-		}
-		
-		/* 他のユーザーのメッセージ（左寄せ） */
-		.chat-message.left {
-		    justify-content: flex-start;
-		}
-		
-		/* 自分のメッセージ（右寄せ） */
-		.chat-message.right {
-		    justify-content: flex-end;
-		}
-		
-		/* メッセージの内容部分 */
-		.chat-message .message {
-		    max-width: 70%;
-		    padding: 10px;
-		    border-radius: 10px;
-		    word-break: break-word;
-		    font-size: 14px;
-		}
-		
-		/* 他のユーザーのメッセージ */
-		.chat-message.left .message {
-		    background-color: #e0e0e0; /* ライトグレー */
-		    color: #333;
-		}
-		
-		/* 自分のメッセージ */
-		.chat-message.right .message {
-		    background-color: #a0e7ff; /* ライトブルー */
-		    color: #004466;
-		}
-		
-		/* ユーザー名 */
-		.chat-message .user {
-		    font-weight: bold;
-		    color: #007bff; /* 青 */
-		}
-		
-		/* 送信時間 */
-		.chat-message .time {
-		    font-size: 0.8em;
-		    color: #888; /* グレー */
-		    margin-left: 5px;
-		}
-	</style>
+body, html {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f1f1f1;
+    height: 100%;
+    overflow: hidden; /* ページ全体のスクロールを防ぐ */
+}
+
+h1 {
+    text-align: center;
+    color: #007bff;
+}
+
+h3 {
+    position: absolute;
+    top: 10px;
+    left: 20px;
+    font-size: 16px;
+    color: #333;
+    margin: 0;
+}
+
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* 画面全体を埋める */
+    overflow: hidden; /* コンテンツがはみ出てもスクロールしない */
+}
+
+.chat-box {
+    flex: 1;
+    overflow-y: auto; /* ここだけスクロール可能にする */
+    background-color: #f8f9fa;
+    display: flex;
+    flex-direction: column-reverse;
+    padding: 15px;
+}
+
+.chat-message {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+.chat-message.left {
+    align-items: flex-start;
+}
+
+.chat-message.right {
+    align-items: flex-end;
+}
+
+.chat-message .message {
+    max-width: 70%;
+    padding: 10px;
+    border-radius: 10px;
+    word-break: break-word;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.chat-message.left .message {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
+.chat-message.right .message {
+    background-color: #a0e7ff;
+    color: #004466;
+}
+
+.chat-message .user {
+    font-weight: bold;
+    color: #007bff;
+    margin: 0;
+}
+
+.chat-message .time {
+    font-size: 0.8em;
+    color: #888;
+    margin: 0;
+}
+
+.chatWindow {
+    position: relative;
+    width: 100%;
+    background-color: #fff;
+    padding: 10px;
+    border-top: 1px solid #ccc;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    resize: none;
+    outline: none;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+button:disabled {
+    background-color: #d6d6d6;
+    cursor: not-allowed;
+}
+
+.friend-list-button {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 12px;
+}
+
+.friend-list-button:hover {
+    background-color: #218838;
+}
+
+.warning-message {
+    color: red;
+    text-align: center;
+    font-size: 1.2em;
+    margin-top: 20px;
+}
+
+
+    </style>
 </head>
 <body>
     <%
@@ -84,24 +163,34 @@
         String jsonResponse = (String) request.getAttribute("messages");
         Map<String, String> userMap = (Map<String, String>) request.getAttribute("userMap");
     %>
+<form action="FrontServlet" method="POST">
+    <input type="hidden" name="userId" value="${sessionScope.userId}">
+    <input type="hidden" name="command" value="FriendList">
+    <button type="submit" class="friend-list-button">フレンドリストへ</button>
+</form>
+<div class="chat-container">
     <h1>Chat Room</h1>
-    <h1>ログインユーザー：${sessionScope.user_name }</h1>
-    <div id="chat-box" name="chat-box" style="border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; "></div>
-	<!-- css修正する、後でやる -->
-	<c:set var="isBlock" value="${param.isBlock}" />
-	<!-- ブロック時の警告メッセージ -->
-	<c:if test="${isBlock eq 'true'}">
-	    <p style="color: red;">ブロック中のため、メッセージを送信できません。</p>
-	</c:if>
-	<div class="chatWindow">
-	    <form action="FrontServlet" method="POST" id="chatForm" onsubmit="return false;">
-	        <textarea name="message" id="messageInput" placeholder="Type your message here..." required></textarea>
-	        <input type="hidden" name="relationId" id="relationId" value="${param.relationId}">
-	        <input type="hidden" name="userId" id="userId" value="${sessionScope.userId}">
-	        <input type="hidden" name="command" value="AddMessage">
-	        <button id="sendButton" type="submit" ${isBlock eq 'true' ? 'disabled' : ''}>送信</button>
-	    </form>
-	</div>
+    <h3>ログインユーザー：${sessionScope.user_name }</h3>
+
+    <div id="chat-box" class="chat-box">
+        <!-- メッセージ表示部分 -->
+    </div>
+
+    <c:set var="isBlock" value="${param.isBlock}" />
+    <div class="chatWindow">
+    <c:if test="${isBlock eq 'true'}">
+        <p class="warning-message">ブロック中のため、メッセージを送信できません。</p>
+    </c:if>
+        <form action="FrontServlet" method="POST" id="chatForm" onsubmit="return false;">
+            <textarea name="message" id="messageInput" placeholder="Type your message here..." required></textarea>
+            <input type="hidden" name="relationId" id="relationId" value="${param.relationId}">
+            <input type="hidden" name="userId" id="userId" value="${sessionScope.userId}">
+            <input type="hidden" name="command" value="AddMessage">
+            <button id="sendButton" name="sendButton" type="submit" ${isBlock eq 'true' ? 'disabled' : ''}>送信</button>
+        </form>
+    </div>
+</div>
+
     <script>
         // サーバーから受け取ったJSONメッセージをパースして表示
         //ChatCommandからのデータ
@@ -189,27 +278,45 @@
 		        messageContainer.classList.add('left');
 		    }
 
+		    // ユーザー名を表示
 		    const userSpan = document.createElement('span');
 		    userSpan.classList.add('user');
-		    userSpan.textContent = userMap[message.userId] || message.userId;
+		    if (message.userId !== loggedInUserId) {  // 自分のメッセージでは名前を表示しない
+		        userSpan.textContent = userMap[message.userId] || message.userId;
+		    }
 
+		    // メッセージ内容
 		    const messageSpan = document.createElement('span');
 		    messageSpan.classList.add('message');
 		    messageSpan.innerHTML = escapeHTML(message.sendMessage).replace(/\n/g, '<br>');
 
+		    // メッセージ送信時刻
 		    const timeSpan = document.createElement('span');
 		    timeSpan.classList.add('time');
-		    timeSpan.textContent = message.sendTime;
+		    const date = new Date(message.sendTime);
+		    const formattedTime = date.toLocaleString('ja-JP', {
+		        year: 'numeric',
+		        month: '2-digit',
+		        day: '2-digit',
+		        hour: '2-digit',
+		        minute: '2-digit',
+		        second: '2-digit',
+		        hour12: false // 24時間表示
+		    });
+		    timeSpan.textContent = formattedTime;
 
+		    // メッセージの組み立て
 		    messageContainer.appendChild(userSpan);
-		    messageContainer.appendChild(document.createElement('br'));
+		    //messageContainer.appendChild(document.createElement('br'));
 		    messageContainer.appendChild(messageSpan);
-		    messageContainer.appendChild(document.createElement('br'));
+		    //messageContainer.appendChild(document.createElement('br'));
 		    messageContainer.appendChild(timeSpan);
-		    messageContainer.appendChild(document.createElement('br'));
+		    //messageContainer.appendChild(document.createElement('br'));
 
+		    // チャットボックスに追加
 		    chatBox.appendChild(messageContainer);
 		}
+
 
 
 		//ロード時にisBlockがtrueならチャットの送信ボタンが押せないようにする

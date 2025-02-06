@@ -85,6 +85,7 @@
 	    <c:forEach var="relation" items="${messages.relations}">
 	        <c:if test="${relation.status eq 'ACCEPT'}">
 	            <c:set var="blocked" value="false"/>
+	            <c:set var="blockTime" value="" />
 	            <c:forEach var="block" items="${messages.blockusers}">
 	                <c:if test="${(relation.user1Id == sessionScope.userId and relation.user2Id == block.blockedId) or 
 	                              (relation.user2Id == sessionScope.userId and relation.user1Id == block.blockedId)}">
