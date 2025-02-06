@@ -66,7 +66,7 @@ public class SpotifyAddTrackServlet extends HttpServlet {
 
         // ?? 結果を JavaScript で親ページに通知
         response.setContentType("text/html; charset=UTF-8");
-        response.getWriter().write("<script>parent.alert('" + (success ? "追加成功！" : "追加に失敗しました。") + "');</script>");
+        response.getWriter().write("<script>parent.alert('" + (success ? "プレイリストに追加しました" : "追加に失敗しました。") + "');</script>");
     }
 
     private boolean addTrackToPlaylist(String playlistId, String trackId, String accessToken) throws IOException {

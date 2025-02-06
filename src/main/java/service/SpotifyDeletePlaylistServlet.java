@@ -44,7 +44,7 @@ public class SpotifyDeletePlaylistServlet extends HttpServlet {
         }
 
         response.setContentType("text/html; charset=UTF-8");
-        response.getWriter().write("<script>parent.alert('" + (success ? "プレイリスト削除成功！" : "プレイリスト削除に失敗しました。") + "'); parent.location.reload();</script>");
+        response.getWriter().write("<script>parent.location.reload();</script>");
     }
 
     private boolean deletePlaylist(String playlistId, String accessToken) throws IOException {

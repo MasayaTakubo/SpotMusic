@@ -119,7 +119,6 @@ public class SpotifyFollowArtistServlet extends HttpServlet {
             + "if (followButton) { followButton.innerText = '" + (isFollowed ? "リフォロー解除" : "フォロー") + "'; }"
             + "var actionInput = parentDoc.querySelector('#followForm input[name=action]');"
             + "if (actionInput) { actionInput.value = '" + newAction + "'; }"
-            + "window.parent.alert('アーティストを" + message + "');"
             + "window.parent.fetch('/SpotMusic/SpotifyCheckFollowStatusServlet?id=" + artistId + "')"
             + "    .then(response => response.text())"
             + "    .then(data => { parentDoc.querySelector('.content').innerHTML = data; });"

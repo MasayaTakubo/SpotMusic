@@ -435,7 +435,6 @@ window.removeTrack = function(playlistId, trackId, button) {
         url: "SpotifyRemoveTrackServlet",
         data: { playlistId: playlistId, trackId: trackId },
         success: function(response) {
-            alert("削除しました！");
             $(button).closest("li").remove();
         },
         error: function() {
@@ -1165,7 +1164,7 @@ function deletePlaylist(playlistId) {
     })
     .then(response => response.text())
     .then(data => {
-        alert(data); // 削除結果を表示
+        
         location.reload(); // ページをリロードして変更を反映
     })
     .catch(error => console.error("エラー:", error));
@@ -1227,7 +1226,6 @@ function friendlist() {
     window.location.href = '/SpotMusic/FrontServlet?command=FriendList&userId=${sessionScope.user_id}';
 }
 </script>
-<script src="script.js"></script>
 
 <script>
 //リロード処理
