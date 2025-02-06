@@ -4,9 +4,186 @@ body {
     background-color: #121212; /* Spotify のようなダークモード */
     color: #ffffff;
     margin: 0;
-    padding: 0;
     text-align: center;
+    padding-top: 60px; /* ヘッダーの高さ分を確保 */
+    padding-bottom: 30px;
+    display:flex;
+    overflow: hidden; /* ページ全体のスクロールバーを無効化 */
 }
+
+.sidebar, .content, .property-panel {
+    padding: 20px;
+    overflow-y: auto; /* 縦スクロールを有効にする */
+    
+    /* スクロールバーを非表示にする設定 */
+    -ms-overflow-style: none; /* IEとEdgeのスクロールバー非表示 */
+    scrollbar-width: none;    /* Firefoxのスクロールバー非表示 */
+}
+
+/* Chrome, Safari, Opera のスクロールバー非表示 */
+.sidebar::-webkit-scrollbar,
+.content::-webkit-scrollbar,
+.property-panel::-webkit-scrollbar {
+    display: none;
+}
+
+.sidebar {
+	width: 25%;
+	background-color: #121212;
+	border-right: 1px solid #ddd;
+	height: calc(100vh - 110px); /* 固定の高さを設定 */
+
+}
+
+.content {
+	
+	width: 50%;
+	background-color: #121212;
+	text-align: center;
+	height: calc(100vh - 110px); /* 固定の高さを設定 */
+    padding: 10px; /* 内側の余白を追加（任意） */
+
+}
+
+.property-panel {
+	width: 25%;
+	background-color: #121212;
+	border-left: 1px solid #ddd;
+	display: none; /* デフォルトでは非表示 */
+	height: calc(100vh - 110px); /* 固定の高さを設定 */
+	}
+
+.property-panel.active {
+	display: block; /* 音楽再生時に表示 */
+}
+
+.header {
+	height:50px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px 20px;
+	background-color: #121212;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	position: fixed;
+	top: 0;
+	width: 100%;
+	z-index: 1000; /* ヘッダーを最上位に表示 */
+}
+
+/* ロゴのスタイル */
+.logo-icon {
+	height: 40px;
+}
+
+.actions {
+	display: flex;
+	align-items: right;
+	justify-content: flex-end; /* アクションエリアを右端揃え */
+	gap: 10px; /* アイコン間のスペース */
+}
+
+/* リロードアイコンのスタイル */
+.reload-icon {
+	width: 32px;
+	height: 32px;
+	cursor: pointer;
+}
+
+.account-container {
+	position: relative;
+	margin-right: 50px; /* 必要に応じて右の余白を調整 */
+}
+
+.account-icon {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	cursor: pointer;
+}
+
+.account-menu {
+	display: none;
+	position: absolute;
+	right: 0;
+	top: 50px;
+	background-color: white;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	list-style: none;
+	padding: 10px 0;
+	margin: 0;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	z-index: 1000;
+	min-width: 150px; /* 最低幅を設定 */
+	white-space: nowrap; /* 折り返しを防止 */
+}
+
+.account-menu li {
+	padding: 10px 20px;
+	text-align: left; /* テキストを左揃え */
+}
+
+.account-menu a {
+	text-decoration: none;
+	color: #333;
+	display: block; /* リンク全体をクリック可能に */
+}
+/* [仮] playlist.jspのボタン調整*/
+/* プレイリストのボタンのスタイル（黒色に設定） */
+.sidebar button {
+    background-color: transparent;
+    color: white !important;  /* 文字色を黒に固定 */
+    font-size: 16px;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: color 0.3s, transform 0.2s;
+}
+
+/* プレイリストボタンのホバー時（強調しすぎないように少し明るい黒） */
+.sidebar button:hover {
+    color: #222 !important; /* やや明るめの黒 */
+    transform: scale(1.05);
+}	
+
+/* 各曲の再生ボタンのデザイン（黒色に設定） */
+.track-play-button {
+    background-color: transparent;
+    color: white !important; /* ボタンのアイコン色を黒に固定 */
+    font-size: 18px;
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s, transform 0.2s;
+}
+
+/* ホバー時（少しだけ明るめの黒に） */
+.track-play-button:hover {
+    color: #222 !important; /* ホバー時に若干明るい黒 */
+    transform: scale(1.1);
+}
+/* プレイリスト詳細ページの再生ボタンのみ黒くする */
+.track-list button {
+    background-color: transparent;
+    color: white !important; /* 文字・アイコン色を黒に */
+    font-size: 16px;
+    border: 1px solid black; /* ボタンの枠線も黒に */
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: color 0.3s, transform 0.2s;
+}
+
+/* ホバー時に少し明るめの黒 */
+.track-list button:hover {
+    color: #222 !important;
+    border-color: #222;
+    transform: scale(1.05);
+}
+
+  .search-button {
+      color: white;
+  }
+
 
 /* ヘッダー */
 h1 {
