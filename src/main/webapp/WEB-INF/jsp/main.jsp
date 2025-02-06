@@ -140,12 +140,12 @@ h2 {
 </head>
 <body>
 	<div class="header">
-    <div class="logo">
-        <!-- リロード用アイコン -->
-        <a href="javascript:void(0)" onclick="location.reload()" class="reload-link">
-            <img src="<c:url value='/img/Spotmusic.webp' />" alt="ロゴを配置" class="reload-icon">
-        </a>
-    </div>
+	<div class="logo">
+	    <!-- リロード用アイコン -->
+	    <a href="javascript:void(0)" onclick="reloadFollowedArtists()" class="reload-link">
+	        <img src="<c:url value='/img/Spotmusic.webp' />" alt="ロゴを配置" class="reload-icon">
+	    </a>
+	</div>
     
 <form onsubmit="event.preventDefault(); loadSearchPage();">
     <input type="text" id="searchQuery" name="query" placeholder="何を再生したいですか？" required>
@@ -280,7 +280,7 @@ h2 {
 						<th>Track Name</th>
 						<th>Track ID</th>
 						<th>Image</th>
-						<th>☺</th>
+						<th>?</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -856,25 +856,48 @@ window.removeTrack = function(playlistId, trackId, button) {
 
         }
     </script>
-	<script>
-        // artist.jspを動的に読み込む関数
-function loadArtistPage(artistId) {
-    var contentDiv = document.querySelector('.content');
-    var url = '/SpotMusic/FrontServlet?command=ArtistDetails&artistId=' + artistId;
-    
-    fetch(url)
-        .then(response => response.text())
-        .then(data => {
-            // 取得したデータを.content内に上書きする
-            contentDiv.innerHTML = data;
-        })
-        .catch(error => {
-            console.error('Error loading artist page:', error);
-            contentDiv.innerHTML = '<p>アーティスト情報の取得に失敗しました。</p>';
-        });
-}
+    <script>
+    // artist.jspを動的に読み込む関数
+    function loadArtistPage(artistId) {
+        var contentDiv = document.querySelector('.content');
+        var url = '/SpotMusic/FrontServlet?command=ArtistDetails&artistId=' + artistId;
 
-    </script>
+        fetch(url)
+            .then(response => response.text())
+            .then(data => {
+                // 取得したデータを.content内に上書きする
+                contentDiv.innerHTML = data;
+
+                // ページのHTML更新後、フォロー状態を再取得
+                updateFollowButton(artistId);
+            })
+            .catch(error => {
+                console.error('Error loading artist page:', error);
+                contentDiv.innerHTML = '<p>アーティスト情報の取得に失敗しました。</p>';
+            });
+    }
+
+    // フォロー状態を取得し、ボタンを更新する関数
+    function updateFollowButton(artistId) {
+        fetch("/SpotMusic/SpotifyCheckFollowStatusServlet?id=" + artistId + "&fromArtistPage=true")
+            .then(response => response.text())
+            .then(isFollowed => {
+                var followButton = document.getElementById("followButton");
+                var followAction = document.getElementById("followAction");
+
+                if (followButton && followAction) {  // 要素が存在するか確認
+                    if (isFollowed.trim() === "true") {
+                        followButton.innerText = "リフォロー解除";
+                        followAction.value = "unfollow";
+                    } else {
+                        followButton.innerText = "フォロー";
+                        followAction.value = "follow";
+                    }
+                }
+            })
+            .catch(error => console.error("フォロー状態取得エラー:", error));
+    }
+</script>
 
 	<script>
     // アルバム情報を動的に読み込む関数
@@ -1287,12 +1310,33 @@ document.getElementById("playlistForm").addEventListener("submit", function() {
 });
 </script>
 
+
 <script>
 function friendlist() {
     window.location.href = '/SpotMusic/FrontServlet?command=FriendList&userId=${sessionScope.user_id}';
 }
 </script>
 <script src="script.js"></script>
+
+<script>
+//リロード処理
+function reloadFollowedArtists() {
+    fetch('/SpotMusic/SpotifyCheckFollowStatusServlet')
+        .then(response => response.text())
+        .then(data => {
+            console.log("フォローリストを再取得しました");
+
+            // **データ取得後、ページを完全リロード**
+            window.location.reload(true); // キャッシュをクリアして完全リロード
+        })
+        .catch(error => {
+            console.error('フォローリストの更新に失敗しました:', error);
+
+            // **エラー時もページをリロード (最新データ取得を試す)**
+            window.location.reload(true);
+        });
+}
+</script>
 
 </body>
 </html>
