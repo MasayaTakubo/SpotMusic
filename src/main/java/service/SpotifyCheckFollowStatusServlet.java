@@ -22,7 +22,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import service.SpotifySearchServlet.JsonToListConverter;
-//searchartist.jsp
+
 @WebServlet("/SpotifyCheckFollowStatusServlet")
 public class SpotifyCheckFollowStatusServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -37,7 +37,7 @@ public class SpotifyCheckFollowStatusServlet extends HttpServlet {
             return;
         }
 
-        String artistId = request.getParameter("id");  // 修正: artistId を id に統一
+        String artistId = request.getParameter("id"); // 修正: artistId を id に統一
 
         if (artistId == null || artistId.isEmpty()) {
             request.setAttribute("error", "アーティストIDが指定されていません。");
@@ -46,18 +46,27 @@ public class SpotifyCheckFollowStatusServlet extends HttpServlet {
         }
 
         try {
-            // アーティスト情報の取得
+            SpotifyAuthService spotifyAuthService = new SpotifyAuthService();
+
+            // **アーティスト情報の取得**
             String artistUrl = "https://api.spotify.com/v1/artists/" + artistId;
             JSONObject artistJson = new JSONObject(sendSpotifyRequest(artistUrl, accessToken));
             Map<String, Object> artist = convertArtistDetails(artistJson);
 
-            // 人気曲の取得
+            // **プレイリスト情報の取得**
+            String userPlaylistsUrl = "https://api.spotify.com/v1/me/playlists";
+            JSONObject playlistResponse = new JSONObject(sendSpotifyRequest(userPlaylistsUrl, accessToken));
+            JSONArray userPlaylistsArray = playlistResponse.optJSONArray("items");
+            List<Map<String, Object>> userPlaylists = JsonToListConverter.convertJSONArrayToList(userPlaylistsArray);
+            request.setAttribute("userPlaylists", userPlaylists);
+
+            // **人気曲の取得**
             String topTracksUrl = "https://api.spotify.com/v1/artists/" + artistId + "/top-tracks?market=JP";
             JSONObject topTracksResponse = new JSONObject(sendSpotifyRequest(topTracksUrl, accessToken));
             JSONArray topTracksArray = topTracksResponse.optJSONArray("tracks");
             List<Map<String, Object>> topTracks = JsonToListConverter.convertJSONArrayToList(topTracksArray);
 
-            // アルバム一覧の取得
+            // **アルバム一覧の取得**
             String albumsUrl = "https://api.spotify.com/v1/artists/" + artistId + "/albums?include_groups=album&market=JP&limit=10";
             JSONObject albumsResponse = new JSONObject(sendSpotifyRequest(albumsUrl, accessToken));
             JSONArray albumsArray = albumsResponse.optJSONArray("items");
@@ -65,22 +74,34 @@ public class SpotifyCheckFollowStatusServlet extends HttpServlet {
 
             // **フォロー状態の取得**
             boolean isFollowed = isArtistFollowed(artistId, accessToken);
+            session.setAttribute("isFollowed", isFollowed);
 
          // artist.jsp からも呼ばれるように
             if (request.getParameter("fromArtistPage") != null) {
                 response.getWriter().write(String.valueOf(isFollowed));
                 return;
             }
+            // **フォローリストの最新化**
+            try {
+                List<String> artistIds = spotifyAuthService.getArtistIds(accessToken, 50);
+                List<String> artistNames = spotifyAuthService.getArtistNames(accessToken, 50);
+                
 
-            // **セッションに保存**
-            session.setAttribute("isFollowed", isFollowed);
+                session.setAttribute("artistIds", artistIds);
+                session.setAttribute("followedArtistNames", artistNames);
+                
+                System.out.println("DEBUG: フォローリストを更新しました");
+            } catch (Exception e) {
+                System.out.println("ERROR: フォローリストの更新に失敗しました - " + e.getMessage());
+                e.printStackTrace();
+            }
 
-            // JSPにデータを渡す
+            // **JSPにデータを渡す**
             request.setAttribute("artist", artist);
             request.setAttribute("top_tracks", topTracks);
             request.setAttribute("albums", albums);
 
-            // `searchartist.jsp` に遷移
+            // **`searchartist.jsp` に遷移**
             request.getRequestDispatcher("/WEB-INF/jsp/searchartist.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
@@ -88,6 +109,7 @@ public class SpotifyCheckFollowStatusServlet extends HttpServlet {
             request.getRequestDispatcher("/WEB-INF/jsp/search.jsp").forward(request, response);
         }
     }
+
 
 
     private String sendSpotifyRequest(String urlString, String accessToken) throws IOException {
