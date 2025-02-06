@@ -22,7 +22,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import service.SpotifySearchServlet.JsonToListConverter;
-
+//searchartist.jsp
 @WebServlet("/SpotifyCheckFollowStatusServlet")
 public class SpotifyCheckFollowStatusServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -65,6 +65,12 @@ public class SpotifyCheckFollowStatusServlet extends HttpServlet {
 
             // **フォロー状態の取得**
             boolean isFollowed = isArtistFollowed(artistId, accessToken);
+
+         // artist.jsp からも呼ばれるように
+            if (request.getParameter("fromArtistPage") != null) {
+                response.getWriter().write(String.valueOf(isFollowed));
+                return;
+            }
 
             // **セッションに保存**
             session.setAttribute("isFollowed", isFollowed);

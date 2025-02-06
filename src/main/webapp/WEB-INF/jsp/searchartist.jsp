@@ -24,30 +24,28 @@
         </div>
 
         <!-- フォロー/リフォローフォーム -->
-        <iframe name="hidden_iframe" style="display: none;" id="hidden_iframe"></iframe>
+		<iframe name="hidden_iframe" style="display:none;"></iframe>
+		
+		<form id="followForm" action="SpotifyFollowArtistServlet" method="post" target="hidden_iframe">
+		    <input type="hidden" name="artistId" value="${artist.id}">
+		    <c:choose>
+		        <c:when test="${sessionScope.isFollowed}">
+		            <input type="hidden" name="action" value="unfollow">
+		            <button type="submit" id="followButton">リフォロー解除</button>
+		        </c:when>
+		        <c:otherwise>
+		            <input type="hidden" name="action" value="follow">
+		            <button type="submit" id="followButton">フォロー</button>
+		        </c:otherwise>
+		    </c:choose>
+		</form>
 
-        <form id="followForm" action="SpotifyFollowArtistServlet" method="post" target="hidden_iframe">
-            <input type="hidden" name="artistId" value="${artist.id}">
-            <c:choose>
-                <c:when test="${sessionScope.isFollowed}">
-                    <input type="hidden" name="action" value="unfollow">
-                    <button type="submit" id="followButton">リフォロー解除</button>
-                </c:when>
-                <c:otherwise>
-                    <input type="hidden" name="action" value="follow">
-                    <button type="submit" id="followButton">フォロー</button>
-                </c:otherwise>
-            </c:choose>
-        </form>
 
-        <script>
-            document.getElementById("hidden_iframe").onload = function() {
-                setTimeout(() => {
-                    document.getElementById("followButton").innerText = 
-                        (document.getElementById("followButton").innerText === "フォロー") ? "リフォロー解除" : "フォロー";
-                }, 500);
-            };
-        </script>
+
+
+
+
+
 
         <!-- 人気曲 -->
         <h3>人気曲</h3>
