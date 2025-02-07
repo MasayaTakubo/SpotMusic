@@ -37,13 +37,14 @@ public class WebApplicationController implements ApplicationController {
 	    String playlistId = req.getParameter("playlistId");
 	    
 	    try {
-		    if ("AddMessage".equals(command)) {
-		        res.setContentType("application/json");
-		        PrintWriter out = res.getWriter();
-		        String jsonResponse = new Gson().toJson(result);
-		        out.write(jsonResponse);
-		        out.flush();
-		    }else if( "ChatCommand".equals(command)){
+	    	if ("AddMessage".equals(command) || "SpotifyRemoveTrack".equals(command)) {
+	            res.setContentType("application/json");
+	            res.setCharacterEncoding("UTF-8");
+	            PrintWriter out = res.getWriter();
+	            String jsonResponse = new Gson().toJson(result);
+	            out.write(jsonResponse);
+	            out.flush();
+	        }else if( "ChatCommand".equals(command)){
 		    	WebResponseContext wresc = (WebResponseContext)resc;
 		    	Map<String,String> userMap = (Map)wresc.getResult("userMap");
 		        res.setContentType("application/json");

@@ -432,7 +432,7 @@ window.removeTrack = function(playlistId, trackId, button) {
     console.log("removeTrack が呼ばれました");
     $.ajax({
         type: "POST",
-        url: "SpotifyRemoveTrackServlet",
+        url: "FrontServlet?command=SpotifyRemoveTrack",
         data: { playlistId: playlistId, trackId: trackId },
         success: function(response) {
             $(button).closest("li").remove();

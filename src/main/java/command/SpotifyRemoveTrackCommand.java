@@ -6,42 +6,63 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.json.JSONObject;
 
-@WebServlet("/SpotifyRemoveTrackServlet")
-public class SpotifyRemoveTrackCommand extends HttpServlet {
-    private static final long serialVersionUID = 1L;
+import context.RequestContext;
+import context.ResponseContext;
+
+public class SpotifyRemoveTrackCommand extends AbstractCommand {
     private static final String SPOTIFY_API_URL = "https://api.spotify.com/v1/playlists";
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    @Override
+    public ResponseContext execute(ResponseContext responseContext) {
+        RequestContext reqContext = getRequestContext();
+        HttpServletRequest request = (HttpServletRequest) reqContext.getRequest();
         HttpSession session = request.getSession();
+        
         String accessToken = (String) session.getAttribute("access_token");
 
+        JSONObject jsonResponse = new JSONObject();
+
         if (accessToken == null) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
+            jsonResponse.put("error", "Unauthorized");
+            responseContext.setContentType("application/json");
+            responseContext.setResult(jsonResponse.toString()); // ← 修正
+            return responseContext;
         }
 
         String playlistId = request.getParameter("playlistId");
         String trackId = request.getParameter("trackId");
 
         if (playlistId == null || trackId == null) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return;
+            jsonResponse.put("error", "Bad Request");
+            responseContext.setContentType("application/json");
+            responseContext.setResult(jsonResponse.toString()); // ← 修正
+            return responseContext;
         }
 
-        boolean success = removeTrackFromPlaylist(playlistId, trackId, accessToken);
+        boolean success = false;
+        try {
+            success = removeTrackFromPlaylist(playlistId, trackId, accessToken);
+        } catch (IOException e) {
+            e.printStackTrace();
+            jsonResponse.put("error", "Internal Server Error");
+            responseContext.setContentType("application/json");
+            responseContext.setResult(jsonResponse.toString()); // ← 修正
+            return responseContext;
+        }
 
-        response.setContentType("application/json");
-        response.getWriter().write(new JSONObject().put("success", success).toString());
+        jsonResponse.put("success", success);
+        
+        responseContext.setContentType("application/json");
+        responseContext.setResult(jsonResponse.toString()); // ← 修正
+        
+        return responseContext;
     }
+
 
     private boolean removeTrackFromPlaylist(String playlistId, String trackId, String accessToken) throws IOException {
         String urlString = SPOTIFY_API_URL + "/" + playlistId + "/tracks";
