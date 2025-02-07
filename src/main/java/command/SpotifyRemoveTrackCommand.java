@@ -1,4 +1,4 @@
-package service;
+package command;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -16,7 +16,7 @@ import javax.servlet.http.HttpSession;
 import org.json.JSONObject;
 
 @WebServlet("/SpotifyRemoveTrackServlet")
-public class SpotifyRemoveTrackServlet extends HttpServlet {
+public class SpotifyRemoveTrackCommand extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final String SPOTIFY_API_URL = "https://api.spotify.com/v1/playlists";
 

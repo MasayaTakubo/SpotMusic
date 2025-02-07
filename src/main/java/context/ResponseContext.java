@@ -7,4 +7,6 @@ public interface ResponseContext {
     public void setTarget(String transferInfo);
     public void setResponse(Object obj);
     public Object getResponse();
+ // 追加
+    public void setContentType(String contentType);
 }

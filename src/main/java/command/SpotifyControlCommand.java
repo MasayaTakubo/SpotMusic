@@ -1,4 +1,4 @@
-package service;
+package command;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,8 +12,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import service.SpotifyAuthService;
+
 @WebServlet("/spotifyControl")
-public class SpotifyControlServlet extends HttpServlet {
+public class SpotifyControlCommand extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private SpotifyAuthService spotifyService = new SpotifyAuthService();
     @Override

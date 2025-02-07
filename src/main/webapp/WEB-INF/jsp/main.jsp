@@ -761,10 +761,10 @@ window.removeTrack = function(playlistId, trackId, button) {
         }
 
 //Spotifyログアウト用JavaScript
-        function logout() {
-            window.location.href = '/SpotMusic/logout';
+	function logout() {
+	    window.location.href = '/SpotMusic/FrontServlet?command=Logout';
+	}
 
-        }
     </script>
     <script>
     // artist.jspを動的に読み込む関数
@@ -1068,7 +1068,7 @@ $(document).ready(function(){
 function loadSearchPage() {
     console.log("loadSearchPage called");  // デバッグ用
     const query = document.getElementById("searchQuery").value;
-    const url = "/SpotMusic/SpotifySearchServlet?query=" + encodeURIComponent(query);
+    const url = "/SpotMusic/SpotifySearch?query=" + encodeURIComponent(query);
 
     console.log("Fetch URL:", url);  // デバッグ用
 
@@ -1086,7 +1086,7 @@ function loadSearchPage() {
 
 function loadAlbumDetail(albumId) {
     console.log("loadAlbumDetail called with ID:", albumId);  // デバッグ用
-    const url = "/SpotMusic/SpotifySearchServlet?action=album&id=" + encodeURIComponent(albumId);
+    const url = "/SpotMusic/SpotifySearch?action=album&id=" + encodeURIComponent(albumId);
 
     console.log("Fetch URL:", url);  // デバッグ用
 
@@ -1131,7 +1131,7 @@ function loadArtistDetail(artistId) {
 
 function loadPlaylistDetail(playlistId) {
     console.log("loadPlaylistDetail called with ID:", playlistId);  // デバッグ用
-    const url = "/SpotMusic/SpotifySearchServlet?action=playlist&id=" + encodeURIComponent(playlistId);
+    const url = "/SpotMusic/SpotifySearch?action=playlist&id=" + encodeURIComponent(playlistId);
 
     console.log("Fetch URL:", url);  // デバッグ用
 

@@ -1,4 +1,4 @@
-package service;
+package command;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,7 +18,7 @@ import javax.servlet.http.HttpSession;
 import org.json.JSONObject;
 
 @WebServlet("/SpotifyAddTrackServlet")
-public class SpotifyAddTrackServlet extends HttpServlet {
+public class SpotifyAddTrackCommand extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final String SPOTIFY_API_URL = "https://api.spotify.com/v1/playlists";
 

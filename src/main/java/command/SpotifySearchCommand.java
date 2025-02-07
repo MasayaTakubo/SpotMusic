@@ -1,4 +1,4 @@
-package service;
+package command;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,8 +23,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 
-@WebServlet("/SpotifySearchServlet")
-public class SpotifySearchServlet extends HttpServlet {
+@WebServlet("/SpotifySearch")
+public class SpotifySearchCommand extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final String SPOTIFY_API_URL = "https://api.spotify.com/v1/search";
 
@@ -123,7 +123,7 @@ public class SpotifySearchServlet extends HttpServlet {
                 JSONArray tracksArray = playlist.optJSONObject("tracks").optJSONArray("items");
                 List<Map<String, Object>> trackList = convertPlaylistTracks(tracksArray);
 
-             // ✅ ユーザーのプレイリストを取得してセット
+             // $2705 ユーザーのプレイリストを取得してセット
                 String userPlaylistsUrl = "https://api.spotify.com/v1/me/playlists";
                 JSONObject playlistResponse = new JSONObject(sendSpotifyRequest(userPlaylistsUrl, accessToken));
                 JSONArray userPlaylistsArray = playlistResponse.optJSONArray("items");
@@ -131,7 +131,7 @@ public class SpotifySearchServlet extends HttpServlet {
                 
                 System.out.println("DEBUG: ユーザーのプレイリスト - " + userPlaylists);
 
-                // ✅ JSP にデータを渡す
+                // $2705 JSP にデータを渡す
                 request.setAttribute("playlist", playlistInfo);
                 request.setAttribute("tracks", trackList);
                 request.setAttribute("userPlaylists", userPlaylists); // 追加
@@ -160,7 +160,7 @@ public class SpotifySearchServlet extends HttpServlet {
                 List<Map<String, Object>> topTracks = JsonToListConverter.convertJSONArrayToList(topTracksArray);
                 List<Map<String, Object>> albums = JsonToListConverter.convertJSONArrayToList(albumsArray);
 
-                // ✅ ユーザーのプレイリストを取得
+                // $2705 ユーザーのプレイリストを取得
                 String userPlaylistsUrl = "https://api.spotify.com/v1/me/playlists";
                 JSONObject playlistResponse = new JSONObject(sendSpotifyRequest(userPlaylistsUrl, accessToken));
                 JSONArray userPlaylistsArray = playlistResponse.optJSONArray("items");
@@ -168,7 +168,7 @@ public class SpotifySearchServlet extends HttpServlet {
 
                 System.out.println("DEBUG: ユーザーのプレイリスト - " + userPlaylists);
 
-                // ✅ JSP にデータを渡す
+                // $2705 JSP にデータを渡す
                 request.setAttribute("artist", artist);
                 request.setAttribute("top_tracks", topTracks);
                 request.setAttribute("albums", albums);
@@ -188,7 +188,7 @@ public class SpotifySearchServlet extends HttpServlet {
                 JSONArray tracksArray = albumJson.optJSONObject("tracks").optJSONArray("items");
                 List<Map<String, Object>> tracks = JsonToListConverter.convertJSONArrayToList(tracksArray);
 
-                // ✅ ユーザーのプレイリストを取得
+                // $2705 ユーザーのプレイリストを取得
                 String userPlaylistsUrl = "https://api.spotify.com/v1/me/playlists";
                 JSONObject playlistResponse = new JSONObject(sendSpotifyRequest(userPlaylistsUrl, accessToken));
                 JSONArray userPlaylistsArray = playlistResponse.optJSONArray("items");
@@ -196,7 +196,7 @@ public class SpotifySearchServlet extends HttpServlet {
 
                 System.out.println("DEBUG: ユーザーのプレイリスト - " + userPlaylists);
 
-                // ✅ JSP にデータを渡す
+                // $2705 JSP にデータを渡す
                 request.setAttribute("album", album);
                 request.setAttribute("tracks", tracks);
                 request.setAttribute("userPlaylists", userPlaylists); // 追加
@@ -333,7 +333,7 @@ public class SpotifySearchServlet extends HttpServlet {
             trackInfo.put("track_number", track.optInt("track_number", 0));
             trackInfo.put("id", track.optString("id", "unknown_id"));
 
-            // 🔹 **アルバム画像の取得**
+            // $D83D$DD39 **アルバム画像の取得**
             JSONObject album = track.optJSONObject("album");
             JSONArray imagesArray = (album != null) ? album.optJSONArray("images") : null;
 
@@ -342,7 +342,7 @@ public class SpotifySearchServlet extends HttpServlet {
                 imageUrl = imagesArray.getJSONObject(0).optString("url", "no_image.png");
             }
 
-            // 🔹 **デバッグログ追加**
+            // $D83D$DD39 **デバッグログ追加**
             System.out.println("DEBUG: Track - Name: " + track.optString("name", "Unknown") + 
                                ", Album: " + (album != null ? album.optString("name", "Unknown Album") : "No Album") + 
                                ", Image: " + imageUrl);
