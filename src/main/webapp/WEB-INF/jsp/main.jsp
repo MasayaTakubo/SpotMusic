@@ -89,7 +89,9 @@
         <!-- プレイリスト作成ボタン -->
 		<button id="showPlaylistForm" class="plus-button">[+]</button>
 		<!-- プレイリスト作成フォーム (デフォルトは非表示) -->
-		<form id="playlistForm" action="SpotifyCreatePlaylistServlet" method="post" target="hidden_iframe" style="display: none;">
+		<form id="playlistForm" action="FrontServlet" method="post" target="hidden_iframe" style="display: none;">
+		    <input type="hidden" name="command" value="SpotifyCreatePlaylistCommand">
+		    <input type="hidden" name="responseType" value="html"> <!-- HTML レスポンスを要求 -->
 		    <label for="playlistName">新しいプレイリスト名:</label>
 		    <input type="text" id="playlistName" name="playlistName" required>
 		    <button type="submit">作成</button>
@@ -118,10 +120,15 @@
                 <strong>プレイリスト名：</strong> ${playlist.playlistName}<br>
                 <strong>プレイリストID：</strong> ${playlist.playlistId}<br>
             </button>
-            <form action="SpotifyDeletePlaylistServlet" method="post" target="hidden_iframe">
-                <input type="hidden" name="playlistId" value="${playlist.playlistId}">
-                <button type="submit">削除</button>
-            </form>
+			<form action="FrontServlet" method="post" target="hidden_iframe">
+			    <input type="hidden" name="command" value="SpotifyDeletePlaylistCommand">
+			    <input type="hidden" name="playlistId" value="${playlist.playlistId}">
+			    <input type="hidden" name="trackId" value="${track.trackId}">
+			    <input type="hidden" name="responseType" value="html"> <!-- HTML レスポンスを要求 -->
+			    <button type="submit">削除</button>
+			</form>
+
+			</form>
             <strong>イメージ画像：</strong>
             <c:choose>
                 <c:when test="${not empty playlist.imageUrl and fn:length(playlist.imageUrl) > 0}">
@@ -1155,20 +1162,23 @@ function deletePlaylist(playlistId) {
         return;
     }
 
-
     let formData = new FormData();
+    formData.append("command", "SpotifyDeletePlaylistCommand");
     formData.append("playlistId", playlistId);
-    fetch("SpotifyDeletePlaylistServlet", {
+    formData.append("responseType", "html"); // HTMLレスポンスを要求
+
+    fetch("FrontServlet", {
         method: "POST",
         body: formData
     })
-    .then(response => response.text())
-    .then(data => {
-        
-        location.reload(); // ページをリロードして変更を反映
+    .then(response => response.text())  // HTML を受け取る
+    .then(html => {
+        console.log("レスポンスHTML:", html); // デバッグ用
+        document.body.innerHTML += html; // HTML のスクリプトを実行
     })
     .catch(error => console.error("エラー:", error));
 }
+
 
 function showTab(tabName) {
     // すべてのタブコンテンツを非表示にする
