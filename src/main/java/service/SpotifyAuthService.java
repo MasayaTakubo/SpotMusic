@@ -1152,7 +1152,34 @@ public class SpotifyAuthService {
         }
     }
 
+    private static final String SPOTIFY_PLAYLISTS_API = "https://api.spotify.com/v1/me/playlists";
 
+    private String sendSpotifyRequest(String urlString, String accessToken) throws IOException {
+        System.out.println("DEBUG: Spotify API リクエスト - " + urlString);
+
+        URL url = new URL(urlString);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Authorization", "Bearer " + accessToken);
+        connection.setRequestProperty("Content-Type", "application/json");
+
+        int responseCode = connection.getResponseCode();
+        if (responseCode != 200) {
+            throw new IOException("Spotify API Error: HTTP " + responseCode);
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
+        String responseBody = reader.lines().reduce("", String::concat);
+        reader.close();
+
+        return responseBody;
+    }
+    
+    public JSONArray getUserPlaylists(String accessToken) throws IOException {
+        String jsonResponse = sendSpotifyRequest(SPOTIFY_PLAYLISTS_API, accessToken);
+        JSONObject json = new JSONObject(jsonResponse);
+        return json.optJSONArray("items");  // プレイリストの配列を返す
+    }
 
 
 }
