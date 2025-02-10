@@ -12,238 +12,125 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import context.RequestContext;
+import context.ResponseContext;
 
-@WebServlet("/SpotifySearch")
-public class SpotifySearchCommand extends HttpServlet {
-    private static final long serialVersionUID = 1L;
+public class SpotifySearchCommand extends AbstractCommand {
     private static final String SPOTIFY_API_URL = "https://api.spotify.com/v1/search";
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    @Override
+    public ResponseContext execute(ResponseContext responseContext) {
+        System.out.println("?? SpotifySearchCommand: execute() called");
+
+        RequestContext reqContext = getRequestContext();
+        HttpServletRequest request = (HttpServletRequest) reqContext.getRequest();
+
         String action = request.getParameter("action");
-        String id = request.getParameter("id");
         String query = request.getParameter("query");
+        String id = request.getParameter("id");
+        System.out.println("?? Received action: " + action + ", query: " + query + ", id: " + id);
 
-        System.out.println("DEBUG: action=" + action + ", id=" + id + ", query=" + query);
-
-        HttpSession session = request.getSession();
-        String accessToken = (String) session.getAttribute("access_token");
-
+        String accessToken = (String) request.getSession().getAttribute("access_token");
         if (accessToken == null) {
-            request.setAttribute("error", "Spotifyにログインしていません。");
-            request.getRequestDispatcher("/WEB-INF/jsp/search.jsp").forward(request, response);
-            return;
+            System.out.println("?? ERROR: Spotify にログインしていません。");
+            return createErrorResponse(responseContext, "Spotifyにログインしていません。");
         }
 
         try {
-            if (query != null && !query.trim().isEmpty()) {
-                // ?? Spotify検索を実行
-                System.out.println("DEBUG: Spotify検索を実行します - " + query);
-                String jsonResponse = searchSpotify(query, accessToken);
-                System.out.println("DEBUG: Spotify API Response - " + jsonResponse);
-
-                JSONObject json = new JSONObject(jsonResponse);
-
-                // ?? 各検索結果のデータを取得
-                JSONArray artistsArray = json.optJSONObject("artists").optJSONArray("items");
-                JSONArray albumsArray = json.optJSONObject("albums").optJSONArray("items");
-                JSONArray playlistsArray = json.optJSONObject("playlists").optJSONArray("items");
-                JSONArray tracksArray = json.optJSONObject("tracks").optJSONArray("items"); // ?? 曲のデータを取得
-
-                System.out.println("DEBUG: artistsArray = " + artistsArray);
-                System.out.println("DEBUG: albumsArray = " + albumsArray);
-                System.out.println("DEBUG: playlistsArray = " + playlistsArray);
-                System.out.println("DEBUG: tracksArray = " + tracksArray);
-
-                // ?? JSON → List に変換
-                List<Map<String, Object>> artistList = JsonToListConverter.convertJSONArrayToList(artistsArray);
-                List<Map<String, Object>> albumList = JsonToListConverter.convertJSONArrayToList(albumsArray);
-                List<Map<String, Object>> playlistList = JsonToListConverter.convertJSONArrayToList(playlistsArray);
-                List<Map<String, Object>> trackList = JsonToListConverter.convertJSONArrayToList(tracksArray); // ?? 曲リストに変換
-
-                System.out.println("DEBUG: 結果データ (tracks) - " + trackList);
-
-
-             // ?? trackList に画像URLをセットする
-             for (Map<String, Object> track : trackList) {
-                 JSONObject album = (JSONObject) track.get("album"); // アルバム情報を取得
-                 JSONArray imagesArray = (album != null) ? album.optJSONArray("images") : null;
-
-                 String imageUrl = "no_image.png"; // デフォルト画像
-                 if (imagesArray != null && imagesArray.length() > 0) {
-                     JSONObject firstImage = imagesArray.optJSONObject(0);
-                     if (firstImage != null) {
-                         imageUrl = firstImage.optString("url", "no_image.png");
-                     }
-                 }
-
-                 track.put("image", imageUrl); // ?? 画像URLをセット
-             }
-
-             // ?? デバッグログで確認
-             System.out.println("DEBUG: 修正後の trackList:");
-             for (Map<String, Object> track : trackList) {
-                 System.out.println("Track: " + track.get("name") + ", Image: " + track.get("image"));
-             }
-                // ?? JSP にデータを渡す
-                request.setAttribute("artists", artistList);
-                request.setAttribute("albums", albumList);
-                request.setAttribute("playlists", playlistList);
-                request.setAttribute("tracks", trackList);
-                request.setAttribute("query", query);
-
-                // ?? ユーザーのプレイリストを取得
-                String userPlaylistsUrl = "https://api.spotify.com/v1/me/playlists";
-                JSONObject playlistResponse = new JSONObject(sendSpotifyRequest(userPlaylistsUrl, accessToken));
-                JSONArray userPlaylistsArray = playlistResponse.optJSONArray("items");
-                List<Map<String, Object>> userPlaylists = JsonToListConverter.convertJSONArrayToList(userPlaylistsArray);
-                request.setAttribute("userPlaylists", userPlaylists);
-
-                // ?? 検索結果をJSPに渡す
-                request.getRequestDispatcher("/WEB-INF/jsp/search.jsp").forward(request, response);
-            } 
-            else if ("playlist".equals(action)) {
-                System.out.println("DEBUG: プレイリスト詳細取得 - ID: " + id);
-                JSONObject playlist = getSpotifyDetails("playlists", id, accessToken);
-                System.out.println("DEBUG: プレイリスト情報 - " + playlist.toString());
-
-                // プレイリスト情報を変換
-                Map<String, Object> playlistInfo = convertPlaylistDetails(playlist);
-
-                // トラック情報を変換
-                JSONArray tracksArray = playlist.optJSONObject("tracks").optJSONArray("items");
-                List<Map<String, Object>> trackList = convertPlaylistTracks(tracksArray);
-
-             // $2705 ユーザーのプレイリストを取得してセット
-                String userPlaylistsUrl = "https://api.spotify.com/v1/me/playlists";
-                JSONObject playlistResponse = new JSONObject(sendSpotifyRequest(userPlaylistsUrl, accessToken));
-                JSONArray userPlaylistsArray = playlistResponse.optJSONArray("items");
-                List<Map<String, Object>> userPlaylists = JsonToListConverter.convertJSONArrayToList(userPlaylistsArray);
-                
-                System.out.println("DEBUG: ユーザーのプレイリスト - " + userPlaylists);
-
-                // $2705 JSP にデータを渡す
-                request.setAttribute("playlist", playlistInfo);
-                request.setAttribute("tracks", trackList);
-                request.setAttribute("userPlaylists", userPlaylists); // 追加
-
-                request.getRequestDispatcher("/WEB-INF/jsp/searchplaylist.jsp").forward(request, response);            
-                } else if ("artist".equals(action)) {
-                // アーティスト詳細を取得
-                System.out.println("DEBUG: アーティスト詳細取得 - ID: " + id);
-                JSONObject artistJson = getSpotifyDetails("artists", id, accessToken);
-                System.out.println("DEBUG: アーティスト情報 - " + artistJson.toString());
-
-                // JSONObject を Map に変換
-                Map<String, Object> artist = convertArtistDetails(artistJson);
-
-                // 人気曲の取得
-                String topTracksUrl = "https://api.spotify.com/v1/artists/" + id + "/top-tracks?market=JP";
-                JSONObject topTracksResponse = new JSONObject(sendSpotifyRequest(topTracksUrl, accessToken));
-                JSONArray topTracksArray = topTracksResponse.optJSONArray("tracks");
-
-                // アルバム一覧の取得
-                String albumsUrl = "https://api.spotify.com/v1/artists/" + id + "/albums?include_groups=album&market=JP&limit=10";
-                JSONObject albumsResponse = new JSONObject(sendSpotifyRequest(albumsUrl, accessToken));
-                JSONArray albumsArray = albumsResponse.optJSONArray("items");
-
-                // JSON を List<Map<String, Object>> に変換
-                List<Map<String, Object>> topTracks = JsonToListConverter.convertJSONArrayToList(topTracksArray);
-                List<Map<String, Object>> albums = JsonToListConverter.convertJSONArrayToList(albumsArray);
-
-                // $2705 ユーザーのプレイリストを取得
-                String userPlaylistsUrl = "https://api.spotify.com/v1/me/playlists";
-                JSONObject playlistResponse = new JSONObject(sendSpotifyRequest(userPlaylistsUrl, accessToken));
-                JSONArray userPlaylistsArray = playlistResponse.optJSONArray("items");
-                List<Map<String, Object>> userPlaylists = JsonToListConverter.convertJSONArrayToList(userPlaylistsArray);
-
-                System.out.println("DEBUG: ユーザーのプレイリスト - " + userPlaylists);
-
-                // $2705 JSP にデータを渡す
-                request.setAttribute("artist", artist);
-                request.setAttribute("top_tracks", topTracks);
-                request.setAttribute("albums", albums);
-                request.setAttribute("userPlaylists", userPlaylists); // 追加
-
-                request.getRequestDispatcher("/WEB-INF/jsp/searchartist.jsp").forward(request, response);
-            } else if ("album".equals(action)) {
-                // アルバム詳細を取得
-                System.out.println("DEBUG: アルバム詳細取得 - ID: " + id);
-                JSONObject albumJson = getSpotifyDetails("albums", id, accessToken);
-                System.out.println("DEBUG: アルバム情報 - " + albumJson.toString());
-
-                // JSONObject を Map に変換
-                Map<String, Object> album = convertAlbumDetails(albumJson);
-
-                // 収録曲の取得
-                JSONArray tracksArray = albumJson.optJSONObject("tracks").optJSONArray("items");
-                List<Map<String, Object>> tracks = JsonToListConverter.convertJSONArrayToList(tracksArray);
-
-                // $2705 ユーザーのプレイリストを取得
-                String userPlaylistsUrl = "https://api.spotify.com/v1/me/playlists";
-                JSONObject playlistResponse = new JSONObject(sendSpotifyRequest(userPlaylistsUrl, accessToken));
-                JSONArray userPlaylistsArray = playlistResponse.optJSONArray("items");
-                List<Map<String, Object>> userPlaylists = JsonToListConverter.convertJSONArrayToList(userPlaylistsArray);
-
-                System.out.println("DEBUG: ユーザーのプレイリスト - " + userPlaylists);
-
-                // $2705 JSP にデータを渡す
-                request.setAttribute("album", album);
-                request.setAttribute("tracks", tracks);
-                request.setAttribute("userPlaylists", userPlaylists); // 追加
-
-                request.getRequestDispatcher("/WEB-INF/jsp/searchalbum.jsp").forward(request, response);
+            if ("album".equals(action) && id != null) {
+                return handleAlbumDetail(responseContext, request, id, accessToken);
+            } else if ("artist".equals(action) && id != null) {
+                return handleArtistDetail(responseContext, request, id, accessToken);
+            } else if ("playlist".equals(action) && id != null) {
+                return handlePlaylistDetail(responseContext, request, id, accessToken);
+            } else if (query != null && !query.trim().isEmpty()) {
+                return handleSearch(responseContext, request, query, accessToken);
             } else {
-                request.getRequestDispatcher("/WEB-INF/jsp/search.jsp").forward(request, response);
+                System.out.println("?? ERROR: 無効なリクエスト");
+                return createErrorResponse(responseContext, "無効なリクエスト");
             }
         } catch (Exception e) {
-            System.out.println("ERROR: 例外が発生しました - " + e.getMessage());
             e.printStackTrace();
-            request.setAttribute("error", "エラーが発生しました: " + e.getMessage());
-            request.getRequestDispatcher("/WEB-INF/jsp/search.jsp").forward(request, response);
+            return createErrorResponse(responseContext, "Internal Server Error: " + e.getMessage());
         }
     }
 
 
-    // ?? Spotify検索API
-    private String searchSpotify(String query, String accessToken) throws IOException {
-        String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8.toString());
-        String urlString = SPOTIFY_API_URL + "?q=" + encodedQuery + "&type=track,album,artist,playlist&limit=10";
-        return sendSpotifyRequest(urlString, accessToken);
+    /*** ?? Spotify検索を実行 ***/
+    private ResponseContext handleSearch(ResponseContext responseContext, HttpServletRequest request, String query, String accessToken) throws IOException {
+        System.out.println("?? Executing Spotify search for query: " + query);
+
+        JSONObject json = new JSONObject(searchSpotify(query, accessToken));
+
+        // **?? 各カテゴリーのデータ取得**
+        JSONArray tracksArray = json.optJSONObject("tracks") != null ? json.optJSONObject("tracks").optJSONArray("items") : null;
+        JSONArray albumsArray = json.optJSONObject("albums") != null ? json.optJSONObject("albums").optJSONArray("items") : null;
+        JSONArray artistsArray = json.optJSONObject("artists") != null ? json.optJSONObject("artists").optJSONArray("items") : null;
+        JSONArray playlistsArray = json.optJSONObject("playlists") != null ? json.optJSONObject("playlists").optJSONArray("items") : null;
+
+        // **?? 各リストを JSP 用に変換**
+        List<Map<String, Object>> trackList = convertTracks(tracksArray);
+        List<Map<String, Object>> albumList = convertAlbums(albumsArray);
+        List<Map<String, Object>> artistList = convertArtists(artistsArray);
+        List<Map<String, Object>> playlistList = convertPlaylists(playlistsArray);
+
+        // **?? ユーザーのプレイリストを取得**
+        String userPlaylistsUrl = "https://api.spotify.com/v1/me/playlists";
+        JSONObject playlistResponse = new JSONObject(sendSpotifyRequest(userPlaylistsUrl, accessToken));
+        JSONArray userPlaylistsArray = playlistResponse.optJSONArray("items");
+        List<Map<String, Object>> userPlaylists = convertPlaylists(userPlaylistsArray);
+
+        // **?? JSP にデータを渡す**
+        request.setAttribute("tracks", trackList);
+        request.setAttribute("albums", albumList);
+        request.setAttribute("artists", artistList);
+        request.setAttribute("playlists", playlistList);
+        request.setAttribute("query", query);
+        request.setAttribute("userPlaylists", userPlaylists); // ?? ユーザーのプレイリストもセット！
+        // **?? JSP のパスを設定**
+        responseContext.setTarget("search");
+
+        System.out.println("?? Target set to: " + responseContext.getTarget());
+        return responseContext;
     }
 
-    // Spotify詳細取得API
-    private JSONObject getSpotifyDetails(String type, String id, String accessToken) throws IOException {
-        String urlString = "https://api.spotify.com/v1/" + type + "/" + id;
-        String response = sendSpotifyRequest(urlString, accessToken);
-        return new JSONObject(response);
+
+
+
+
+
+    /*** ?? JSONデータをリストに変換 ***/
+    public static class JsonToListConverter {
+        public static List<Map<String, Object>> convertJSONArrayToList(JSONArray jsonArray) {
+            List<Map<String, Object>> list = new ArrayList<>();
+            if (jsonArray == null) return list;
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.optJSONObject(i);
+                Map<String, Object> map = new HashMap<>();
+                for (String key : jsonObject.keySet()) {
+                    map.put(key, jsonObject.get(key));
+                }
+                list.add(map);
+            }
+            return list;
+        }
     }
 
-    // ?? Spotify API リクエスト送信
+    /*** ?? Spotify API リクエスト送信 ***/
     private String sendSpotifyRequest(String urlString, String accessToken) throws IOException {
-        System.out.println("DEBUG: Spotify API リクエスト - " + urlString);
+        System.out.println("?? Sending Spotify API request: " + urlString);
 
         URL url = new URL(urlString);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.setRequestProperty("Authorization", "Bearer " + accessToken);
         connection.setRequestProperty("Content-Type", "application/json");
-
-        int responseCode = connection.getResponseCode();
-        System.out.println("DEBUG: Spotify API Response Code - " + responseCode);
-
-        if (responseCode != 200) {
-            throw new IOException("Spotify API Error: HTTP " + responseCode);
-        }
 
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
         StringBuilder response = new StringBuilder();
@@ -253,143 +140,145 @@ public class SpotifySearchCommand extends HttpServlet {
         }
         in.close();
 
-        System.out.println("DEBUG: Spotify API Response Body - " + response.toString());
-
+        System.out.println("?? Spotify API Response: " + response.toString());
         return response.toString();
     }
 
-
-    public static class JsonToListConverter {
-        public static List<Map<String, Object>> convertJSONArrayToList(JSONArray jsonArray) {
-            List<Map<String, Object>> list = new ArrayList<>();
-            if (jsonArray == null) return list; // nullチェック
-
-            for (int i = 0; i < jsonArray.length(); i++) {
-                Object element = jsonArray.get(i);
-                if (!(element instanceof JSONObject)) {
-                    System.out.println("WARNING: Skipping non-JSONObject element at index " + i + ": " + element);
-                    continue; // JSONObject でない場合はスキップ
-                }
-
-                JSONObject jsonObject = (JSONObject) element;
-                Map<String, Object> map = new HashMap<>();
-
-                for (String key : jsonObject.keySet()) {
-                    Object value = jsonObject.get(key);
-
-                    // images フィールドの場合は List<Map<String, Object>> に変換
-                    if ("images".equals(key) && value instanceof JSONArray) {
-                        map.put(key, convertJSONArrayToList((JSONArray) value));
-                    } else {
-                        map.put(key, value);
-                    }
-                }
-
-                list.add(map);
-            }
-            return list;
-        }
+    /*** ?? Spotify検索APIを実行 ***/
+    private String searchSpotify(String query, String accessToken) throws IOException {
+        String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8.toString());
+        String urlString = SPOTIFY_API_URL + "?q=" + encodedQuery + "&type=track,album,artist,playlist&limit=10";
+        return sendSpotifyRequest(urlString, accessToken);
     }
 
-    // プレイリストの詳細情報を変換するメソッド
-    public static Map<String, Object> convertPlaylistDetails(JSONObject playlist) {
-        Map<String, Object> playlistInfo = new HashMap<>();
-        if (playlist == null) return playlistInfo;
+    /*** ?? エラーレスポンスを作成 ***/
+    private ResponseContext createErrorResponse(ResponseContext responseContext, String message) {
+        System.out.println("?? createErrorResponse called with message: " + message);
 
-        playlistInfo.put("name", playlist.optString("name", "不明なプレイリスト"));
-        playlistInfo.put("owner", playlist.optJSONObject("owner") != null ? playlist.optJSONObject("owner").optString("display_name", "不明な作成者") : "不明な作成者");
+        JSONObject errorResponse = new JSONObject();
+        errorResponse.put("error", message);
 
-        // images の処理
-        JSONArray imagesArray = playlist.optJSONArray("images");
-        List<Map<String, Object>> imagesList = new ArrayList<>();
-        if (imagesArray != null) {
-            for (int i = 0; i < imagesArray.length(); i++) {
-                JSONObject imageObject = imagesArray.optJSONObject(i);
-                if (imageObject != null) {
-                    Map<String, Object> imageMap = new HashMap<>();
-                    imageMap.put("url", imageObject.optString("url", "no_image.png"));
-                    imagesList.add(imageMap);
-                }
-            }
-        }
-        playlistInfo.put("images", imagesList);
+        responseContext.setContentType("application/json");
+        responseContext.setResult(errorResponse.toString());
 
-        return playlistInfo;
-    }
-
-    // プレイリストのトラック情報を変換するメソッド
- // プレイリストのトラック情報を変換するメソッド
-    public static List<Map<String, Object>> convertPlaylistTracks(JSONArray tracksArray) {
-        List<Map<String, Object>> trackList = new ArrayList<>();
-        if (tracksArray == null) return trackList; // nullチェック
-
-        for (int i = 0; i < tracksArray.length(); i++) {
-            JSONObject trackObject = tracksArray.optJSONObject(i);
-            if (trackObject == null || !trackObject.has("track")) continue;
-
-            JSONObject track = trackObject.getJSONObject("track");
-            Map<String, Object> trackInfo = new HashMap<>();
-            trackInfo.put("name", track.optString("name", "不明なトラック"));
-            trackInfo.put("track_number", track.optInt("track_number", 0));
-            trackInfo.put("id", track.optString("id", "unknown_id"));
-
-            // $D83D$DD39 **アルバム画像の取得**
-            JSONObject album = track.optJSONObject("album");
-            JSONArray imagesArray = (album != null) ? album.optJSONArray("images") : null;
-
-            String imageUrl = "no_image.png"; // デフォルト画像
-            if (imagesArray != null && imagesArray.length() > 0) {
-                imageUrl = imagesArray.getJSONObject(0).optString("url", "no_image.png");
-            }
-
-            // $D83D$DD39 **デバッグログ追加**
-            System.out.println("DEBUG: Track - Name: " + track.optString("name", "Unknown") + 
-                               ", Album: " + (album != null ? album.optString("name", "Unknown Album") : "No Album") + 
-                               ", Image: " + imageUrl);
-
-            trackInfo.put("image", imageUrl);
-            trackList.add(trackInfo);
-        }
-        return trackList;
-    }
-
- // アーティスト情報を Map に変換
-    private static Map<String, Object> convertArtistDetails(JSONObject artistJson) {
-        Map<String, Object> artist = new HashMap<>();
-        
-        artist.put("id", artistJson.optString("id", ""));
-        artist.put("name", artistJson.optString("name", "不明なアーティスト"));
-        artist.put("followers", artistJson.optJSONObject("followers") != null 
-            ? artistJson.optJSONObject("followers").optInt("total", 0) 
-            : 0);
-
-        // images の処理
-        JSONArray imagesArray = artistJson.optJSONArray("images");
-        List<Map<String, Object>> imagesList = new ArrayList<>();
-        if (imagesArray != null) {
-            for (int i = 0; i < imagesArray.length(); i++) {
-                JSONObject imageObject = imagesArray.optJSONObject(i);
-                if (imageObject != null) {
-                    Map<String, Object> imageMap = new HashMap<>();
-                    imageMap.put("url", imageObject.optString("url", "no_image.png"));
-                    imagesList.add(imageMap);
-                }
-            }
-        }
-        artist.put("images", imagesList);
-
-        return artist;
+        System.out.println("?? Returning responseContext with error. Target: " + responseContext.getTarget());
+        return responseContext;
     }
     
- // アルバム情報を Map に変換
-    private static Map<String, Object> convertAlbumDetails(JSONObject albumJson) {
-        Map<String, Object> album = new HashMap<>();
-        
-        album.put("id", albumJson.optString("id", ""));
-        album.put("name", albumJson.optString("name", "不明なアルバム"));
-        album.put("release_date", albumJson.optString("release_date", "不明な日付"));
+    private List<Map<String, Object>> convertTracks(JSONArray jsonArray) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        if (jsonArray == null) return list;
 
-        // images の処理
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject jsonObject = jsonArray.optJSONObject(i);
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", jsonObject.optString("id"));
+            map.put("name", jsonObject.optString("name"));
+            map.put("track_number", jsonObject.optInt("track_number", 0));
+            map.put("image", extractImageUrl(jsonObject.optJSONObject("album")));
+            System.out.println("?? Track name: " + map.get("name") + ", Image URL: " + map.get("image"));
+            list.add(map);
+        }
+        return list;
+    }
+
+    private List<Map<String, Object>> convertAlbums(JSONArray jsonArray) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        if (jsonArray == null) return list;
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject jsonObject = jsonArray.optJSONObject(i);
+            if (jsonObject == null) continue;
+            
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", jsonObject.optString("id"));
+            map.put("name", jsonObject.optString("name"));
+            map.put("image", extractImageUrl(jsonObject)); // ?? String に統一
+
+            list.add(map);
+        }
+        return list;
+    }
+
+
+
+
+    private List<Map<String, Object>> convertArtists(JSONArray jsonArray) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        if (jsonArray == null) return list;
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject jsonObject = jsonArray.optJSONObject(i);
+            if (jsonObject == null) continue;
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", jsonObject.optString("id"));
+            map.put("name", jsonObject.optString("name"));
+            map.put("image", extractImageUrl(jsonObject)); // ?? String に統一
+
+            list.add(map);
+        }
+        return list;
+    }
+
+
+
+    private List<Map<String, Object>> convertPlaylists(JSONArray jsonArray) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        if (jsonArray == null) {
+            System.out.println("?? convertPlaylists: jsonArray is null. Returning empty list.");
+            return list;
+        }
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject jsonObject = jsonArray.optJSONObject(i);
+            if (jsonObject == null) {
+                System.out.println("?? convertPlaylists: jsonObject at index " + i + " is null. Skipping.");
+                continue;
+            }
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", jsonObject.optString("id", "unknown_id"));
+            map.put("name", jsonObject.optString("name", "No Name"));
+            map.put("image", extractImageUrl(jsonObject)); // ?? String に統一
+
+            list.add(map);
+        }
+        return list;
+    }
+
+
+
+    private String extractImageUrl(JSONObject jsonObject) {
+        if (jsonObject == null) {
+            System.out.println("?? extractImageUrl: jsonObject is null, returning default image.");
+            return "/img/no_image.png";
+        }
+        
+        JSONArray imagesArray = jsonObject.optJSONArray("images");
+        if (imagesArray != null && imagesArray.length() > 0) {
+            JSONObject firstImage = imagesArray.optJSONObject(0);
+            if (firstImage != null) {
+                return firstImage.optString("url", "/img/no_image.png");
+            }
+        }
+        
+        return "/img/no_image.png";
+    }
+    private ResponseContext handleAlbumDetail(ResponseContext responseContext, HttpServletRequest request, String albumId, String accessToken) throws IOException {
+        System.out.println("?? Fetching album details for ID: " + albumId);
+
+        // **アルバム情報の取得**
+        String urlString = "https://api.spotify.com/v1/albums/" + albumId;
+        JSONObject albumJson = new JSONObject(sendSpotifyRequest(urlString, accessToken));
+
+        // **アルバムの基本情報を取得**
+        Map<String, Object> album = new HashMap<>();
+        album.put("id", albumJson.optString("id"));
+        album.put("name", albumJson.optString("name"));
+        album.put("release_date", albumJson.optString("release_date"));
+
+        // **アルバム画像の取得**
         JSONArray imagesArray = albumJson.optJSONArray("images");
         List<Map<String, Object>> imagesList = new ArrayList<>();
         if (imagesArray != null) {
@@ -397,19 +286,359 @@ public class SpotifySearchCommand extends HttpServlet {
                 JSONObject imageObject = imagesArray.optJSONObject(i);
                 if (imageObject != null) {
                     Map<String, Object> imageMap = new HashMap<>();
-                    imageMap.put("url", imageObject.optString("url", "no_image.png"));
+                    imageMap.put("url", imageObject.optString("url", "/img/no_image.png"));
                     imagesList.add(imageMap);
                 }
             }
         }
         album.put("images", imagesList);
 
-        return album;
+        // **収録曲の取得**
+        JSONArray tracksArray = albumJson.optJSONObject("tracks") != null ? albumJson.optJSONObject("tracks").optJSONArray("items") : null;
+        List<Map<String, Object>> trackList = new ArrayList<>();
+        if (tracksArray != null) {
+            for (int i = 0; i < tracksArray.length(); i++) {
+                JSONObject trackObject = tracksArray.optJSONObject(i);
+                if (trackObject == null) continue;
+
+                Map<String, Object> trackInfo = new HashMap<>();
+                trackInfo.put("id", trackObject.optString("id"));
+                trackInfo.put("name", trackObject.optString("name"));
+                trackInfo.put("track_number", trackObject.optInt("track_number", 0));
+
+                // **アルバム画像の取得**
+                String trackImageUrl = imagesList.isEmpty() ? "/img/no_image.png" : imagesList.get(0).get("url").toString();
+                trackInfo.put("image", trackImageUrl);
+
+                trackList.add(trackInfo);
+            }
+        }
+
+        // **ユーザーのプレイリスト情報を取得**
+        String userPlaylistsUrl = "https://api.spotify.com/v1/me/playlists";
+        JSONObject playlistResponse = new JSONObject(sendSpotifyRequest(userPlaylistsUrl, accessToken));
+        JSONArray userPlaylistsArray = playlistResponse.optJSONArray("items");
+        List<Map<String, Object>> userPlaylists = convertPlaylists(userPlaylistsArray);
+
+        // **もともとの検索ワード (`query`) を取得**
+        String query = request.getParameter("query");
+        if (query == null || query.trim().isEmpty()) {
+            query = "top albums";  // デフォルト検索ワード
+        }
+        System.out.println("?? Using search query: " + query);
+
+        // **Spotify検索データも取得 (タブ用データ)**
+        JSONObject json = new JSONObject(searchSpotify(query, accessToken));
+
+        JSONArray albumsArray = json.optJSONObject("albums") != null ? json.optJSONObject("albums").optJSONArray("items") : null;
+        JSONArray artistsArray = json.optJSONObject("artists") != null ? json.optJSONObject("artists").optJSONArray("items") : null;
+        JSONArray playlistsArray = json.optJSONObject("playlists") != null ? json.optJSONObject("playlists").optJSONArray("items") : null;
+
+        // **データを変換**
+        List<Map<String, Object>> albumList = convertAlbums(albumsArray);
+        List<Map<String, Object>> artistList = convertArtists(artistsArray);
+        List<Map<String, Object>> playlistList = convertPlaylists(playlistsArray);
+
+        // **JSP にデータを渡す**
+        request.setAttribute("album", album);
+        request.setAttribute("tracks", trackList);
+        request.setAttribute("userPlaylists", userPlaylists);
+        request.setAttribute("albums", albumList);
+        request.setAttribute("artists", artistList);
+        request.setAttribute("playlists", playlistList);
+        request.setAttribute("query", query);
+
+        // **JSP のターゲットを設定**
+        responseContext.setTarget("searchalbum");
+
+        return responseContext;
     }
 
 
+
+
+    // 収録曲の画像情報を渡すために修正したconvertTracksメソッド
+    private List<Map<String, Object>> convertTracks(JSONArray jsonArray, List<Map<String, Object>> albumImages) {
+        List<Map<String, Object>> trackList = new ArrayList<>();
+        if (jsonArray == null) return trackList;
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject jsonObject = jsonArray.optJSONObject(i);
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", jsonObject.optString("id"));
+            map.put("name", jsonObject.optString("name"));
+            map.put("track_number", jsonObject.optInt("track_number", 0));
+
+            // アルバム画像を収録曲に追加
+            String imageUrl = albumImages.isEmpty() ? "no_image.png" : (String) albumImages.get(0).get("url");
+            map.put("image", imageUrl);
+
+            System.out.println("?? Track name: " + map.get("name") + ", Image URL: " + map.get("image"));
+            trackList.add(map);
+        }
+        return trackList;
+    }
+
+    
+ // アーティスト詳細を処理するメソッド
+    private ResponseContext handleArtistDetail(ResponseContext responseContext, HttpServletRequest request, String artistId, String accessToken) throws IOException {
+        System.out.println("?? Fetching artist details for ID: " + artistId);
+
+        // **アーティスト情報の取得**
+        String urlString = "https://api.spotify.com/v1/artists/" + artistId;
+        JSONObject artistJson;
+        try {
+            artistJson = new JSONObject(sendSpotifyRequest(urlString, accessToken));
+        } catch (IOException e) {
+            System.out.println("?? ERROR: Failed to fetch artist details.");
+            return createErrorResponse(responseContext, "アーティスト情報の取得に失敗しました。");
+        }
+
+        // **アーティストの基本情報**
+        Map<String, Object> artist = new HashMap<>();
+        artist.put("id", artistJson.optString("id", "unknown_id"));
+        artist.put("name", artistJson.optString("name", "No Name"));
+        artist.put("followers", artistJson.optJSONObject("followers") != null ? artistJson.optJSONObject("followers").optInt("total") : 0);
+
+        // **アーティストの画像**
+        JSONArray imagesArray = artistJson.optJSONArray("images");
+        List<Map<String, Object>> imagesList = new ArrayList<>();
+        if (imagesArray != null) {
+            for (int i = 0; i < imagesArray.length(); i++) {
+                JSONObject imageObject = imagesArray.optJSONObject(i);
+                if (imageObject != null) {
+                    Map<String, Object> imageMap = new HashMap<>();
+                    imageMap.put("url", imageObject.optString("url", "/img/no_image.png"));
+                    imagesList.add(imageMap);
+                }
+            }
+        }
+        artist.put("images", imagesList);
+
+        // **人気曲の取得**
+        System.out.println("?? Fetching top tracks for artist.");
+        String topTracksUrl = "https://api.spotify.com/v1/artists/" + artistId + "/top-tracks?market=JP";
+        JSONObject topTracksResponse;
+        try {
+            topTracksResponse = new JSONObject(sendSpotifyRequest(topTracksUrl, accessToken));
+        } catch (IOException e) {
+            System.out.println("?? ERROR: Failed to fetch top tracks.");
+            return createErrorResponse(responseContext, "アーティストの人気曲の取得に失敗しました。");
+        }
+
+        JSONArray topTracksArray = topTracksResponse.optJSONArray("tracks");
+        List<Map<String, Object>> topTracksList = convertTracksWithImages(topTracksArray);
+
+        // **ログイン中のユーザーのプレイリスト情報を取得**
+        System.out.println("?? Fetching user's playlists.");
+        String userPlaylistsUrl = "https://api.spotify.com/v1/me/playlists";
+        JSONObject playlistResponse;
+        try {
+            playlistResponse = new JSONObject(sendSpotifyRequest(userPlaylistsUrl, accessToken));
+        } catch (IOException e) {
+            System.out.println("?? ERROR: Failed to fetch user's playlists.");
+            return createErrorResponse(responseContext, "ユーザーのプレイリスト情報の取得に失敗しました。");
+        }
+
+        JSONArray userPlaylistsArray = playlistResponse.optJSONArray("items");
+        List<Map<String, Object>> userPlaylists = convertPlaylists(userPlaylistsArray);
+
+        // **検索ワード (query) を取得**
+        String query = request.getParameter("query");
+        if (query == null || query.trim().isEmpty()) {
+            query = "top artists";  // 空の場合はデフォルトワード
+        }
+        System.out.println("?? Using search query: " + query);
+
+        // **Spotify検索データの取得**
+        System.out.println("?? Fetching related search data.");
+        JSONObject json;
+        try {
+            json = new JSONObject(searchSpotify(query, accessToken));
+        } catch (IOException e) {
+            System.out.println("?? ERROR: Failed to fetch search data.");
+            return createErrorResponse(responseContext, "関連検索データの取得に失敗しました。");
+        }
+
+        JSONArray albumsArray = json.optJSONObject("albums") != null ? json.optJSONObject("albums").optJSONArray("items") : null;
+        JSONArray artistsArray = json.optJSONObject("artists") != null ? json.optJSONObject("artists").optJSONArray("items") : null;
+        JSONArray playlistsArray = json.optJSONObject("playlists") != null ? json.optJSONObject("playlists").optJSONArray("items") : null;
+
+        // **データの変換**
+        List<Map<String, Object>> albumList = convertAlbums(albumsArray);
+        List<Map<String, Object>> artistList = convertArtists(artistsArray);
+        List<Map<String, Object>> playlistList = convertPlaylists(playlistsArray);
+
+        // **JSP にデータを渡す**
+        request.setAttribute("artist", artist);
+        request.setAttribute("top_tracks", topTracksList);
+        request.setAttribute("userPlaylists", userPlaylists);
+        request.setAttribute("albums", albumList);
+        request.setAttribute("artists", artistList);
+        request.setAttribute("playlists", playlistList);
+        request.setAttribute("query", query);
+
+        // **JSP のターゲットを設定**
+        responseContext.setTarget("searchartist");
+
+        return responseContext;
+    }
+
+
+
+    // 人気曲に画像をセットするメソッド
+    private List<Map<String, Object>> convertTracksWithImages(JSONArray tracksArray) {
+        List<Map<String, Object>> trackList = new ArrayList<>();
+        if (tracksArray == null) return trackList;
+
+        for (int i = 0; i < tracksArray.length(); i++) {
+            JSONObject trackObject = tracksArray.optJSONObject(i);
+            if (trackObject == null) continue;
+
+            JSONObject track = trackObject;
+            Map<String, Object> trackInfo = new HashMap<>();
+            trackInfo.put("name", track.optString("name", "不明なトラック"));
+            trackInfo.put("id", track.optString("id", "unknown_id"));
+
+            // アルバム情報から画像を取得
+            JSONObject album = track.optJSONObject("album");
+            JSONArray imagesArray = (album != null) ? album.optJSONArray("images") : null;
+            String imageUrl = "no_image.png"; // デフォルト画像
+            if (imagesArray != null && imagesArray.length() > 0) {
+                imageUrl = imagesArray.optJSONObject(0).optString("url", "no_image.png");
+            }
+
+            trackInfo.put("image", imageUrl); // トラックの画像URLをセット
+            trackList.add(trackInfo);
+        }
+        return trackList;
+    }
+
+
+    private ResponseContext handlePlaylistDetail(ResponseContext responseContext, HttpServletRequest request, String playlistId, String accessToken) throws IOException {
+        System.out.println("?? Fetching playlist details for ID: " + playlistId);
+
+        // **プレイリスト情報の取得**
+        String urlString = "https://api.spotify.com/v1/playlists/" + playlistId;
+        JSONObject playlistJson;
+        try {
+            playlistJson = new JSONObject(sendSpotifyRequest(urlString, accessToken));
+        } catch (IOException e) {
+            System.out.println("?? ERROR: Failed to fetch playlist details.");
+            return createErrorResponse(responseContext, "プレイリスト情報の取得に失敗しました。");
+        }
+
+        // **プレイリストの基本情報を取得**
+        Map<String, Object> playlist = new HashMap<>();
+        playlist.put("id", playlistJson.optString("id", "unknown_id"));
+        playlist.put("name", playlistJson.optString("name", "No Name"));
+        playlist.put("owner", playlistJson.optJSONObject("owner") != null ? playlistJson.optJSONObject("owner").optString("display_name", "Unknown") : "Unknown");
+
+        // **画像情報の取得**
+        JSONArray imagesArray = playlistJson.optJSONArray("images");
+        List<Map<String, Object>> imagesList = new ArrayList<>();
+        if (imagesArray != null) {
+            for (int i = 0; i < imagesArray.length(); i++) {
+                JSONObject imageObject = imagesArray.optJSONObject(i);
+                if (imageObject != null) {
+                    Map<String, Object> imageMap = new HashMap<>();
+                    imageMap.put("url", imageObject.optString("url", "/img/no_image.png"));
+                    imagesList.add(imageMap);
+                }
+            }
+        }
+        playlist.put("images", imagesList);
+
+        // **収録トラックの取得**
+        JSONArray tracksArray = playlistJson.optJSONObject("tracks") != null ? playlistJson.optJSONObject("tracks").optJSONArray("items") : null;
+        List<Map<String, Object>> trackList = new ArrayList<>();
+        if (tracksArray != null) {
+            for (int i = 0; i < tracksArray.length(); i++) {
+                JSONObject trackObject = tracksArray.optJSONObject(i);
+                if (trackObject == null || !trackObject.has("track")) continue;
+
+                JSONObject track = trackObject.getJSONObject("track");
+                Map<String, Object> trackInfo = new HashMap<>();
+                trackInfo.put("id", track.optString("id", "unknown_id"));
+                trackInfo.put("name", track.optString("name", "No Name"));
+                trackInfo.put("track_number", track.optInt("track_number", 0));
+
+                // **アルバム画像の取得**
+                JSONObject album = track.optJSONObject("album");
+                String trackImageUrl = extractImageUrl3(album);
+                trackInfo.put("image", trackImageUrl);
+
+                trackList.add(trackInfo);
+            }
+        }
+
+        // **ログイン中のユーザーのプレイリスト情報を取得**
+        System.out.println("?? Fetching user's playlists.");
+        String userPlaylistsUrl = "https://api.spotify.com/v1/me/playlists";
+        JSONObject playlistResponse;
+        try {
+            playlistResponse = new JSONObject(sendSpotifyRequest(userPlaylistsUrl, accessToken));
+        } catch (IOException e) {
+            System.out.println("?? ERROR: Failed to fetch user's playlists.");
+            return createErrorResponse(responseContext, "ユーザーのプレイリスト情報の取得に失敗しました。");
+        }
+
+        JSONArray userPlaylistsArray = playlistResponse.optJSONArray("items");
+        List<Map<String, Object>> userPlaylists = convertPlaylists(userPlaylistsArray);
+
+        // **検索クエリの取得**
+        String query = request.getParameter("query");
+        if (query == null || query.trim().isEmpty()) {
+            query = "top playlists";  // 空の場合はデフォルトワード
+        }
+        System.out.println("?? Using search query: " + query);
+
+        // **Spotify検索データの取得**
+        JSONObject json = new JSONObject(searchSpotify(query, accessToken));
+
+        JSONArray albumsArray = json.optJSONObject("albums") != null ? json.optJSONObject("albums").optJSONArray("items") : null;
+        JSONArray artistsArray = json.optJSONObject("artists") != null ? json.optJSONObject("artists").optJSONArray("items") : null;
+        JSONArray playlistsArray = json.optJSONObject("playlists") != null ? json.optJSONObject("playlists").optJSONArray("items") : null;
+
+        // **データの変換**
+        List<Map<String, Object>> albumList = convertAlbums(albumsArray);
+        List<Map<String, Object>> artistList = convertArtists(artistsArray);
+        List<Map<String, Object>> playlistList = convertPlaylists(playlistsArray);
+
+        // **JSP にデータを渡す**
+        request.setAttribute("playlist", playlist);
+        request.setAttribute("tracks", trackList);
+        request.setAttribute("userPlaylists", userPlaylists);
+        request.setAttribute("albums", albumList); // 追加
+        request.setAttribute("artists", artistList); // 追加
+        request.setAttribute("playlists", playlistList); // 追加
+        request.setAttribute("query", query); // 追加
+
+        // **JSP のターゲットを設定**
+        responseContext.setTarget("searchplaylist");
+
+        return responseContext;
+    }
+
+
+
+    // 曲のアルバムから画像URLを抽出するメソッド
+    private String extractImageUrl3(JSONObject albumJson) {
+        if (albumJson == null) {
+            return "/img/no_image.png"; // デフォルト画像
+        }
+
+        JSONArray imagesArray = albumJson.optJSONArray("images");
+        if (imagesArray != null && imagesArray.length() > 0) {
+            JSONObject firstImage = imagesArray.optJSONObject(0);
+            if (firstImage != null) {
+                return firstImage.optString("url", "/img/no_image.png");
+            }
+        }
+        
+        return "/img/no_image.png";
+    }
+
+
+
 }
-
-
-
-

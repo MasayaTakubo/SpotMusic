@@ -1,4 +1,4 @@
-package command;
+/*package command;
 
 import java.io.IOException;
 
@@ -33,3 +33,4 @@ public class SpotifyFollowStatusCommand extends HttpServlet {
         response.getWriter().write(jsonResponse.toString());
     }
 }
+*/

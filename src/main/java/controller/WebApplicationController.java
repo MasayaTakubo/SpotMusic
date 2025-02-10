@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -72,9 +73,20 @@ public class WebApplicationController implements ApplicationController {
 	    Object result = resc.getResult();
 	    String command = req.getParameter("command");
 	    String playlistId = req.getParameter("playlistId");
+	    String target = resc.getTarget(); // コマンドが設定したターゲット
+	    System.out.println("?? Handling response. Target: " + resc.getTarget());
+
 
 	    try {
-	        if ("SpotifyDeletePlaylistCommand".equals(command)) {
+	    	if ("SpotifySearchCommand".equals(command)) {
+	            // `resc.getTarget()` を使用して動的に JSP にフォワード
+	            if (target == null || target.isEmpty()) {
+	                target = "search"; // デフォルトのページ
+	            }
+	            RequestDispatcher dispatcher = req.getRequestDispatcher(target);
+	            dispatcher.forward(req, res);
+
+	    	} else if ("SpotifyDeletePlaylistCommand".equals(command)) {
 	            // SpotifyDeletePlaylistCommand の場合、HTML または JSON を適切に処理
 	            String responseType = req.getParameter("responseType");
 
@@ -110,7 +122,7 @@ public class WebApplicationController implements ApplicationController {
 		                out.write(jsonResponse);
 		                out.flush();
 		            }
-		        }  else if ("AddMessage".equals(command) || "SpotifyRemoveTrack".equals(command) || "SpotifyCreatePlaylistCommand".equals(command)) {
+		        }else if ("AddMessage".equals(command) || "SpotifyRemoveTrack".equals(command) || "SpotifyCreatePlaylistCommand".equals(command)) {
 	            // 他の JSON のみを返すコマンド
 	            res.setContentType("application/json");
 	            res.setCharacterEncoding("UTF-8");
