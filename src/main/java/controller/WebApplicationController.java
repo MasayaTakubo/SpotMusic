@@ -104,6 +104,12 @@ public class WebApplicationController implements ApplicationController {
 	                out.write(jsonResponse);
 	                out.flush();
 	            } 
+	        	} else if ("addTrack".equals(command)) {
+	        	    res.setContentType("text/html; charset=UTF-8");
+	        	    res.setCharacterEncoding("UTF-8");
+	        	    PrintWriter out = res.getWriter();
+	        	    out.write((String) result); // プレイリスト追加の結果を返す
+	        	    out.flush();
 	        	}else if ("SpotifyCreatePlaylistCommand".equals(command)) {
 		            // SpotifyCreatePlaylistCommand の場合、HTML または JSON を適切に処理
 		            String responseType = req.getParameter("responseType");

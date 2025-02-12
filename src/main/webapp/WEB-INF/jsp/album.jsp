@@ -36,17 +36,19 @@
                 </c:if>
 
                 <!-- プレイリスト追加フォーム -->
-                <c:if test="${not empty sessionScope.userPlaylists}">
-                    <form action="SpotifyAddTrackServlet" method="post" target="hidden_iframe">
-                        <input type="hidden" name="trackId" value="${track.trackId}">
-                        <select name="playlistId">
-                            <c:forEach var="playlist" items="${sessionScope.userPlaylists}">
-                                <option value="${playlist.playlistId}">${playlist.playlistName}</option>
-                            </c:forEach>
-                        </select>
-                        <button type="submit">プレイリストに追加</button>
-                    </form>
-                </c:if>
+			<c:if test="${not empty sessionScope.userPlaylists}">
+			    <form action="FrontServlet" method="post" target="hidden_iframe">
+			        <input type="hidden" name="command" value="addTrack"> <!-- コマンド指定 -->
+			        <input type="hidden" name="trackId" value="${track.trackId}">
+			        <select name="playlistId">
+			            <c:forEach var="playlist" items="${sessionScope.userPlaylists}">
+			                <option value="${playlist.playlistId}">${playlist.playlistName}</option>
+			            </c:forEach>
+			        </select>
+			        <button type="submit">プレイリストに追加</button>
+			    </form>
+			</c:if>
+
             </li>
         </c:forEach>
     </ul>

@@ -52,16 +52,17 @@
 		                ${track.name}
 		
 		                <!-- プレイリスト追加フォーム -->
-		                <form class="add-track-form" action="SpotifyAddTrackServlet" method="post" target="hidden_iframe">
-		                    <input type="hidden" name="trackId" value="${track.id}">
-		                    <select name="playlistId">
-		                        <c:forEach var="playlist" items="${userPlaylists}">
-		                            <option value="${playlist.id}">${playlist.name}</option>
-		                        </c:forEach>
-		                    </select>
-		                    <button type="button" onclick="playTrack('${track.id}', '${track.name}')">再生</button>
-		                    <button type="submit">追加</button>
-		                </form>
+					<form class="add-track-form" action="FrontServlet" method="post" target="hidden_iframe">
+					    <input type="hidden" name="command" value="addTrack">
+					    <input type="hidden" name="trackId" value="${track.id}">
+					    <select name="playlistId">
+					        <c:forEach var="playlist" items="${userPlaylists}">
+					            <option value="${playlist.id}">${playlist.name}</option>
+					        </c:forEach>
+					    </select>
+					    <button class="add-button" type="submit">追加</button>
+					    <button type="button" onclick="playTrack('${track.id}', '${track.name}')">再生</button>
+					</form>
 		            </li>
 		        </c:forEach>
 		    </ul>
