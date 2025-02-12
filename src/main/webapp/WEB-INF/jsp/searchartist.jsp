@@ -23,19 +23,16 @@
         </div>
 
         <!-- フォロー/リフォローフォーム -->
-        <form id="followForm" action="SpotifyFollowArtistServlet" method="post" target="hidden_iframe">
-            <input type="hidden" name="artistId" value="${artist.id}">
-            <c:choose>
-                <c:when test="${sessionScope.isFollowed}">
-                    <input type="hidden" name="action" value="unfollow">
-                    <button type="submit" id="followButton">リフォロー解除</button>
-                </c:when>
-                <c:otherwise>
-                    <input type="hidden" name="action" value="follow">
-                    <button type="submit" id="followButton">フォロー</button>
-                </c:otherwise>
-            </c:choose>
-        </form>
+		<form id="followForm" action="FrontServlet" method="post" target="hidden_iframe">
+		    <input type="hidden" name="command" value="followArtist"> <!-- コマンド指定 -->
+		    <input type="hidden" name="artistId" value="${artist.id}">
+		    <input type="hidden" id="followAction" name="action" value="${sessionScope.isFollowed ? 'unfollow' : 'follow'}">
+		    <button type="submit" id="followButton">
+		        ${sessionScope.isFollowed ? 'リフォロー解除' : 'フォロー'}
+		    </button>
+		</form>
+		
+		<iframe name="hidden_iframe" style="display:none;"></iframe>
 
 		<h3>人気曲</h3>
 		<c:if test="${not empty top_tracks}">
@@ -96,5 +93,53 @@
     </c:if>
 
     <a href="javascript:history.back()" class="back-button">戻る</a>
+<script>
+//フォロー　フォロー解除ボタン
+document.addEventListener("DOMContentLoaded", function () {
+    function updateFollowButton(artistId) {
+    	fetch("/SpotMusic/SpotifyCheckFollowStatusServlet?id=" + artistId + "&fromArtistPage=true")
+            .then(response => response.text())
+            .then(isFollowed => {
+                var followButton = document.getElementById("followButton");
+                var followAction = document.getElementById("followAction");
+
+                if (isFollowed.trim() === "true") {
+                    followButton.innerText = "リフォロー解除";
+                    followAction.value = "unfollow";
+                } else {
+                    followButton.innerText = "フォロー";
+                    followAction.value = "follow";
+                }
+            })
+            .catch(error => console.error("フォロー状態取得エラー:", error));
+    }
+
+    var artistId = document.querySelector("input[name='artistId']").value;
+    updateFollowButton(artistId); // ページ読み込み時にフォロー状態を取得
+
+    var followForm = document.getElementById("followForm");
+    var followButton = document.getElementById("followButton");
+    var followAction = document.getElementById("followAction");
+
+    followForm.addEventListener("submit", function (event) {
+        event.preventDefault(); // デフォルトのフォーム送信を防ぐ
+
+        var formData = new FormData(followForm);
+        fetch("/SpotMusic/FrontServlet", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.text())
+        .then(data => {
+            console.log("フォロー/リフォロー処理完了:", data);
+            // フォロー処理後に再度状態を取得し、最新のボタン状態を反映
+            updateFollowButton(artistId);
+        })
+        .catch(error => console.error("エラー:", error));
+    });
+});
+
+</script>
+
 </body>
 </html>
