@@ -1,4 +1,4 @@
-package service;
+/*package command;
 
 import java.io.IOException;
 
@@ -12,7 +12,7 @@ import javax.servlet.http.HttpSession;
 import org.json.JSONObject;
 
 @WebServlet("/SpotifyFollowStatusServlet")
-public class SpotifyFollowStatusServlet extends HttpServlet {
+public class SpotifyFollowStatusCommand extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -33,3 +33,4 @@ public class SpotifyFollowStatusServlet extends HttpServlet {
         response.getWriter().write(jsonResponse.toString());
     }
 }
+*/

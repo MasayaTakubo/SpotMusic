@@ -1,4 +1,4 @@
-package service;
+package command;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,9 +15,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import service.SpotifyAuthService;
 //searchartist.jsp用
 @WebServlet("/SpotifyFollowArtistServlet")
-public class SpotifyFollowArtistServlet extends HttpServlet {
+public class SpotifyFollowArtistCommand extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private static final String SPOTIFY_API_URL = "https://api.spotify.com/v1/me/following?type=artist&ids=";
 

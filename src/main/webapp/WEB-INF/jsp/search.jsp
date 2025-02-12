@@ -65,7 +65,7 @@
 			    <li class="album-item">
 			        <a href="javascript:void(0);" 
 			           onclick="loadAlbumDetail('${album.id}')">
-			            <img src="${not empty album.images ? album.images[0].url : noImageUrl}" width="100">
+			            <img src="${album.image}" width="100">
 			            ${album.name}
 			        </a>
 			    </li>
@@ -82,7 +82,7 @@
 			    <li class="artist-item">
 			        <a href="javascript:void(0);" 
 			           onclick="loadArtistDetail('${artist.id}')">
-			            <img src="${not empty artist.images ? artist.images[0].url : noImageUrl}" width="100">
+			            <img src="${artist.image}" width="100">
 			            ${artist.name}
 			        </a>
 			    </li>
@@ -99,7 +99,7 @@
 			    <li class="playlist-item">
 			        <a href="javascript:void(0);" 
 			           onclick="loadPlaylistDetail('${playlist.id}')">
-			            <img src="${not empty playlist.images ? playlist.images[0].url : noImageUrl}" width="100">
+			            <img src="${playlist.image}" width="100">
 			            ${playlist.name}
 			        </a>
 			    </li>
@@ -135,6 +135,7 @@
                                 <option value="${playlist.id}">${playlist.name}</option>
                             </c:forEach>
                         </select>
+                        <button type="button" onclick="playTrack('${track.id}', '${track.name}')">再生</button>
                         <button type="submit">追加</button>
 
                         
@@ -154,7 +155,7 @@
 			    <li class="album-item">
 			        <a href="javascript:void(0);" 
 			           onclick="loadAlbumDetail('${album.id}')">
-			            <img src="${not empty album.images ? album.images[0].url : noImageUrl}" width="100">
+			            <img src="${album.image}" width="100">
 			            ${album.name}
 			        </a>
 			    </li>
@@ -176,7 +177,7 @@
 			    <li class="artist-item">
 			        <a href="javascript:void(0);" 
 			           onclick="loadArtistDetail('${artist.id}')">
-			            <img src="${not empty artist.images ? artist.images[0].url : noImageUrl}" width="100">
+			            <img src="${artist.image}" width="100">
 			            ${artist.name}
 			        </a>
 			    </li>
@@ -198,7 +199,7 @@
 			    <li class="playlist-item">
 			        <a href="javascript:void(0);" 
 			           onclick="loadPlaylistDetail('${playlist.id}')">
-			            <img src="${not empty playlist.images ? playlist.images[0].url : noImageUrl}" width="100">
+			            <img src="${playlist.image}" width="100">
 			            ${playlist.name}
 			            
 			        </a>
@@ -266,56 +267,79 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function loadAlbumDetail(albumId) {
-    console.log("loadAlbumDetail called with ID:", albumId);  // デバッグ用
-    const url = "/SpotMusic/SpotifySearchServlet?action=album&id=" + encodeURIComponent(albumId);
+    console.log("loadAlbumDetail called with ID:", albumId); // デバッグ用
 
-    console.log("Fetch URL:", url);  // デバッグ用
+    // URLエンコード処理
+    const url = "/SpotMusic/FrontServlet?command=SpotifySearchCommand&action=album&id="+ encodeURIComponent(albumId);
+
+    console.log("Fetch URL:", url); // デバッグ用
 
     const contentDiv = document.querySelector('.content');
     fetch(url)
-    .then(response => response.text())
-    .then(data => {
-        contentDiv.innerHTML = data;
-    })
-    .catch(error => {
-        console.error('Error loading album details:', error);
-        contentDiv.innerHTML = '<p>アルバム情報の取得に失敗しました。</p>';
-    });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.text();
+        })
+        .then(data => {
+            console.log("Response received for album details."); // デバッグ用
+            contentDiv.innerHTML = data;
+        })
+        .catch(error => {
+            console.error('Error loading album details:', error);
+            contentDiv.innerHTML = '<p>アルバム情報の取得に失敗しました。</p>';
+        });
 }
+
 function loadArtistDetail(artistId) {
-    console.log("loadArtistDetail called with ID:", artistId);  // デバッグ用
-    const url = "/SpotMusic/SpotifyCheckFollowStatusServlet?action=artist&id=" + encodeURIComponent(artistId);
+    console.log("loadArtistDetail called with ID:", artistId); // デバッグ用
 
-    console.log("Fetch URL:", url);  // デバッグ用
+    const url = "/SpotMusic/FrontServlet?command=SpotifySearchCommand&action=artist&id=" + encodeURIComponent(artistId);
+    console.log("Fetch URL:", url); // デバッグ用
 
     const contentDiv = document.querySelector('.content');
+
     fetch(url)
-    .then(response => response.text())
-    .then(data => {
-        contentDiv.innerHTML = data;
-    })
-    .catch(error => {
-        console.error('Error loading artist details:', error);
-        contentDiv.innerHTML = '<p>アーティスト情報の取得に失敗しました。</p>';
-    });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.text();
+        })
+        .then(data => {
+            console.log("Response received for artist details."); // デバッグ用
+            contentDiv.innerHTML = data;
+        })
+        .catch(error => {
+            console.error('Error loading artist details:', error);
+            contentDiv.innerHTML = '<p>アーティスト情報の取得に失敗しました。</p>';
+        });
 }
+
 
 function loadPlaylistDetail(playlistId) {
-    console.log("loadPlaylistDetail called with ID:", playlistId);  // デバッグ用
-    const url = "/SpotMusic/SpotifySearchServlet?action=playlist&id=" + encodeURIComponent(playlistId);
+    console.log("loadPlaylistDetail called with ID:", playlistId); // デバッグ用
+    const url = "/SpotMusic/FrontServlet?command=SpotifySearchCommand&action=playlist&id=" + encodeURIComponent(playlistId);
 
-    console.log("Fetch URL:", url);  // デバッグ用
+    console.log("Fetch URL:", url); // デバッグ用
 
     const contentDiv = document.querySelector('.content');
     fetch(url)
-    .then(response => response.text())
-    .then(data => {
-        contentDiv.innerHTML = data;
-    })
-    .catch(error => {
-        console.error('Error loading playlist details:', error);
-        contentDiv.innerHTML = '<p>プレイリスト情報の取得に失敗しました。</p>';
-    });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.text();
+        })
+        .then(data => {
+            console.log("Response received for playlist details."); // デバッグ用
+            contentDiv.innerHTML = data;
+        })
+        .catch(error => {
+            console.error('Error loading playlist details:', error);
+            contentDiv.innerHTML = '<p>プレイリスト情報の取得に失敗しました。</p>';
+        });
 }
 
 	
