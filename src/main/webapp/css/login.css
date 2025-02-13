@@ -43,9 +43,10 @@
 .signup{
 	display: flex;
     justify-content: center;
+    margin-top:50px;
 }
 .signup p{
-	font-size: 23px;
+	font-size: 27px;
 	font-weight: bold;
 	color: white;
 	margin-left: 4.5cm;
@@ -56,7 +57,7 @@
 }
 
 .signup button{
-	font-size: 27px;
+	font-size: 30px;
 	border:none;
 	background: none;
 	color:#1DB954;
@@ -70,124 +71,16 @@
 	color: white;
 }
 
+
+
 .line{
 	width: 80%;
 	background-color:rgba(255,255,255,0.2);
 	height: 2px;
-	margin: 50px;
-	margin-bottom: 5px;
+	margin: 100px;
+	
 	box-shadow: 0 0 10px rgba(255,255,255,0.4);
 	
-}
-.friendList form{
-	display: flex;
-    justify-content: center;
-}
-
-.friendList input {
-    background-color: rgba(0, 0, 0, 0.6);
-    width: 12cm;
-    height: 1.5cm;
-    border-radius: 10px;
-    outline: none;
-    color: white;
-    font-size: 20px;
-    font-weight: bold;
-    border: 2px solid transparent;
-    padding: 5px 10px; 
-    box-shadow: 0 0 10px rgba(255,255,255,0.8); 
-    
-     
-}
-
-
-.friendList input:focus {
-    box-shadow:0 0 10px #1DB954;
-}
-.friendList input:-webkit-autofill,
-.friendList input:-webkit-autofill:hover,
-.friendList input:-webkit-autofill:focus,
-.friendList input:-webkit-autofill:active {
-    background-color: rgba(0, 0, 0, 0.6) !important;
-    -webkit-box-shadow: 0 0 0px 1000px rgba(0, 0, 0, 0.6) inset !important;
-    -webkit-text-fill-color: white !important;
-    transition: background-color 5000s ease-in-out 0s;
-}
-
-.friendListButton{
-	background: none;
-	border: none;
-}
-.friendListButton i{
-	font-size: 50px;
-	color: rgba(255,255,255,0.8);
-	margin-left: 0.5cm;
-	text-shadow: 0 0 10px rgba(255,255,255,0.4); 
-	
-}
-.friendListButton i:hover{
-	font-size: 52px;
-	
-	text-shadow:0 0 10px #1DB954;
-}
-h2{
-	font-size:30px;
-	color: white;
-    font-weight: bold;
-    text-shadow: 0 0 10px #1DB954;
-}
-
-
-.userList form{
-	display: flex;
-    justify-content: center;
-}
-
-.userList input {
-    background-color: rgba(0, 0, 0, 0.6);
-    width: 12cm;
-    height: 1.5cm;
-    border-radius: 10px;
-    outline: none;
-    color: white;
-    font-size: 20px;
-    font-weight: bold;
-    border: 2px solid transparent;
-    padding: 5px 10px; 
-    box-shadow: 0 0 10px rgba(255,255,255,0.8); 
-    
-     
-}
-
-
-.userList input:focus {
-    box-shadow:0 0 10px #1DB954;
-}
-.userList input:-webkit-autofill,
-.userList input:-webkit-autofill:hover,
-.userList input:-webkit-autofill:focus,
-.userList input:-webkit-autofill:active {
-    background-color: rgba(0, 0, 0, 0.6) !important;
-    -webkit-box-shadow: 0 0 0px 1000px rgba(0, 0, 0, 0.6) inset !important;
-    -webkit-text-fill-color: white !important;
-    transition: background-color 5000s ease-in-out 0s;
-}
-
-.userListButton{
-	background: none;
-	border: none;
-}
-.userListButton i{
-	font-size: 50px;
-	color: rgba(255,255,255,0.8);
-	margin-left: 0.5cm;
-	text-shadow: 0 0 10px rgba(255,255,255,0.4); 
-	
-}
-.userListButton i:hover{
-	font-size: 52px;
-	
-	text-shadow:0 0 10px #1DB954;
 }
 
 .formLogin{
@@ -196,10 +89,39 @@ h2{
 	flex-direction: column;
 	align-items: center;
 	border-radius: 2%;
-	width: 22cm;
-	height: 26cm;
+	width: 21cm;
+	height: 24cm;
 	margin-top: 1cm;
 	animation:glowing 1.5s infinite alternate;
 	
-	
+}
+ #progressContainer {
+    width: 500px;
+    height: 50px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 25px;
+    margin: 20px auto;
+    margin-top:70px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    position: relative;
+}
+
+#progressBar {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #1DB954, #1ED760);
+    border-radius: 25px;
+    transition: width 0.1s ease-in-out;
+}
+
+#progressText {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 0;
+    left: 0;
+    line-height: 50px;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
 }

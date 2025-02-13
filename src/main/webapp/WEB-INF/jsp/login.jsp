@@ -8,64 +8,67 @@
     <link rel="stylesheet" type="text/css" href="<c:url value='/css/login.css' />">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <title>Spotify</title>
-</head>
-<style>
-	
-    body{
-    	background-color:black;
-        background-image: url('<c:url value="/img/music.png"/>');
-        background-size: cover;
-       	background-repeat: no-repeat;
-        background-position: center;
-       	display: flex;
-		justify-content:center;
-		align-items: center;
-    }
-</style>
-	
+    <style>
+        body {
+            background-color: black;
+            background-image: url('<c:url value="/img/music.png"/>');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
 
-</style>
+    </style>
+</head>
 <body>
-	<div class="formLogin">
-			<img src="<c:url value='/img/logo.png' />" alt="logo" class="logo">
-		
-			<div class="login">
-			    <!-- Spotifyアカウントでログイン -->
-			    <form action="/SpotMusic/auth" method="get">
-			        <input type="hidden" name="command" value="MyPlayListCommand">
-			        <button type="submit" class="loginButton">Spotifyアカウントでログイン<i class='bx bx-log-in'></i></button>
-			        
-			    </form>
-			    
-	  		</div>
-	    	<div class="signup">
-	   			 <!-- Spotifyアカウント登録へのボタン -->
-			    
-			       <p>アカウントがありませんか？</p> <button type="button" onclick="window.open('https://www.spotify.com/signup/', '_blank')">SignUp</button>
-			    
-			</div>
-			<div class="line"></div>
-		
-		
-			<div class="friendList">
-			    
-			    <h2>フレンドリスト</h2>
-			    <form action="FrontServlet" method="POST">
-			        <input type="text" name="userId" placeholder="Enter your user ID" required>
-			        <input type="hidden" name="command" value="FriendList">
-			        <button type="submit" class="friendListButton"><i class='bx bxs-send'></i></button>
-			    </form>
-			    
-	    	</div>
-	    	<div class="userList">
-	    
-		   	 <h2>ユーザーリスト</h2>  
-		    <form action="FrontServlet" method="POST">
-		        <input type="text" name="userId" placeholder="Enter your user ID" required>
-		        <input type="hidden" name="command" value="UsersList">
-		        <button type="submit" class="userListButton"><i class='bx bxs-send'></i></button>
-	        </div>
-        
-   </div>
+    <div class="formLogin">
+        <img src="<c:url value='/img/logo.png' />" alt="logo" class="logo">
+
+        <div class="login">
+            <form id="loginForm" action="/SpotMusic/auth" method="get" onsubmit="return handleLogin(event)">
+                <input type="hidden" name="command" value="MyPlayListCommand">
+                <button type="submit" class="loginButton">Spotifyアカウントでログイン<i class='bx bx-log-in'></i></button>
+            </form>
+            <div id="progressContainer">
+                <div id="progressBar"></div>
+                <div id="progressText">0%</div>
+            </div>
+        </div>
+        <div class="line"></div>
+
+        <div class="signup">
+            <p>アカウントがありませんか？</p>
+            <button type="button" onclick="window.open('https://www.spotify.com/signup/', '_blank')">SignUp</button>
+        </div>
+    </div>
+
+    <script>
+        function handleLogin(event) {
+            event.preventDefault();
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            const form = document.getElementById('loginForm');
+            let progress = 0;
+
+            progressContainer.style.display = 'block';
+
+            const interval = setInterval(() => {
+                progress += 5;
+                progressBar.style.width = progress + '%';
+                progressText.textContent = progress + '%';
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    form.submit();
+                }
+            }, 100);
+
+            return false;
+        }
+    </script>
 </body>
 </html>
