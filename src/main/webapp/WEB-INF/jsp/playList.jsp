@@ -50,7 +50,7 @@
 
 <c:if test="${not empty trackList}">
     <ul class="track-list">
-	<c:forEach var="track" items="${trackList}">
+	<c:forEach var="track" items="${trackList}" varStatus="status">
 	    <li>
 	        <strong>トラック名:</strong> ${fn:escapeXml(track.trackName)}<br> 
 	        <strong>アーティスト名:</strong> ${fn:escapeXml(track.artistName)}<br>
@@ -60,7 +60,10 @@
 	            <img src="${track.trackImageUrl}" alt="${fn:escapeXml(track.trackName)}" width="100" />
 	        </c:if>
 	
-	        <button onclick="playTrack('${track.trackId}', '${track.trackName}')">再生</button>
+	           <button onclick="console.log('クリック: trackIndex=', ${status.index}); playTrack('${track.trackId}', '${track.trackName}', '${param.playlistId}', ${status.index})">再生</button>
+	        
+	        
+	        
 	
 	        <!-- メニュー用のボタン -->
 	        <div class="track-menu">

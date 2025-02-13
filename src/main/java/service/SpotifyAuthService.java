@@ -228,14 +228,18 @@ public class SpotifyAuthService {
     }
     
     public void playTrack(HttpSession session, String accessToken, String trackUri) throws Exception {
+        playTrack(session, accessToken, trackUri, 0); // デフォルトで1曲目から再生
+    }
+
+    public void playTrack(HttpSession session, String accessToken, String uri, int trackIndex) throws Exception {
         if (accessToken == null || accessToken.isEmpty()) {
             throw new IllegalArgumentException("アクセストークンが指定されていません");
         }
-        if (trackUri == null || trackUri.isEmpty()) {
-            throw new IllegalArgumentException("トラック URI が指定されていません");
+        if (uri == null || uri.isEmpty()) {
+            throw new IllegalArgumentException("URI が指定されていません");
         }
 
-        // セッションからシャッフル状態を取得し、安全に処理
+        // セッションからシャッフル状態を取得
         Object shuffleStateObj = session.getAttribute("shuffle");
         boolean shuffleState = false;
 
@@ -245,9 +249,11 @@ public class SpotifyAuthService {
             shuffleState = Boolean.parseBoolean((String) shuffleStateObj);
         }
 
-        String endpoint = "https://api.spotify.com/v1/me/player/shuffle?state=" + shuffleState;
-        sendPutRequest(endpoint, accessToken);
+        // シャッフル状態を設定
+        String shuffleEndpoint = "https://api.spotify.com/v1/me/player/shuffle?state=" + shuffleState;
+        sendPutRequest(shuffleEndpoint, accessToken);
 
+        // API リクエストの準備
         URL url = new URL("https://api.spotify.com/v1/me/player/play");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("PUT");
@@ -255,7 +261,23 @@ public class SpotifyAuthService {
         conn.setRequestProperty("Content-Type", "application/json");
         conn.setDoOutput(true);
 
-        String jsonPayload = "{\"uris\": [\"" + trackUri + "\"]}";
+        String jsonPayload;
+
+        if (uri.startsWith("spotify:playlist:")) {
+            // プレイリストの特定の位置から再生
+            jsonPayload = "{"
+                + "\"context_uri\": \"" + uri + "\","
+                + "\"offset\": {\"position\": " + trackIndex + "}"
+                + "}";
+            System.out.println("送信する JSON: " + jsonPayload);
+
+        } else {
+            // 個別のトラックを再生
+            jsonPayload = "{"
+                + "\"uris\": [\"" + uri + "\"]"
+                + "}";
+        }
+
         try (OutputStream os = conn.getOutputStream()) {
             os.write(jsonPayload.getBytes(StandardCharsets.UTF_8));
         }
@@ -1179,6 +1201,43 @@ public class SpotifyAuthService {
         String jsonResponse = sendSpotifyRequest(SPOTIFY_PLAYLISTS_API, accessToken);
         JSONObject json = new JSONObject(jsonResponse);
         return json.optJSONArray("items");  // プレイリストの配列を返す
+    }
+
+    
+    public List<String> getTracksFromPlaylist(String accessToken, String playlistId) throws IOException {
+        List<String> trackIds = new ArrayList<>();
+        String nextUrl = "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks";
+
+        while (nextUrl != null) {
+            URL url = new URL(nextUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Authorization", "Bearer " + accessToken);
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuilder response = new StringBuilder();
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+
+            JSONObject jsonResponse = new JSONObject(response.toString());
+            JSONArray items = jsonResponse.getJSONArray("items");
+
+            // 各トラックのIDを取得
+            for (int i = 0; i < items.length(); i++) {
+                JSONObject trackObject = items.getJSONObject(i).optJSONObject("track");
+                if (trackObject != null && trackObject.has("id")) {
+                    trackIds.add(trackObject.getString("id"));
+                }
+            }
+
+            // 次のページがある場合は取得
+            nextUrl = jsonResponse.optString("next", null);
+        }
+
+        return trackIds;
     }
 
 

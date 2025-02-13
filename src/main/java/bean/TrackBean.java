@@ -7,7 +7,7 @@ public class TrackBean {
     private String trackImageUrl; // トラック画像URL
     private String albumImageUrl; // アルバム画像URL
     private String artistImageUrl; // アーティスト画像URL
-
+    private int index; // ★追加★
 
     // プレイリストのコンストラクタ（4引数）
     public TrackBean(String trackId, String trackName, String artistName, String trackImageUrl) {
@@ -74,5 +74,14 @@ public class TrackBean {
 
     public void setArtistImageUrl(String artistImageUrl) {
         this.artistImageUrl = artistImageUrl;
+    }
+
+    // ★追加: インデックスの getter/setter ★
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 }
