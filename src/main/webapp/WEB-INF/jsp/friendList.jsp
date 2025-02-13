@@ -1,5 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ page import="java.util.List"%>
+<%@ page import="bean.SpotifyPlayListBean"%>
+<%@ page import="java.util.ArrayList"%>
+<%@ page import="bean.TrackBean"%>
+<%@ page import="bean.PlayListBean"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -146,6 +152,59 @@
 	        </c:if>
 	    </c:forEach>
 	</table>
+	<ul>
+		<c:forEach var="playlistBeans" items="${messages.friendsList}">
+	    <c:forEach var="playlist" items="${playlistBeans}">
+	        <li>
+	            <button onclick="loadPlaylistPage('${playlist.playlistId}')">
+	            	<strong>ユーザー名  ：</strong>
+	            	<c:forEach var="user" items="${messages.users}">
+                        <c:if test="${user.userId eq playlist.userId}">
+                            ${user.userName}<br>
+                        </c:if>
+                    </c:forEach>
+	                <strong>プレイリストID：</strong> ${playlist.playlistId}<br>
+	            </button>
+	        </li><br>
+	    </c:forEach>
+	    </c:forEach>
+	</ul>
+	<script>
+	function loadPlaylistPage(playlistId) {
+	    if (!playlistId) {
+	        console.error('playlistId が指定されていません');
+	        return;
+	    }
+	
+	    const url = "/SpotMusic/FrontServlet?command=PlayListDetails&playlistId=" + encodeURIComponent(playlistId);
+	    const contentDiv = document.querySelector('.content');
+	
+	    fetch(url)
+	        .then(response => {
+	            if (!response.ok) {
+	                throw new Error('サーバーエラー: ' + response.status);
+	            }
+	            return response.text();
+	        })
+	        .then(data => {
+	            contentDiv.innerHTML = data;
+	            console.log("プレイリストページがロードされました！");
+	
+	            // **イベントリスナーを再適用**
+	            document.querySelectorAll(".menu-btn").forEach(button => {
+	                button.addEventListener("click", function() {
+	                    toggleMenu(this);
+	                });
+	            });
+	
+	            console.log("toggleMenu イベントを再適用しました");
+	        })
+	        .catch(error => {
+	            console.error('エラー発生:', error);
+	            contentDiv.innerHTML = '<p>プレイリスト情報の取得に失敗しました。</p>';
+	        });
+	}
+	</script>
 
     <p>フレンド申請をキャンセルしたユーザー</p>
 	<table border="1">
