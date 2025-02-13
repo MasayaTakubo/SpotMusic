@@ -282,6 +282,7 @@ public class SpotifyWebPlaybackSDK extends HttpServlet {
                         response.getWriter().write("{\"error\": \"Failed to fetch current track image\"}");
                     }
                     break;
+                    
 
 
 
@@ -296,5 +297,3 @@ public class SpotifyWebPlaybackSDK extends HttpServlet {
         }
     }
 }
-
-

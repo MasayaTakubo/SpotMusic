@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpSession;
 
@@ -1202,6 +1203,47 @@ public class SpotifyAuthService {
         JSONObject json = new JSONObject(jsonResponse);
         return json.optJSONArray("items");  // プレイリストの配列を返す
     }
+    
+    
+    
+    public String getCurrentTrackDetails(String accessToken) throws IOException {
+        String url = "https://api.spotify.com/v1/me/player/currently-playing";
+
+        HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+        conn.setRequestMethod("GET");
+        conn.setRequestProperty("Authorization", "Bearer " + accessToken);
+        
+        int responseCode = conn.getResponseCode();
+        if (responseCode != 200) {
+            return "{\"error\": \"Failed to fetch track details from Spotify\"}";
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        String response = reader.lines().collect(Collectors.joining());
+        reader.close();
+
+        // JSON解析
+        JSONObject jsonResponse = new JSONObject(response);
+        JSONObject track = jsonResponse.getJSONObject("item");
+        JSONObject album = track.getJSONObject("album");
+
+        // 必要な情報を取得
+        String trackId = track.getString("id");
+        String albumName = album.getString("name");
+        String albumImageUrl = album.getJSONArray("images").getJSONObject(0).getString("url");
+        String releaseDate = album.getString("release_date");
+
+        // JSONレスポンス作成
+        JSONObject resultJson = new JSONObject();
+        resultJson.put("trackId", trackId);
+        resultJson.put("albumName", albumName);
+        resultJson.put("albumImageUrl", albumImageUrl);
+        resultJson.put("releaseDate", releaseDate);
+
+        return resultJson.toString();
+    }
+    
+    
 
     
     public List<String> getTracksFromPlaylist(String accessToken, String playlistId) throws IOException {
