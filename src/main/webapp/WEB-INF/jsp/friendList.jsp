@@ -238,15 +238,7 @@
 	        </c:if>
 	    </c:forEach>
 	</table>
-    <form action="FrontServlet" method="POST">
-        <input type="hidden" name="userId" value="${sessionScope.userId}"><br><br>
-        <input type="hidden" name="command" value="UsersList">
-        <button type="submit">ユーザーリストへ</button>
-    </form>
-	<form action="FrontServlet" method="POST">
-    	<input type="hidden" name="userId" value="${sessionScope.userId}">
-        <input type="hidden" name="command" value="BlockList">
-        <button type="submit">ブロックリストへ</button>
-    </form>
+		<button type="button" onclick="userList()">ユーザーリストへ</button>
+		<button type="button" onclick="blockList()">ブロックリストへ</button>
 </body>
 </html>

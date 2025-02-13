@@ -100,6 +100,13 @@ VALUES ('31iu3d27fuexgadotnfmmv3knrhu', '31gqpyn64ycd6uq37qkbmtngl26q', 'CANCEL'
 INSERT INTO blocked_user (BLOCKER_ID, BLOCKED_ID) 
 VALUES ('31iu3d27fuexgadotnfmmv3knrhu', '31gqpyn64ycd6uq37qkbmtngl26q'); -- saino ブロック thau
 
+
+
+-- プレイリスト表のダミーデータ（仮）
+
+insert into playlists (playlist_id, user_id) values('1lZGQliJOQ8Xabg4k2SYvl','31rqkz3mglwnl47b2g4thwqfih4a');
+
+
 -- ------------------------
 -- 4. 手動オペレーション（Webアプリ上で作業）
 -- これはUPDATEしない。実際のWebアプリ上で操作する

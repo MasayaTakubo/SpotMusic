@@ -1254,8 +1254,96 @@ document.getElementById("playlistForm").addEventListener("submit", function() {
 
 <script>
 function friendlist() {
-    window.location.href = '/SpotMusic/FrontServlet?command=FriendList&userId=${sessionScope.user_id}';
+    const url = '/SpotMusic/FrontServlet?command=FriendList&userId=' + encodeURIComponent('${sessionScope.user_id}');
+    const contentDiv = document.querySelector('.content');
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('サーバーエラー: ' + response.status);
+            }
+            return response.text();
+        })
+        .then(data => {
+            contentDiv.innerHTML = data;
+            console.log("フレンドリストページがロードされました！");
+
+            document.querySelectorAll(".menu-btn").forEach(button => {
+                button.addEventListener("click", function() {
+                    toggleMenu(this);
+                });
+            });
+
+            console.log("toggleMenu イベントを再適用しました");
+        })
+        .catch(error => {
+            console.error('エラー発生:', error);
+            contentDiv.innerHTML = '<p>フレンドリストの取得に失敗しました。</p>';
+        });
 }
+
+
+function userList() {
+    const userId = encodeURIComponent('${sessionScope.user_id}'); // user_idを取得
+    const url = '/SpotMusic/FrontServlet?command=UsersList&userId=' + userId;
+    const contentDiv = document.querySelector('.content');
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('サーバーエラー: ' + response.status);
+            }
+            return response.text();
+        })
+        .then(data => {
+            contentDiv.innerHTML = data;
+            console.log("ユーザーリストページがロードされました！");
+
+            document.querySelectorAll(".menu-btn").forEach(button => {
+                button.addEventListener("click", function() {
+                    toggleMenu(this);
+                });
+            });
+
+            console.log("toggleMenu イベントを再適用しました");
+        })
+        .catch(error => {
+            console.error('エラー発生:', error);
+            contentDiv.innerHTML = '<p>ユーザーリストの取得に失敗しました。</p>';
+        });
+}
+function blockList() {
+    const userId = encodeURIComponent('${sessionScope.user_id}'); // user_idを取得
+    const url = '/SpotMusic/FrontServlet?command=BlockList&userId=' + userId;
+    const contentDiv = document.querySelector('.content');
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('サーバーエラー: ' + response.status);
+            }
+            return response.text();
+        })
+        .then(data => {
+            contentDiv.innerHTML = data;
+            console.log("ブロックリストページがロードされました！");
+
+            document.querySelectorAll(".menu-btn").forEach(button => {
+                button.addEventListener("click", function() {
+                    toggleMenu(this);
+                });
+            });
+
+            console.log("toggleMenu イベントを再適用しました");
+        })
+        .catch(error => {
+            console.error('エラー発生:', error);
+            contentDiv.innerHTML = '<p>ブロックリストの取得に失敗しました。</p>';
+        });
+}
+
+
+
 </script>
 
 <script>

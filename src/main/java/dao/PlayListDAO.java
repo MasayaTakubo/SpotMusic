@@ -23,16 +23,25 @@ import connector.MySQLConnector;
 public class PlayListDAO {
 	//MySQLに保存するメソッド
 	public void savePlaylistReview(String playlistId, String userId) throws SQLException {
-	    // プレイリストIDとユーザーIDを保存するSQL文
-	    String sql = "INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES (?, ?)";
-	    
-	    try (Connection conn = MySQLConnector.getConn();
-	         PreparedStatement stmt = conn.prepareStatement(sql)) {
-	        stmt.setString(1, playlistId); // プレイリストID
-	        stmt.setString(2, userId); // ユーザーID
-	        stmt.executeUpdate();
+	    String checkSql = "SELECT COUNT(*) FROM playlists WHERE playlist_id = ?";
+	    String insertSql = "INSERT INTO playlists (playlist_id, user_id) VALUES (?, ?)";
+
+	    try (Connection con = MySQLConnector.getConn();
+	         PreparedStatement checkStmt = con.prepareStatement(checkSql);
+	         PreparedStatement insertStmt = con.prepareStatement(insertSql)) {
+	        
+	        checkStmt.setString(1, playlistId);
+	        ResultSet rs = checkStmt.executeQuery();
+	        if (rs.next() && rs.getInt(1) > 0) {
+	            return; // すでに登録されている場合は何もしない
+	        }
+
+	        insertStmt.setString(1, playlistId);
+	        insertStmt.setString(2, userId);
+	        insertStmt.executeUpdate();
 	    }
 	}
+
 	
 	//Spotifyから取得するコード達
 	public JSONObject getSpotifyPlaylists(String accessToken) throws Exception {

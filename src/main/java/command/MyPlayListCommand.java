@@ -1,5 +1,6 @@
 package command;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import bean.SpotifyPlayListBean;
 import bean.TrackBean;
 import context.RequestContext;
 import context.ResponseContext;
+import dao.PlayListDAO; // 追加
 import service.SpotifyAuthService;
 
 public class MyPlayListCommand extends AbstractCommand {
@@ -37,6 +39,7 @@ public class MyPlayListCommand extends AbstractCommand {
         
         try {
             SpotifyAuthService sas = new SpotifyAuthService();
+            PlayListDAO playlistDAO = new PlayListDAO(); // 追加
 
             // プレイリスト情報の取得
             JSONObject playlistsJson = sas.getSpotifyPlaylists(accessToken);
@@ -48,12 +51,10 @@ public class MyPlayListCommand extends AbstractCommand {
             for (int i = 0; i < playlistArray.length(); i++) {
                 JSONObject playlistJson = playlistArray.getJSONObject(i);
                 SpotifyPlayListBean bean = new SpotifyPlayListBean(playlistJson, userId);
-
-             // プレイリスト画像の取得
-                JSONArray images = playlistJson.optJSONArray("images");
-
-
                 
+                // プレイリストIDを保存
+                playlistDAO.savePlaylistReview(bean.getPlaylistId(), userId); // 追加
+
                 // 各プレイリストに対するトラック情報を取得し、Track Beanに格納
                 List<TrackBean> trackList = new ArrayList<>();
                 List<JSONObject> allTracks = sas.getAllPlaylistTracks(accessToken, bean.getPlaylistId());
@@ -62,15 +63,14 @@ public class MyPlayListCommand extends AbstractCommand {
                     String trackId = trackInfo.getString("id");
                     String trackName = trackInfo.getString("name");
                     String artistName = trackInfo.getJSONArray("artists").getJSONObject(0).getString("name");
-
-                 // トラック画像の取得
-                    JSONObject albumInfo = trackInfo.optJSONObject("album"); // アルバム情報がnullの場合を考慮
+                    
+                    JSONObject albumInfo = trackInfo.optJSONObject("album");
                     JSONArray trackImages = (albumInfo != null) ? albumInfo.optJSONArray("images") : null;
                     String trackImageUrl = (trackImages != null && trackImages.length() > 0)
                         ? trackImages.getJSONObject(0).optString("url", "/img/no_image.png")
-                        : "/img/no_image.png"; // デフォルト画像を設定
-
-                    TrackBean track = new TrackBean(trackId, trackName, artistName, trackImageUrl); // TrackBeanに画像URLを追加
+                        : "/img/no_image.png";
+                    
+                    TrackBean track = new TrackBean(trackId, trackName, artistName, trackImageUrl);
                     trackList.add(track);
                 }
 
@@ -89,25 +89,28 @@ public class MyPlayListCommand extends AbstractCommand {
                 JSONObject artistJson = artistArray.getJSONObject(i);
                 followedArtistNames.add(artistJson.getString("name"));
 
-             // アーティスト画像の取得
                 JSONArray artistImages = artistJson.optJSONArray("images");
                 if (artistImages != null && artistImages.length() > 0) {
-                    String artistImageUrl = artistImages.getJSONObject(0).optString("url", "/img/no_image.png"); // デフォルト画像
+                    String artistImageUrl = artistImages.getJSONObject(0).optString("url", "/img/no_image.png");
                     followedArtistImages.add(artistImageUrl);
                 } else {
-                    followedArtistImages.add("/img/no_image.png"); // 画像がない場合のデフォルト
+                    followedArtistImages.add("/img/no_image.png");
                 }
             }
 
             // セッションスコープにデータを保存
-            session.setAttribute("playlistBeans", playlistBeans); // プレイリストBeanリスト
-            session.setAttribute("followedArtistNames", followedArtistNames); // フォロー中のアーティスト名リスト
-            session.setAttribute("followedArtistImages", followedArtistImages); // フォロー中のアーティスト画像URLリスト
+            session.setAttribute("playlistBeans", playlistBeans);
+            session.setAttribute("followedArtistNames", followedArtistNames);
+            session.setAttribute("followedArtistImages", followedArtistImages);
 
             // レスポンスに設定
-            responseContext.setResult(playlistBeans); // プレイリスト情報を結果に設定
-            responseContext.setTarget("main");       // 転送先JSPを設定
+            responseContext.setResult(playlistBeans);
+            responseContext.setTarget("main");
 
+        } catch (SQLException e) {
+            e.printStackTrace();
+            responseContext.setResult("database_error");
+            responseContext.setTarget("error");
         } catch (Exception e) {
             e.printStackTrace();
             responseContext.setResult("error");
