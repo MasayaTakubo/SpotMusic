@@ -8,31 +8,32 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.json.JSONObject;
 
-@WebServlet("/SpotifyAddTrackServlet")
-public class SpotifyAddTrackCommand extends HttpServlet {
-    private static final long serialVersionUID = 1L;
+import context.RequestContext;
+import context.ResponseContext;
+
+public class SpotifyAddTrackCommand extends AbstractCommand {
+
     private static final String SPOTIFY_API_URL = "https://api.spotify.com/v1/playlists";
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	response.setContentType("text/html; charset=UTF-8");
-    	response.setCharacterEncoding("UTF-8");
-    	
+    @Override
+    public ResponseContext execute(ResponseContext resc) {
+        RequestContext reqContext = getRequestContext();
+        HttpServletRequest request = (HttpServletRequest) reqContext.getRequest();
         HttpSession session = request.getSession();
+        HttpServletResponse response = (HttpServletResponse) resc.getResponse();
+
         String accessToken = (String) session.getAttribute("access_token");
 
         if (accessToken == null) {
             System.out.println("ERROR: アクセストークンが null です。ログインしてください。");
-            response.getWriter().write("<script>parent.alert('Spotify にログインしてください。');</script>");
-            return;
+            resc.setResult("<script>parent.alert('Spotify にログインしてください。');</script>");
+            return resc;
         }
 
         String playlistId = request.getParameter("playlistId");
@@ -43,30 +44,43 @@ public class SpotifyAddTrackCommand extends HttpServlet {
 
         if (playlistId == null || trackId == null || playlistId.isEmpty() || trackId.isEmpty()) {
             System.out.println("ERROR: プレイリストID または トラックID が不足しています。");
-            response.getWriter().write("<script>parent.alert('プレイリストIDまたはトラックIDが不足しています。');</script>");
-            return;
-        }
-        
-        // ?? プレイリストのオーナーを確認
-        String playlistOwner = getPlaylistOwner(playlistId, accessToken);
-        String currentUserId = getCurrentUserId(accessToken);
-
-        System.out.println("DEBUG: プレイリストのオーナーID = " + playlistOwner);
-        System.out.println("DEBUG: 現在のユーザーID = " + currentUserId);
-
-        if (!playlistOwner.equals(currentUserId)) {
-            System.out.println("ERROR: このプレイリストは現在のユーザーが作成したものではありません。");
-            response.getWriter().write("<script>parent.alert('このプレイリストには曲を追加できません (オーナー権限なし)。');</script>");
-            return;
+            resc.setResult("<script>parent.alert('プレイリストIDまたはトラックIDが不足しています。');</script>");
+            return resc;
         }
 
-        boolean success = addTrackToPlaylist(playlistId, trackId, accessToken);
+        // **プレイリストのオーナーを確認**
+        try {
+            String playlistOwner = getPlaylistOwner(playlistId, accessToken);
+            String currentUserId = getCurrentUserId(accessToken);
+
+            System.out.println("DEBUG: プレイリストのオーナーID = " + playlistOwner);
+            System.out.println("DEBUG: 現在のユーザーID = " + currentUserId);
+
+            if (!playlistOwner.equals(currentUserId)) {
+                System.out.println("ERROR: このプレイリストは現在のユーザーが作成したものではありません。");
+                resc.setResult("<script>parent.alert('このプレイリストには曲を追加できません (オーナー権限なし)。');</script>");
+                return resc;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            resc.setResult("<script>parent.alert('プレイリストの所有者情報を取得できませんでした。');</script>");
+            return resc;
+        }
+
+        boolean success;
+        try {
+            success = addTrackToPlaylist(playlistId, trackId, accessToken);
+        } catch (IOException e) {
+            e.printStackTrace();
+            resc.setResult("<script>parent.alert('プレイリストに曲を追加できませんでした。');</script>");
+            return resc;
+        }
 
         System.out.println("DEBUG: APIリクエスト完了 - 成功: " + success);
 
-        // ?? 結果を JavaScript で親ページに通知
-        response.setContentType("text/html; charset=UTF-8");
-        response.getWriter().write("<script>parent.alert('" + (success ? "プレイリストに追加しました" : "追加に失敗しました。") + "');</script>");
+        // **結果を JavaScript で親ページに通知**
+        resc.setResult("<script>parent.alert('" + (success ? "プレイリストに追加しました" : "追加に失敗しました。") + "');</script>");
+        return resc;
     }
 
     private boolean addTrackToPlaylist(String playlistId, String trackId, String accessToken) throws IOException {
@@ -92,12 +106,7 @@ public class SpotifyAddTrackCommand extends HttpServlet {
         int responseCode = connection.getResponseCode();
         System.out.println("DEBUG: APIレスポンスコード = " + responseCode);
 
-        if (responseCode != 201) {
-            System.out.println("ERROR: APIリクエスト失敗 - HTTP " + responseCode);
-            return false;
-        }
-
-        return true;
+        return responseCode == 201;
     }
 
     private String sendSpotifyRequest(String urlString, String accessToken) throws IOException {
@@ -129,7 +138,6 @@ public class SpotifyAddTrackCommand extends HttpServlet {
         return response.toString();
     }
 
-    // ?? プレイリストのオーナーを取得
     private String getPlaylistOwner(String playlistId, String accessToken) throws IOException {
         String urlString = "https://api.spotify.com/v1/playlists/" + playlistId;
         String response = sendSpotifyRequest(urlString, accessToken);
@@ -137,7 +145,6 @@ public class SpotifyAddTrackCommand extends HttpServlet {
         return json.getJSONObject("owner").getString("id");
     }
 
-    // ?? 現在のユーザーの ID を取得
     private String getCurrentUserId(String accessToken) throws IOException {
         String urlString = "https://api.spotify.com/v1/me";
         String response = sendSpotifyRequest(urlString, accessToken);

@@ -68,7 +68,8 @@
         <img src="${artistBean.artistImageUrl}" alt="アーティスト画像" style="width:200px;height:auto;">
     </c:if>
     <!--  フォローボタン追加 -->
-	<form id="followForm" action="SpotifyFollowArtistServlet" method="post" target="hidden_iframe">
+	<form id="followForm" action="FrontServlet" method="post" target="hidden_iframe">
+	    <input type="hidden" name="command" value="followArtist"> <!-- コマンド指定 -->
 	    <input type="hidden" name="artistId" value="${artistBean.artistId}">
 	    <input type="hidden" id="followAction" name="action" value="<%= isFollowed ? "unfollow" : "follow" %>">
 	    <button type="submit" id="followButton">
@@ -76,6 +77,7 @@
 	    </button>
 	</form>
 	<iframe name="hidden_iframe" style="display:none;"></iframe>
+
 
     <h2>プレイリスト</h2>
 
@@ -126,7 +128,7 @@ function loadAlbumPage(albumId) {
 //フォロー　フォロー解除ボタン
 document.addEventListener("DOMContentLoaded", function () {
     function updateFollowButton(artistId) {
-        fetch("/SpotMusic/SpotifyCheckFollowStatusServlet?id=" + artistId + "&fromArtistPage=true")
+    	fetch("/SpotMusic/SpotifyCheckFollowStatusServlet?id=" + artistId + "&fromArtistPage=true")
             .then(response => response.text())
             .then(isFollowed => {
                 var followButton = document.getElementById("followButton");
@@ -154,7 +156,7 @@ document.addEventListener("DOMContentLoaded", function () {
         event.preventDefault(); // デフォルトのフォーム送信を防ぐ
 
         var formData = new FormData(followForm);
-        fetch("SpotifyFollowArtistServlet", {
+        fetch("/SpotMusic/FrontServlet", {
             method: "POST",
             body: formData
         })
@@ -167,6 +169,7 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(error => console.error("エラー:", error));
     });
 });
+
 </script>
 
 </body>
