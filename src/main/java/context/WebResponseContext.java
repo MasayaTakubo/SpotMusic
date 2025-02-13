@@ -67,6 +67,13 @@ public class WebResponseContext implements ResponseContext {
         return resultMap;
     }
     
+ // Content-Type を動的に設定できるメソッドを追加
+    public void setContentType(String contentType) {
+        if (_response != null) {
+            _response.setContentType(contentType);
+        }
+    }
+    
 }
 
 

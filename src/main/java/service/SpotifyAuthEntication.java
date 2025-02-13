@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @WebServlet("/auth")
-public class SpotifyAuthServlet extends HttpServlet {
+public class SpotifyAuthEntication extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private SpotifyAuthService spotifyAuthService = new SpotifyAuthService();
     private String frontURL = "FrontServlet?command=MyPlayListCommand";

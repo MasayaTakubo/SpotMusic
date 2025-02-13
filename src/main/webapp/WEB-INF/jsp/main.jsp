@@ -87,7 +87,9 @@
         <!-- プレイリスト作成ボタン -->
 		<button id="showPlaylistForm" class="plus-button">[+]</button>
 		<!-- プレイリスト作成フォーム (デフォルトは非表示) -->
-		<form id="playlistForm" action="SpotifyCreatePlaylistServlet" method="post" target="hidden_iframe" style="display: none;">
+		<form id="playlistForm" action="FrontServlet" method="post" target="hidden_iframe" style="display: none;">
+		    <input type="hidden" name="command" value="SpotifyCreatePlaylistCommand">
+		    <input type="hidden" name="responseType" value="html"> <!-- HTML レスポンスを要求 -->
 		    <label for="playlistName">新しいプレイリスト名:</label>
 		    <input type="text" id="playlistName" name="playlistName" required>
 		    <button type="submit">作成</button>
@@ -129,10 +131,13 @@
                 <span style="font-size: 10px;">プレイリスト</span>
 
                 <div class="playlist-actions">
-                    <form action="SpotifyDeletePlaylistServlet" method="post" target="hidden_iframe">
-                        <input type="hidden" name="playlistId" value="${playlist.playlistId}">
-                        <button class="playlist-deletebutton" type="submit">削除</button>
-                    </form>
+                  <form action="FrontServlet" method="post" target="hidden_iframe">
+                      <input type="hidden" name="command" value="SpotifyDeletePlaylistCommand">
+                      <input type="hidden" name="playlistId" value="${playlist.playlistId}">
+                      <input type="hidden" name="trackId" value="${track.trackId}">
+                      <input type="hidden" name="responseType" value="html"> <!-- HTML レスポンスを要求 -->
+                      <button type="submit">削除</button>
+                  </form>
                 </div>
                 </div>
             </div>
@@ -406,10 +411,9 @@ window.removeTrack = function(playlistId, trackId, button) {
     console.log("removeTrack が呼ばれました");
     $.ajax({
         type: "POST",
-        url: "SpotifyRemoveTrackServlet",
+        url: "FrontServlet?command=SpotifyRemoveTrack",
         data: { playlistId: playlistId, trackId: trackId },
         success: function(response) {
-            alert("削除しました！");
             $(button).closest("li").remove();
         },
         error: function() {
@@ -736,10 +740,10 @@ window.removeTrack = function(playlistId, trackId, button) {
         }
 
 //Spotifyログアウト用JavaScript
-        function logout() {
-            window.location.href = '/SpotMusic/logout';
+	function logout() {
+	    window.location.href = '/SpotMusic/FrontServlet?command=Logout';
+	}
 
-        }
     </script>
     <script>
     // artist.jspを動的に読み込む関数
@@ -1043,7 +1047,7 @@ $(document).ready(function(){
 function loadSearchPage() {
     console.log("loadSearchPage called");  // デバッグ用
     const query = document.getElementById("searchQuery").value;
-    const url = "/SpotMusic/SpotifySearchServlet?query=" + encodeURIComponent(query);
+    const url = "/SpotMusic/FrontServlet?command=SpotifySearchCommand&query=" + encodeURIComponent(query);
 
     console.log("Fetch URL:", url);  // デバッグ用
 
@@ -1060,67 +1064,83 @@ function loadSearchPage() {
 }
 
 function loadAlbumDetail(albumId) {
-    console.log("loadAlbumDetail called with ID:", albumId);  // デバッグ用
-    const url = "/SpotMusic/SpotifySearchServlet?action=album&id=" + encodeURIComponent(albumId);
+    console.log("loadAlbumDetail called with ID:", albumId); // デバッグ用
 
-    console.log("Fetch URL:", url);  // デバッグ用
+    // URLエンコード処理
+    const url = "/SpotMusic/FrontServlet?command=SpotifySearchCommand&action=album&id="+ encodeURIComponent(albumId);
+
+    console.log("Fetch URL:", url); // デバッグ用
 
     const contentDiv = document.querySelector('.content');
     fetch(url)
-    .then(response => response.text())
-    .then(data => {
-        contentDiv.innerHTML = data;
-    })
-    .catch(error => {
-        console.error('Error loading album details:', error);
-        contentDiv.innerHTML = '<p>アルバム情報の取得に失敗しました。</p>';
-    });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.text();
+        })
+        .then(data => {
+            console.log("Response received for album details."); // デバッグ用
+            contentDiv.innerHTML = data;
+        })
+        .catch(error => {
+            console.error('Error loading album details:', error);
+            contentDiv.innerHTML = '<p>アルバム情報の取得に失敗しました。</p>';
+        });
 }
+
+
 function loadArtistDetail(artistId) {
-    console.log("loadArtistDetail called with ID:", artistId);
-    const url = "/SpotMusic/SpotifyCheckFollowStatusServlet?action=artist&id=" + artistId;
+    console.log("loadArtistDetail called with ID:", artistId); // デバッグ用
+
+    const url = "/SpotMusic/FrontServlet?command=SpotifySearchCommand&action=artist&id=" + encodeURIComponent(artistId);
+    console.log("Fetch URL:", url); // デバッグ用
 
     const contentDiv = document.querySelector('.content');
+
     fetch(url)
-    .then(response => response.text())
-    .then(data => {
-        contentDiv.innerHTML = data;
-        return fetch("/SpotMusic/SpotifyFollowStatusServlet"); // フォロー状態を取得
-    })
-    .then(response => response.json())  // JSONレスポンスを取得
-    .then(data => {
-        if (data.isFollowed) {
-            document.getElementById("followButton").innerText = "リフォロー解除";
-            document.getElementById("followForm").action = "SpotifyFollowArtistServlet?action=unfollow";
-        } else {
-            document.getElementById("followButton").innerText = "フォロー";
-            document.getElementById("followForm").action = "SpotifyFollowArtistServlet?action=follow";
-        }
-    })
-    .catch(error => {
-        console.error('Error loading artist details:', error);
-        contentDiv.innerHTML = '<p>アーティスト情報の取得に失敗しました。</p>';
-    });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.text();
+        })
+        .then(data => {
+            console.log("Response received for artist details."); // デバッグ用
+            contentDiv.innerHTML = data;
+        })
+        .catch(error => {
+            console.error('Error loading artist details:', error);
+            contentDiv.innerHTML = '<p>アーティスト情報の取得に失敗しました。</p>';
+        });
 }
+
 
 
 function loadPlaylistDetail(playlistId) {
-    console.log("loadPlaylistDetail called with ID:", playlistId);  // デバッグ用
-    const url = "/SpotMusic/SpotifySearchServlet?action=playlist&id=" + encodeURIComponent(playlistId);
+    console.log("loadPlaylistDetail called with ID:", playlistId); // デバッグ用
+    const url = "/SpotMusic/FrontServlet?command=SpotifySearchCommand&action=playlist&id=" + encodeURIComponent(playlistId);
 
-    console.log("Fetch URL:", url);  // デバッグ用
+    console.log("Fetch URL:", url); // デバッグ用
 
     const contentDiv = document.querySelector('.content');
     fetch(url)
-    .then(response => response.text())
-    .then(data => {
-        contentDiv.innerHTML = data;
-    })
-    .catch(error => {
-        console.error('Error loading playlist details:', error);
-        contentDiv.innerHTML = '<p>プレイリスト情報の取得に失敗しました。</p>';
-    });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.text();
+        })
+        .then(data => {
+            console.log("Response received for playlist details."); // デバッグ用
+            contentDiv.innerHTML = data;
+        })
+        .catch(error => {
+            console.error('Error loading playlist details:', error);
+            contentDiv.innerHTML = '<p>プレイリスト情報の取得に失敗しました。</p>';
+        });
 }
+
 
 </script>
 <script>
@@ -1130,20 +1150,23 @@ function deletePlaylist(playlistId) {
         return;
     }
 
-
     let formData = new FormData();
+    formData.append("command", "SpotifyDeletePlaylistCommand");
     formData.append("playlistId", playlistId);
-    fetch("SpotifyDeletePlaylistServlet", {
+    formData.append("responseType", "html"); // HTMLレスポンスを要求
+
+    fetch("FrontServlet", {
         method: "POST",
         body: formData
     })
-    .then(response => response.text())
-    .then(data => {
-        alert(data); // 削除結果を表示
-        location.reload(); // ページをリロードして変更を反映
+    .then(response => response.text())  // HTML を受け取る
+    .then(html => {
+        console.log("レスポンスHTML:", html); // デバッグ用
+        document.body.innerHTML += html; // HTML のスクリプトを実行
     })
     .catch(error => console.error("エラー:", error));
 }
+
 
 function showTab(tabName) {
     // すべてのタブコンテンツを非表示にする
@@ -1201,7 +1224,6 @@ function friendlist() {
     window.location.href = '/SpotMusic/FrontServlet?command=FriendList&userId=${sessionScope.user_id}';
 }
 </script>
-<script src="script.js"></script>
 
 <script>
 //リロード処理

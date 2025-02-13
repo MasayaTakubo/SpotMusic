@@ -1,4 +1,4 @@
-package service;
+package command;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,51 +9,58 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-//searchartist.jsp用
-@WebServlet("/SpotifyFollowArtistServlet")
-public class SpotifyFollowArtistServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
+
+import context.RequestContext;
+import context.ResponseContext;
+import service.SpotifyAuthService;
+
+public class SpotifyFollowArtistCommand extends AbstractCommand {
+
     private static final String SPOTIFY_API_URL = "https://api.spotify.com/v1/me/following?type=artist&ids=";
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    @Override
+    public ResponseContext execute(ResponseContext resc) {
+        RequestContext reqContext = getRequestContext();
+        HttpServletRequest request = (HttpServletRequest) reqContext.getRequest();
         HttpSession session = request.getSession();
         String accessToken = (String) session.getAttribute("access_token");
 
         if (accessToken == null) {
-            sendResponse(response, "Spotify にログインしてください。");
-            return;
+            resc.setResult("Spotify にログインしてください。");
+            return resc;
         }
 
         String artistId = request.getParameter("artistId");
         String action = request.getParameter("action");  // "follow" or "unfollow"
 
         if (artistId == null || action == null) {
-            sendResponse(response, "アーティスト ID またはアクションが不足しています。");
-            return;
+            resc.setResult("アーティスト ID またはアクションが不足しています。");
+            return resc;
         }
 
-        boolean success = sendFollowRequest(artistId, accessToken, action.equals("follow") ? "PUT" : "DELETE");
-        boolean isFollowed = isArtistFollowed(artistId, accessToken);  // 最新のフォロー状態を取得
+        try {
+            boolean success = sendFollowRequest(artistId, accessToken, action.equals("follow") ? "PUT" : "DELETE");
+            boolean isFollowed = isArtistFollowed(artistId, accessToken);
 
-        // **フォローリストを更新**
-        updateFollowedArtists(session, accessToken);
+            // **フォローリストを更新**
+            updateFollowedArtists(session, accessToken);
 
-        // **セッションに最新のフォロー状態を保存**
-        session.setAttribute("isFollowed", isFollowed);
+            // **セッションに最新のフォロー状態を保存**
+            session.setAttribute("isFollowed", isFollowed);
 
-        System.out.println("DEBUG: アーティストフォロー結果 = " + success);
-        System.out.println("DEBUG: フォロー状態 (更新後) = " + isFollowed);
+            System.out.println("DEBUG: アーティストフォロー結果 = " + success);
+            System.out.println("DEBUG: フォロー状態 (更新後) = " + isFollowed);
 
-        sendResponse(response, isFollowed, artistId); // フォロー状態を反映
+            sendResponse(resc, isFollowed, artistId); // **フォロー状態を反映**
+        } catch (IOException e) {
+            e.printStackTrace();
+            sendResponse(resc, "エラーが発生しました。");
+        }
+
+        return resc;
     }
-
-
 
     private boolean sendFollowRequest(String artistId, String accessToken, String method) throws IOException {
         String urlString = SPOTIFY_API_URL + artistId;
@@ -97,18 +104,30 @@ public class SpotifyFollowArtistServlet extends HttpServlet {
         }
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8));
-        String response = reader.readLine();  // true/false の配列が返る
+        String response = reader.readLine();
         reader.close();
 
         System.out.println("DEBUG: フォロー状態 API レスポンス = " + response);
 
-        return response.contains("true");  // フォロー済みなら true を返す
+        return response.contains("true");
     }
 
- // boolean を受け取るメソッド（フォロー状態を JavaScript で更新）
-    private void sendResponse(HttpServletResponse response, boolean isFollowed, String artistId) throws IOException {
-        response.setContentType("text/html; charset=UTF-8");
+    private void updateFollowedArtists(HttpSession session, String accessToken) throws IOException {
+        SpotifyAuthService spotifyAuthService = new SpotifyAuthService();
 
+        // **最新のフォローリストを取得**
+        List<String> artistIds = spotifyAuthService.getArtistIds(accessToken, 50);
+        List<String> artistNames = spotifyAuthService.getArtistNames(accessToken, 50);
+
+        // **セッションを更新**
+        session.setAttribute("artistIds", artistIds);
+        session.setAttribute("followedArtistNames", artistNames);
+
+        System.out.println("DEBUG: フォローリストを更新しました");
+    }
+
+    // **追加: フォロー状態を JavaScript で更新するレスポンス**
+    private void sendResponse(ResponseContext resc, boolean isFollowed, String artistId) {
         String newAction = isFollowed ? "unfollow" : "follow";
         String message = isFollowed ? "フォローしました。" : "フォロー解除しました。";
 
@@ -119,52 +138,25 @@ public class SpotifyFollowArtistServlet extends HttpServlet {
             + "if (followButton) { followButton.innerText = '" + (isFollowed ? "リフォロー解除" : "フォロー") + "'; }"
             + "var actionInput = parentDoc.querySelector('#followForm input[name=action]');"
             + "if (actionInput) { actionInput.value = '" + newAction + "'; }"
-            + "window.parent.alert('アーティストを" + message + "');"
             + "window.parent.fetch('/SpotMusic/SpotifyCheckFollowStatusServlet?id=" + artistId + "')"
             + "    .then(response => response.text())"
             + "    .then(data => { parentDoc.querySelector('.content').innerHTML = data; });"
             + "</script>"
             + "</body></html>";
 
-        response.getWriter().write(htmlResponse);
-        response.flushBuffer();
+        resc.setResult(htmlResponse);
         System.out.println("DEBUG: JavaScript を埋め込んでレスポンス送信 -> " + message);
     }
 
-
-    // String を受け取るメソッド（エラーメッセージ用）
-    private void sendResponse(HttpServletResponse response, String message) throws IOException {
-        response.setContentType("text/html; charset=UTF-8");
-
+    // **追加: エラーメッセージ用レスポンス**
+    private void sendResponse(ResponseContext resc, String message) {
         String htmlResponse = "<html><body>"
             + "<script>"
             + "window.parent.alert('" + message + "');"
             + "</script>"
             + "</body></html>";
 
-        response.getWriter().write(htmlResponse);
-        response.flushBuffer();
+        resc.setResult(htmlResponse);
         System.out.println("DEBUG: エラーメッセージ送信 -> " + message);
     }
-
-    private void updateFollowedArtists(HttpSession session, String accessToken) throws IOException {
-        SpotifyAuthService spotifyAuthService = new SpotifyAuthService();
-
-        // **最新のフォローリストを取得**
-        List<String> artistIds = spotifyAuthService.getArtistIds(accessToken, 50);
-        List<String> artistNames = spotifyAuthService.getArtistNames(accessToken, 50);
-
-
-        // **セッションを更新**
-        session.setAttribute("artistIds", artistIds);
-        session.setAttribute("followedArtistNames", artistNames);
-  
-
-        System.out.println("DEBUG: フォローリストを更新しました");
-    }
-
-
-
-
-
 }

@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @WebServlet("/spotifyControl")
-public class SpotifyControlServlet extends HttpServlet {
+public class SpotifyWebPlaybackSDK extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private SpotifyAuthService spotifyService = new SpotifyAuthService();
     @Override

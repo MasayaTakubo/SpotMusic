@@ -1,4 +1,4 @@
-package service;
+package command;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,10 +21,11 @@ import javax.servlet.http.HttpSession;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import service.SpotifySearchServlet.JsonToListConverter;
+import command.SpotifySearchCommand.JsonToListConverter;
+import service.SpotifyAuthService;
 
 @WebServlet("/SpotifyCheckFollowStatusServlet")
-public class SpotifyCheckFollowStatusServlet extends HttpServlet {
+public class SpotifyCheckFollowStatusCommand extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
