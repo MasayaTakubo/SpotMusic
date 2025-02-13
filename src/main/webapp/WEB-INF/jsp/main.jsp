@@ -73,8 +73,6 @@
                 <li>
 				  <a href="https://www.spotify.com/jp/account/overview/?utm_source=spotify&utm_medium=menu&utm_campaign=your_account" target="_blank" rel="noopener noreferrer">アカウント</a>
 				</li>
-
-                <li><a href="/xxx">プロフィール</a></li>
                 <li><a href="javascript:void(0);" onclick="friendlist()">フレンドリスト</a></li>
                 <li><a href="javascript:void(0);" onclick="logout()">ログアウト</a></li>
             </ul>
@@ -85,7 +83,7 @@
     <div class="sidebar">
 		<!-- (プレイリスト作成用)非表示の iframe を用意し、フォーム送信をその中で処理 -->
 		<iframe name="hidden_iframe" style="display: none;"></iframe>
-        <h2>プレイリスト</h2>
+        <h2>マイプレイリスト</h2>
         <!-- プレイリスト作成ボタン -->
 		<button id="showPlaylistForm" class="plus-button">[+]</button>
 		<!-- プレイリスト作成フォーム (デフォルトは非表示) -->
@@ -115,29 +113,34 @@
 %>
 <ul>
     <c:forEach var="playlist" items="${playlistBeans}">
-        <li>
-            <button onclick="loadPlaylistPage('${playlist.playlistId}')">
-                <strong>プレイリスト名：</strong> ${playlist.playlistName}<br>
-                <strong>プレイリストID：</strong> ${playlist.playlistId}<br>
-            </button>
-			<form action="FrontServlet" method="post" target="hidden_iframe">
-			    <input type="hidden" name="command" value="SpotifyDeletePlaylistCommand">
-			    <input type="hidden" name="playlistId" value="${playlist.playlistId}">
-			    <input type="hidden" name="trackId" value="${track.trackId}">
-			    <input type="hidden" name="responseType" value="html"> <!-- HTML レスポンスを要求 -->
-			    <button type="submit">削除</button>
-			</form>
-
-			</form>
-            <strong>イメージ画像：</strong>
+        <li class="playlist-item">
             <c:choose>
                 <c:when test="${not empty playlist.imageUrl and fn:length(playlist.imageUrl) > 0}">
-                    <img src="${playlist.imageUrl}" alt="Playlist Image" width="100" />
+                    <img class="playlist-img" src="${playlist.imageUrl}" alt="Playlist Image" width="100" />
                 </c:when>
                 <c:otherwise>
                     <img src="${pageContext.request.contextPath}/img/no_image.png" alt="No Image" width="100" />
                 </c:otherwise>
             </c:choose>
+
+            <div class="playlist-details">
+                <button class="playlist-button" onclick="loadPlaylistPage('${playlist.playlistId}')">
+                    <strong>${playlist.playlistName}</strong><br>
+                </button>
+                <div class="yokonarabi">
+                <span style="font-size: 10px;">プレイリスト</span>
+
+                <div class="playlist-actions">
+                  <form action="FrontServlet" method="post" target="hidden_iframe">
+                      <input type="hidden" name="command" value="SpotifyDeletePlaylistCommand">
+                      <input type="hidden" name="playlistId" value="${playlist.playlistId}">
+                      <input type="hidden" name="trackId" value="${track.trackId}">
+                      <input type="hidden" name="responseType" value="html"> <!-- HTML レスポンスを要求 -->
+                      <button type="submit">削除</button>
+                  </form>
+                </div>
+                </div>
+            </div>
         </li>
     </c:forEach>
 </ul>
@@ -184,30 +187,15 @@
 		</c:choose>
 
 
-	
 
-
-
-		<h1>今回新たにしゅとくしようとしているもの</h1>
 		<!-- 最近再生履歴の表示 -->
-		<h2>Recently Played Tracks</h2>
+		<h2>最近再生された曲</h2>
 		<c:if test="${not empty recentryDatas}">
 			<table>
-				<thead>
-					<tr>
-						<th>Track Name</th>
-						<th>Track ID</th>
-						<th>Image</th>
-						<th>?</th>
-					</tr>
-				</thead>
 				<tbody>
 					<c:forEach var="entry" items="${recentryDatas}">
 						<tr>
-							<td>${entry.key}</td>
-							<!-- トラック名 -->
-							<td>${entry.value.id}</td>
-							<!-- トラックID -->
+							<td>${entry.key}</td><!-- トラック名 -->
 							<td><c:if test="${not empty entry.value.image}">
 									<img src="${entry.value.image}" alt="Track Image" width="100">
 									
@@ -226,17 +214,10 @@
 
 
 		<!-- Top Mix Tracksの表示 -->
-		<h2>Top Artist(ログインユーザーが聞いている回数が多いアーティスト過去6か月分？)</h2>
-		<h2>Recently Played Artists</h2>
+		<h2>Top Artist</h2>
 		<c:if test="${not empty artistDetails}">
 			<table>
-				<thead>
-					<tr>
-						<th>Artist Name</th>
-						<th>Artist ID</th>
-						<th>Image</th>
-					</tr>
-				</thead>
+
 				<tbody>
 					<c:forEach var="entry" items="${artistDetails}">
 						<tr>
@@ -244,9 +225,6 @@
 							<td><a href="javascript:void(0);"
 								onclick="loadArtistPage('${entry.value.id}')"> ${entry.key}
 							</a></td>
-
-							<!-- アーティストID -->
-							<td>${entry.value.id}</td>
 
 							<!-- 画像URL -->
 							<td><c:if test="${not empty entry.value.image}">
@@ -270,12 +248,6 @@
 		<h2>新着アルバム</h2>
 		<c:if test="${not empty newRelease}">
 			<table>
-				<thead>
-					<tr>
-						<th>Cover</th>
-						<th>Track Name</th>
-					</tr>
-				</thead>
 				<tbody>
 					<c:forEach var="entry" items="${newRelease}">
 						<tr>
