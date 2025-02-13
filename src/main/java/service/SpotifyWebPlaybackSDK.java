@@ -70,16 +70,48 @@ public class SpotifyWebPlaybackSDK extends HttpServlet {
                     break;
 
                 case "play":
-                    if (trackId == null || trackId.isEmpty()) {
-                        trackId = trackIds.get(currentIndex);
-                    } else {
-                        currentIndex = trackIds.indexOf(trackId);
-                        session.setAttribute("currentTrackIndex", currentIndex);
+                    String playlistId = request.getParameter("playlistId");
+                    String trackId2 = request.getParameter("trackId");
+                    String trackIndexParam = request.getParameter("trackIndex");
+                    int trackIndex = 0; // デフォルトのインデックス
+
+                    if (trackIndexParam != null && !trackIndexParam.isEmpty()) {
+                        try {
+                        	System.out.println("受け取ったトラックインデックス: " + trackIndex);
+                            trackIndex = Integer.parseInt(trackIndexParam);
+                        } catch (NumberFormatException e) {
+                            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                            response.getWriter().write("Error: 無効なトラックインデックス");
+                            return;
+                        }
                     }
 
-                    spotifyService.playTrack(session, accessToken, "spotify:track:" + trackId);
+                    if (playlistId != null && !playlistId.isEmpty()) {
+                        // プレイリストからの再生
+                        List<String> selectedPlaylistTracks = spotifyService.getTracksFromPlaylist(accessToken, playlistId);
+                        if (selectedPlaylistTracks != null && !selectedPlaylistTracks.isEmpty()) {
+                            session.setAttribute("trackIds", selectedPlaylistTracks);
+                            session.setAttribute("currentTrackIndex", trackIndex);
+
+                            String playlistUri = "spotify:playlist:" + playlistId;
+                            spotifyService.playTrack(session, accessToken, playlistUri, trackIndex);
+                        } else {
+                            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                            response.getWriter().write("Error: プレイリストに曲がありません");
+                            return;
+                        }
+                    } else if (trackId2 != null && !trackId2.isEmpty()) {
+                        // プレイリスト外の個別トラックを再生
+                        spotifyService.playTrack(session, accessToken, "spotify:track:" + trackId2);
+                    } else {
+                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                        response.getWriter().write("Error: トラック ID または プレイリスト ID が指定されていません");
+                        return;
+                    }
+
                     response.setStatus(HttpServletResponse.SC_OK);
                     break;
+
 
 
 
@@ -177,7 +209,6 @@ public class SpotifyWebPlaybackSDK extends HttpServlet {
                     break;
 
                 case "toggleShuffle":
-                    // 現在のシャッフル状態を取得し、切り替え
                     Boolean currentShuffleState = (Boolean) session.getAttribute("shuffle");
                     if (currentShuffleState == null) {
                         currentShuffleState = false; // デフォルトはOFF
@@ -187,50 +218,19 @@ public class SpotifyWebPlaybackSDK extends HttpServlet {
                     session.setAttribute("shuffle", newShuffleState);
 
                     try {
-                        // シャッフル状態をSpotify APIに送信
                         spotifyService.setShuffleMode(accessToken, String.valueOf(newShuffleState));
 
-                        // 現在再生中のトラックIDを取得
-                        Integer currentIndexnow = (Integer) session.getAttribute("currentTrackIndex");
-                        if (currentIndexnow == null) {
-                            currentIndexnow = 0;
-                        }
-                        String currentTrackId = trackIds.get(currentIndexnow); // 現在のトラックID
-
                         if (newShuffleState) {
-                            // シャッフルONの場合
-                            @SuppressWarnings("unchecked")
-                            List<String> originalTrackIds = (List<String>) session.getAttribute("originalTrackIds");
-                            if (originalTrackIds == null) {
-                                // 元の順序を保存
-                                originalTrackIds = new ArrayList<>(trackIds);
-                                session.setAttribute("originalTrackIds", originalTrackIds);
-                            }
-
-                            // プレイリストをシャッフル
-                            List<String> shuffledTrackIds = new ArrayList<>(originalTrackIds);
+                            // **現在のプレイリスト内でシャッフル**
+                            List<String> shuffledTrackIds = new ArrayList<>(trackIds);
                             Collections.shuffle(shuffledTrackIds);
                             session.setAttribute("trackIds", shuffledTrackIds);
 
                             // シャッフル後のリスト内で現在のトラックIDの位置を再計算
+                            String currentTrackId = trackIds.get(currentIndex);
                             int newIndex = shuffledTrackIds.indexOf(currentTrackId);
                             session.setAttribute("currentTrackIndex", newIndex);
-
-                        } else {
-                            // シャッフルOFFの場合、元の順序に戻す
-                            @SuppressWarnings("unchecked")
-                            List<String> originalTrackIds = (List<String>) session.getAttribute("originalTrackIds");
-                            if (originalTrackIds != null) {
-                                session.setAttribute("trackIds", originalTrackIds);
-
-                                // 元のリスト内で現在のトラックIDの位置を再計算
-                                int newIndex = originalTrackIds.indexOf(currentTrackId);
-                                session.setAttribute("currentTrackIndex", newIndex);
-                            }
                         }
-
-                        // **再生処理を削除**
-                        // シャッフルモード切替時に自動で再生を行わないようにする
 
                         response.setStatus(HttpServletResponse.SC_OK);
                         response.getWriter().write("シャッフル状態を " + newShuffleState + " に設定しました");
@@ -240,6 +240,7 @@ public class SpotifyWebPlaybackSDK extends HttpServlet {
                         response.getWriter().write("Error processing shuffle request: " + e.getMessage());
                     }
                     break;
+
 
                 case "getShuffleState":
                     // セッションから現在のシャッフル状態を取得

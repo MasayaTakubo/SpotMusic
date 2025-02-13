@@ -676,9 +676,13 @@ window.removeTrack = function(playlistId, trackId, button) {
 
             
         }
-        async function controlSpotify(action, trackId = null, deviceId = null, player = null) {
-        	console.log("送信アクション: " + action);
-        	
+
+        async function controlSpotify(action, trackId = null, playlistId = null, deviceId = null, player = null, trackIndex = 0) {
+            console.log("送信アクション: " + action);
+            console.log("受け取った trackIndex: ", trackIndex);
+            
+
+            // プレイヤーが渡された場合は、Spotify Web Playback SDK の操作を優先
             if (player) {
                 switch (action) {
                     case 'togglePlay':
@@ -707,8 +711,26 @@ window.removeTrack = function(playlistId, trackId, button) {
             const params = new URLSearchParams();
             params.append("action", action);
             console.log("送信データ:", params.toString());
-            if (trackId) params.append("trackId", trackId);
-            if (deviceId) params.append("deviceId", deviceId);
+
+            if (trackId) {
+                params.append("trackId", trackId);
+                console.log("送信するトラック ID: ", trackId);
+            }
+
+            if (playlistId) {
+                params.append("playlistId", playlistId);
+                console.log("送信するプレイリスト ID: ", playlistId);
+            } else {
+                console.log("プレイリスト ID はなし（検索やおすすめの曲）");
+            }
+
+            if (deviceId) {
+                params.append("deviceId", deviceId);
+                console.log("送信するデバイス ID: ", deviceId);
+            }
+
+            params.append("trackIndex", trackIndex);
+            console.log("送信するトラックインデックス: ", trackIndex);
 
             try {
                 const response = await fetch("/SpotMusic/spotifyControl", {
@@ -730,15 +752,26 @@ window.removeTrack = function(playlistId, trackId, button) {
                 console.error("Request failed:", error);
             }
         }
+  
 
-        function playTrack(trackId, trackName) {
+        function playTrack(trackId, trackName, playlistId = null, trackIndex = 0) {
             console.log("送信するトラック ID: ", trackId);
-            controlSpotify("play", trackId);
+            console.log("開始するトラックのインデックス: ", trackIndex);
+
+            if (playlistId) {
+                console.log("送信するプレイリスト ID: ", playlistId);
+            } else {
+                console.log("プレイリスト ID はなし（検索やおすすめの曲）");
+            }
+
+            controlSpotify("play", trackId, playlistId, null, null, trackIndex);
+
             const propertyPanel = document.getElementById('propertyPanel');
             const trackDetail = document.getElementById('track-detail');
             trackDetail.textContent = `トラック名: ${trackName}`;
             propertyPanel.classList.add('active');
         }
+
 
         async function setupDevice(deviceId) {
             console.log("デバイスのセットアップを開始: ", deviceId);
