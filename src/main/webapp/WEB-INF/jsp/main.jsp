@@ -11,7 +11,7 @@
 <!-- jQueryをCDNから読み込む -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link rel="stylesheet" type="text/css" href="<c:url value='/css/styles.css' />">
-
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,25 +23,6 @@
 <script src="https://sdk.scdn.co/spotify-player.js"></script>
 
 <style>
-/*body {
-	margin: 0;
-	display: flex;
-	height: 100vh;
-	font-family: Arial, sans-serif;
-	
-} */
-
-
-
-/*h2 {
-	border-bottom: 2px solid #ddd;
-	padding-bottom: 10px;
-}*/
-
-
-
-
-
 
 
 </style>
@@ -54,20 +35,21 @@
 	<div class="logo">
 	    <!-- リロード用アイコン -->
 	    <a href="javascript:void(0)" onclick="reloadFollowedArtists()" class="reload-link">
-	        <img src="<c:url value='/img/Spotmusic.webp' />" alt="ロゴを配置" class="reload-icon">
+	        <img src="<c:url value='/img/spotify.png' />" alt="ロゴを配置" class="reload-icon">
 	    </a>
 	</div>
-    
-<form onsubmit="event.preventDefault(); loadSearchPage();">
-    <input type="text" id="searchQuery" name="query" placeholder="何を再生したいですか？" required>
-    <button class="search-button" type="submit">検索</button>
+<div class="find">  
+<form onsubmit="event.preventDefault(); loadSearchPage();" class="findForm">
+    <input type="text" name="query" class="search" placeholder="何を再生したいですか？" required>
+    <button class="search-button" type="submit"><i class='bx bx-search'></i></button>
 </form>
+</div>  
     <!-- ここまで　　　　　  -->
     
     <div class="actions">
         <!-- アカウントアイコン -->
         <div class="account-container">
-<img src="<c:url value='/img/icon.png' />" alt="アイコン" class="account-icon" id="account-icon">
+<img src="<c:url value='/img/profile-user.png' />" alt="アイコン" class="account-icon" id="account-icon">
             <ul class="account-menu" id="account-menu">
             	<li>ログイン中のユーザー:<%= session.getAttribute("user_name") %></li>
                 <li>
@@ -76,18 +58,22 @@
 
                 <li><a href="/xxx">プロフィール</a></li>
                 <li><a href="javascript:void(0);" onclick="friendlist()">フレンドリスト</a></li>
+               <hr>
                 <li><a href="javascript:void(0);" onclick="logout()">ログアウト</a></li>
             </ul>
         </div>
     </div>
 </div>
+<div class="main">
     <!-- 左側: プレイリスト -->
     <div class="sidebar">
 		<!-- (プレイリスト作成用)非表示の iframe を用意し、フォーム送信をその中で処理 -->
 		<iframe name="hidden_iframe" style="display: none;"></iframe>
-        <h2>プレイリスト</h2>
+		
+        <div class="listIcon"><i class='bx bxs-playlist'></i><h2>プレイリスト</h2>
         <!-- プレイリスト作成ボタン -->
-		<button id="showPlaylistForm" class="plus-button">[+]</button>
+		<button id="showPlaylistForm" class="plus-button">+</button>
+	</div>
 		<!-- プレイリスト作成フォーム (デフォルトは非表示) -->
 		<form id="playlistForm" action="FrontServlet" method="post" target="hidden_iframe" style="display: none;">
 		    <input type="hidden" name="command" value="SpotifyCreatePlaylistCommand">
@@ -113,23 +99,12 @@
     session.setAttribute("currentTrackIndex", 0);
     
 %>
-<ul>
+<div class="libList">
+<div>
     <c:forEach var="playlist" items="${playlistBeans}">
-        <li>
-            <button onclick="loadPlaylistPage('${playlist.playlistId}')">
-                <strong>プレイリスト名：</strong> ${playlist.playlistName}<br>
-                <strong>プレイリストID：</strong> ${playlist.playlistId}<br>
-            </button>
-			<form action="FrontServlet" method="post" target="hidden_iframe">
-			    <input type="hidden" name="command" value="SpotifyDeletePlaylistCommand">
-			    <input type="hidden" name="playlistId" value="${playlist.playlistId}">
-			    <input type="hidden" name="trackId" value="${track.trackId}">
-			    <input type="hidden" name="responseType" value="html"> <!-- HTML レスポンスを要求 -->
-			    <button type="submit">削除</button>
-			</form>
-
-			</form>
-            <strong>イメージ画像：</strong>
+    	<div class="MyPlayList">
+       
+            <button onclick="loadPlaylistPage('${playlist.playlistId}')" >
             <c:choose>
                 <c:when test="${not empty playlist.imageUrl and fn:length(playlist.imageUrl) > 0}">
                     <img src="${playlist.imageUrl}" alt="Playlist Image" width="100" />
@@ -138,13 +113,29 @@
                     <img src="${pageContext.request.contextPath}/img/no_image.png" alt="No Image" width="100" />
                 </c:otherwise>
             </c:choose>
-        </li>
+            <div class="buttonPL">
+                <div class="name"> ${playlist.playlistName}</div>
+                <div class="id"> ${playlist.playlistId}</div>
+             </div>
+            </button>
+            
+            
+			<form action="FrontServlet" method="post" target="hidden_iframe">
+			    <input type="hidden" name="command" value="SpotifyDeletePlaylistCommand">
+			    <input type="hidden" name="playlistId" value="${playlist.playlistId}">
+			    <input type="hidden" name="trackId" value="${track.trackId}">
+			    <input type="hidden" name="responseType" value="html"> <!-- HTML レスポンスを要求 -->
+			    <button class="delete"type="submit"><i class='bx bx-minus-circle'></i></button>
+			</form>
+			
+		</div>            
+        
     </c:forEach>
-</ul>
-<iframe name="hidden_iframe" style="display: none;"></iframe>
-
-
 </div>
+</div>
+<iframe name="hidden_iframe" style="display: none;"></iframe>
+</div>
+<div class="resizer resizer-1"></div>
 		
 			<!-- 中央: 人気のアーティスト -->
 	<div class="content">
@@ -293,12 +284,14 @@
 		</c:if>
 
 	</div>
+	<div class="resizer resizer-2"></div>
 	<!-- 右側: 詳細情報パネル -->
 	<div class="property-panel" id="propertyPanel">
 
 	    <h2>トラック詳細</h2>
 	    <p id="track-detail">再生中のトラック詳細が表示されます。</p>	    
     </div>
+ </div>
 
 <div id="player-container">
     <!-- 左側: 曲名表示 -->
