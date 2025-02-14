@@ -228,7 +228,7 @@
 </div>
 
 
-    <a href="javascript:history.back()" class="back-button">戻る</a>
+    
     
         <!-- メッセージ表示 -->
     <c:if test="${not empty message}">

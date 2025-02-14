@@ -113,8 +113,7 @@
 </c:if>
 
 
-    <br>
-    <a href="main.jsp">戻る</a>
+    
 <script>
 $(document).ready(function(){
     $("#commentForm").submit(function(event){

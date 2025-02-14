@@ -93,7 +93,7 @@
         <p>アーティストが見つかりませんでした。</p>
     </c:if>
 
-    <a href="javascript:history.back()" class="back-button">戻る</a>
+
 <script>
 //フォロー　フォロー解除ボタン
 document.addEventListener("DOMContentLoaded", function () {
