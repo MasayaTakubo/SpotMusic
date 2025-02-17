@@ -27,6 +27,12 @@
 <script src="https://sdk.scdn.co/spotify-player.js"></script>
 
 <style>
+#track-duration {
+    display: none;
+}
+#album-name{
+	display: none;
+}
 /*body {
 	margin: 0;
 	display: flex;
@@ -330,6 +336,67 @@
 			<input type="range" id="progress-bar" value="50" min="0" max="100">
 		</div>
 	</div>
+		<script>
+//リロード処理
+function reloadFollowedArtists() {
+    fetch('/SpotMusic/SpotifyCheckFollowStatusServlet')
+        .then(response => response.text())
+        .then(data => {
+            console.log("フォローリストを再取得しました");
+
+            // **データ取得後、ページを完全リロード**
+            window.location.reload(true); // キャッシュをクリアして完全リロード
+        })
+        .catch(error => {
+            console.error('フォローリストの更新に失敗しました:', error);
+
+            // **エラー時もページをリロード (最新データ取得を試す)**
+            window.location.reload(true);
+        });
+}
+// フォロー状態を取得し、ボタンを更新する関数
+function updateFollowButton(artistId) {
+    fetch("/SpotMusic/SpotifyCheckFollowStatusServlet?id=" + artistId + "&fromArtistPage=true")
+        .then(response => response.text())
+        .then(isFollowed => {
+            var followButton = document.getElementById("followButton");
+            var followAction = document.getElementById("followAction");
+
+            if (followButton && followAction) {  // 要素が存在するか確認
+                if (isFollowed.trim() === "true") {
+                    followButton.innerText = "リフォロー解除";
+                    followAction.value = "unfollow";
+                } else {
+                    followButton.innerText = "フォロー";
+                    followAction.value = "follow";
+                }
+            }
+        })
+        .catch(error => console.error("フォロー状態取得エラー:", error));
+}
+function updateFollowButtonFromSearchArtist(artistId) {
+    fetch("/SpotMusic/SpotifyCheckFollowStatusServlet?id=" + artistId + "&fromSearchArtistPage=true")
+        .then(response => response.text())
+        .then(isFollowed => {
+            var followButton = document.getElementById("followButton");
+            var followAction = document.getElementById("followAction");
+
+            if (followButton && followAction) {  // 要素が存在するか確認
+                if (isFollowed.trim() === "true") {
+                    followButton.innerText = "リフォロー解除";
+                    followAction.value = "unfollow";
+                } else {
+                    followButton.innerText = "フォロー";
+                    followAction.value = "follow";
+                }
+            }
+        })
+        .catch(error => console.error("フォロー状態取得エラー:", error));
+}
+
+
+</script>
+	
 	<script>
 // プレイリストの詳細を受け取った場合
 // プレイリストの詳細を表示する関数
@@ -469,27 +536,6 @@ console.log("toggleMenu スクリプトが実行されました！");
 	    // 曲の詳細情報を更新
 	    updateCurrentTrackDetails();
 	});
-
- 
- 
- 
-//曲削除
-
-window.removeTrack = function(playlistId, trackId, button) {
-    console.log("removeTrack が呼ばれました");
-    $.ajax({
-        type: "POST",
-        url: "FrontServlet?command=SpotifyRemoveTrack",
-        data: { playlistId: playlistId, trackId: trackId },
-        success: function(response) {
-            $(button).closest("li").remove();
-        },
-        error: function() {
-            alert("削除に失敗しました。");
-        }
-    });
-};
-
 
 //曲の詳細情報（アルバム名、リリース日、アルバム画像）を更新
 
@@ -867,7 +913,7 @@ function updateCurrentTrackImages() {
 
             const propertyPanel = document.getElementById('propertyPanel');
             const trackDetail = document.getElementById('track-detail');
-            trackDetail.textContent = `トラック名: ${trackName}`;
+            trackDetail.textContent = `${trackName}`;
             propertyPanel.classList.add('active');
         }
 
@@ -1251,10 +1297,10 @@ function loadAlbumDetail(albumId) {
 
 
 function loadArtistDetail(artistId) {
-    console.log("loadArtistDetail called with ID:", artistId); // デバッグ用
+    console.log("loadArtistDetail called with ID:", artistId);
 
     const url = "/SpotMusic/FrontServlet?command=SpotifySearchCommand&action=artist&id=" + encodeURIComponent(artistId);
-    console.log("Fetch URL:", url); // デバッグ用
+    console.log("Fetch URL:", url);
 
     const contentDiv = document.querySelector('.content');
 
@@ -1266,13 +1312,50 @@ function loadArtistDetail(artistId) {
             return response.text();
         })
         .then(data => {
-            console.log("Response received for artist details."); // デバッグ用
+            console.log("Response received for artist details.");
             contentDiv.innerHTML = data;
+
+            // **searchartist.jsp を描画した後にフォロー状態を取得**
+            updateFollowButtonFromSearchArtist(artistId);
         })
         .catch(error => {
             console.error('Error loading artist details:', error);
             contentDiv.innerHTML = '<p>アーティスト情報の取得に失敗しました。</p>';
         });
+}
+
+// **フォロー状態を取得し、ボタンを更新する関数**
+function updateFollowButtonFromSearchArtist(artistId) {
+    var timestamp = new Date().getTime();  // キャッシュ防止用のタイムスタンプ
+
+    $.ajax({
+        type: "GET",
+        url: "/SpotMusic/SpotifyCheckFollowStatusServlet",
+        data: { id: artistId, fromSearchArtistPage: true, ts: timestamp },  // `ts` パラメータを追加
+        success: function(isFollowed) {
+            var followButton = document.getElementById("followButton");
+            var followAction = document.getElementById("followAction");
+
+            if (followButton && followAction) {
+                var trimmedResponse = isFollowed.trim();
+                
+                if (trimmedResponse === "true") {
+                    followButton.innerText = "リフォロー解除";
+                    followAction.value = "unfollow";
+                } else if (trimmedResponse === "false") {
+                    followButton.innerText = "フォロー";
+                    followAction.value = "follow";
+                } else {
+                    console.warn("予期しないレスポンス:", isFollowed);
+                    followButton.innerText = "フォロー (未確認)";
+                    followAction.value = "follow";
+                }
+            }
+        },
+        error: function() {
+            console.error("フォロー状態の取得に失敗しました");
+        }
+    });
 }
 
 
@@ -1473,29 +1556,6 @@ function blockList() {
 
 </script>
 
-	<script>
-//リロード処理
-function reloadFollowedArtists() {
-    fetch('/SpotMusic/SpotifyCheckFollowStatusServlet')
-        .then(response => response.text())
-        .then(data => {
-            console.log("フォローリストを再取得しました");
-
-            // **データ取得後、ページを完全リロード**
-            window.location.reload(true); // キャッシュをクリアして完全リロード
-        })
-        .catch(error => {
-            console.error('フォローリストの更新に失敗しました:', error);
-
-            // **エラー時もページをリロード (最新データ取得を試す)**
-            window.location.reload(true);
-        });
-}
-
-
-</script>
-
-
 
 
 
@@ -1674,8 +1734,56 @@ function reloadFollowedArtists() {
             });
     }
 </script>
+<script>
+// 曲削除
+window.removeTrack = function(playlistId, trackId, button) {
+    console.log("removeTrack が呼ばれました");
+    $.ajax({
+        type: "POST",
+        url: "FrontServlet?command=SpotifyRemoveTrack",
+        data: { playlistId: playlistId, trackId: trackId },
+        success: function(response) {
+            $(button).closest("li").remove();
+        },
+        error: function() {
+            alert("削除に失敗しました。");
+        }
+    });
+};
+
+// **ページ読み込み時にフォロー状態を更新**
+window.onload = function () {
+    var artistId = document.getElementById("artistId") ? document.getElementById("artistId").value : null;
+    if (artistId) {
+        setTimeout(() => updateFollowButtonFromSearchArtist(artistId), 500); // 0.5秒遅延で実行
+    }
+};
 
 
+// **フォローボタンのクリックイベント**
+$(document).ready(function () {
+    $("#followButton").on("click", function () {
+        var artistId = $("#artistId").val();
+        var action = $("#followAction").val();
+        var endpoint = action === "follow"
+            ? "/SpotMusic/SpotifyFollowArtistServlet"
+            : "/SpotMusic/SpotifyUnfollowArtistServlet";
+
+        $.ajax({
+            type: "POST",
+            url: endpoint,
+            data: { id: artistId },
+            success: function () {
+                console.log("フォロー操作成功");
+                updateFollowButtonFromSearchArtist(artistId); // 状態を即時更新
+            },
+            error: function () {
+                console.error("フォロー操作失敗");
+            }
+        });
+    });
+});
+</script>
 
 </body>
 </html>
