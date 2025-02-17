@@ -95,50 +95,39 @@
 
 
 <script>
-//フォロー　フォロー解除ボタン
-document.addEventListener("DOMContentLoaded", function () {
-    function updateFollowButton(artistId) {
-    	fetch("/SpotMusic/SpotifyCheckFollowStatusServlet?id=" + artistId + "&fromArtistPage=true")
-            .then(response => response.text())
-            .then(isFollowed => {
-                var followButton = document.getElementById("followButton");
-                var followAction = document.getElementById("followAction");
+function updateFollowButtonFromSearchArtist(artistId) {
+    var timestamp = new Date().getTime();  // キャッシュ防止用のタイムスタンプ
 
-                if (isFollowed.trim() === "true") {
+    $.ajax({
+        type: "GET",
+        url: "/SpotMusic/SpotifyCheckFollowStatusServlet",
+        data: { id: artistId, fromSearchArtistPage: true, ts: timestamp },  // `ts` パラメータを追加
+        success: function(isFollowed) {
+            var followButton = document.getElementById("followButton");
+            var followAction = document.getElementById("followAction");
+
+            if (followButton && followAction) {
+                var trimmedResponse = isFollowed.trim();
+                
+                if (trimmedResponse === "true") {
                     followButton.innerText = "リフォロー解除";
                     followAction.value = "unfollow";
-                } else {
+                } else if (trimmedResponse === "false") {
                     followButton.innerText = "フォロー";
                     followAction.value = "follow";
+                } else {
+                    console.warn("予期しないレスポンス:", isFollowed);
+                    followButton.innerText = "フォロー (未確認)";
+                    followAction.value = "follow";
                 }
-            })
-            .catch(error => console.error("フォロー状態取得エラー:", error));
-    }
-
-    var artistId = document.querySelector("input[name='artistId']").value;
-    updateFollowButton(artistId); // ページ読み込み時にフォロー状態を取得
-
-    var followForm = document.getElementById("followForm");
-    var followButton = document.getElementById("followButton");
-    var followAction = document.getElementById("followAction");
-
-    followForm.addEventListener("submit", function (event) {
-        event.preventDefault(); // デフォルトのフォーム送信を防ぐ
-
-        var formData = new FormData(followForm);
-        fetch("/SpotMusic/FrontServlet", {
-            method: "POST",
-            body: formData
-        })
-        .then(response => response.text())
-        .then(data => {
-            console.log("フォロー/リフォロー処理完了:", data);
-            // フォロー処理後に再度状態を取得し、最新のボタン状態を反映
-            updateFollowButton(artistId);
-        })
-        .catch(error => console.error("エラー:", error));
+            }
+        },
+        error: function() {
+            console.error("フォロー状態の取得に失敗しました");
+        }
     });
-});
+}
+
 
 </script>
 

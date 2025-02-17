@@ -294,10 +294,10 @@ function loadAlbumDetail(albumId) {
 }
 
 function loadArtistDetail(artistId) {
-    console.log("loadArtistDetail called with ID:", artistId); // デバッグ用
+    console.log("loadArtistDetail called with ID:", artistId);
 
     const url = "/SpotMusic/FrontServlet?command=SpotifySearchCommand&action=artist&id=" + encodeURIComponent(artistId);
-    console.log("Fetch URL:", url); // デバッグ用
+    console.log("Fetch URL:", url);
 
     const contentDiv = document.querySelector('.content');
 
@@ -309,13 +309,50 @@ function loadArtistDetail(artistId) {
             return response.text();
         })
         .then(data => {
-            console.log("Response received for artist details."); // デバッグ用
+            console.log("Response received for artist details.");
             contentDiv.innerHTML = data;
+
+            // **searchartist.jsp を描画した後にフォロー状態を取得**
+            updateFollowButtonFromSearchArtist(artistId);
         })
         .catch(error => {
             console.error('Error loading artist details:', error);
             contentDiv.innerHTML = '<p>アーティスト情報の取得に失敗しました。</p>';
         });
+}
+
+// **フォロー状態を取得し、ボタンを更新する関数**
+function updateFollowButtonFromSearchArtist(artistId) {
+    var timestamp = new Date().getTime();  // キャッシュ防止用のタイムスタンプ
+
+    $.ajax({
+        type: "GET",
+        url: "/SpotMusic/SpotifyCheckFollowStatusServlet",
+        data: { id: artistId, fromSearchArtistPage: true, ts: timestamp },  // `ts` パラメータを追加
+        success: function(isFollowed) {
+            var followButton = document.getElementById("followButton");
+            var followAction = document.getElementById("followAction");
+
+            if (followButton && followAction) {
+                var trimmedResponse = isFollowed.trim();
+                
+                if (trimmedResponse === "true") {
+                    followButton.innerText = "リフォロー解除";
+                    followAction.value = "unfollow";
+                } else if (trimmedResponse === "false") {
+                    followButton.innerText = "フォロー";
+                    followAction.value = "follow";
+                } else {
+                    console.warn("予期しないレスポンス:", isFollowed);
+                    followButton.innerText = "フォロー (未確認)";
+                    followAction.value = "follow";
+                }
+            }
+        },
+        error: function() {
+            console.error("フォロー状態の取得に失敗しました");
+        }
+    });
 }
 
 
