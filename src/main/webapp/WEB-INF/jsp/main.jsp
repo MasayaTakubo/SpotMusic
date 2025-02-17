@@ -46,19 +46,21 @@
 </head>
 <body>
 	<div class="header">
-<<<<<<< HEAD
 	<div class="logo">
 	    <!-- リロード用アイコン -->
 	    <a href="javascript:void(0)" onclick="reloadFollowedArtists()" class="reload-link">
 	        <img src="<c:url value='/img/Spotmusic.webp' />" alt="ロゴを配置" class="reload-icon">
 	    </a>
 	</div>
-    
-<form onsubmit="event.preventDefault(); loadSearchPage();">
-    <input type="text" id="searchQuery" name="query" placeholder="何を再生したいですか？" required>
-    <button class="search-button" type="submit">検索</button>
-</form>
-    <!-- ここまで　　　　　  -->
+    	<!--  ホームに戻る(main.jsp)呼び出し -->
+		<a href="javascript:void(0);" onclick="loadHome()">🏠</a>
+		<!-- ここまで -->
+		<!--  検索  -->
+		<form onsubmit="event.preventDefault(); loadSearchPage();">
+    		<input type="text" id="searchQuery" name="query" placeholder="何を再生したいですか？" required>
+    		<button class="search-button" type="submit">検索</button>
+		</form>
+    	<!-- ここまで -->
     
     <div class="actions">
         <!-- アカウントアイコン -->
@@ -1641,7 +1643,37 @@ function reloadFollowedArtists() {
 
         
     </script>
+<script>
+//ホームに戻る
+    function loadHome() {
+        const url = '/SpotMusic/FrontServlet?command=GoToMainCommand';
+        const contentDiv = document.querySelector('.content'); // メインの表示エリアのみ更新
 
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('サーバーエラー: ' + response.status);
+                }
+                return response.text();
+            })
+            .then(data => {
+                const tempDiv = document.createElement('div'); // 一時的にレスポンスを挿入
+                tempDiv.innerHTML = data;
+
+                // `.content` の中身だけを更新
+                const newContent = tempDiv.querySelector('.content');
+                if (newContent) {
+                    contentDiv.innerHTML = newContent.innerHTML; // **headerには影響を与えず、.contentだけ更新**
+                }
+
+                console.log("ホームページの .content 部分がロードされました！");
+            })
+            .catch(error => {
+                console.error('エラー発生:', error);
+                contentDiv.innerHTML = '<p>ホーム画面の読み込みに失敗しました。</p>';
+            });
+    }
+</script>
 
 
 
