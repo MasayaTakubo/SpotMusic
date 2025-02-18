@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <%@ page import="java.util.List"%>
 <%@ page import="bean.SpotifyPlayListBean"%>
 <%@ page import="java.util.ArrayList"%>
@@ -16,15 +16,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SpotMusic - Web Player：すべての人に音楽を</title>
-<link rel="stylesheet" type="text/css" href="<c:url value='/css/player.css' />">
-<link rel="stylesheet" type="text/css" href="<c:url value='/css/delete.css' />">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link rel="stylesheet" type="text/css"
+	href="<c:url value='/css/player.css' />">
+<link rel="stylesheet" type="text/css"
+	href="<c:url value='/css/delete.css' />">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 <script src="https://sdk.scdn.co/spotify-player.js"></script>
 
 <style>
-
-
+#track-duration {
+    display: none;
+}
+#album-name{
+	display: none;
+}
 </style>
 
 
@@ -38,13 +45,13 @@
 	        <img src="<c:url value='/img/spotify.png' />" alt="ロゴを配置" class="reload-icon">
 	    </a>
 	</div>
+    		<a href="javascript:void(0);" onclick="loadHome()">HOME</a>
 <div class="find">  
 <form onsubmit="event.preventDefault(); loadSearchPage();" class="findForm">
-    <input type="text" name="query" class="search" placeholder="何を再生したいですか？" required>
+    <input type="text" id="searchQuery" name="query" class="search" placeholder="何を再生したいですか？" required>
     <button class="search-button" type="submit"><i class='bx bx-search'></i></button>
 </form>
 </div>  
-    <!-- ここまで　　　　　  -->
     
     <div class="actions">
         <!-- アカウントアイコン -->
@@ -55,8 +62,6 @@
                 <li>
 				  <a href="https://www.spotify.com/jp/account/overview/?utm_source=spotify&utm_medium=menu&utm_campaign=your_account" target="_blank" rel="noopener noreferrer">アカウント</a>
 				</li>
-
-                <li><a href="/xxx">プロフィール</a></li>
                 <li><a href="javascript:void(0);" onclick="friendlist()">フレンドリスト</a></li>
                <hr>
                 <li><a href="javascript:void(0);" onclick="logout()">ログアウト</a></li>
@@ -70,17 +75,21 @@
 		<!-- (プレイリスト作成用)非表示の iframe を用意し、フォーム送信をその中で処理 -->
 		<iframe name="hidden_iframe" style="display: none;"></iframe>
 		
-        <div class="listIcon"><i class='bx bxs-playlist'></i><h2>プレイリスト</h2>
+        <div class="listIcon"><i class='bx bxs-playlist'></i><h2>マイプレイリスト</h2>
         <!-- プレイリスト作成ボタン -->
 		<button id="showPlaylistForm" class="plus-button">+</button>
 	</div>
+
 		<!-- プレイリスト作成フォーム (デフォルトは非表示) -->
-		<form id="playlistForm" action="FrontServlet" method="post" target="hidden_iframe" style="display: none;">
-		    <input type="hidden" name="command" value="SpotifyCreatePlaylistCommand">
-		    <input type="hidden" name="responseType" value="html"> <!-- HTML レスポンスを要求 -->
-		    <label for="playlistName">新しいプレイリスト名:</label>
-		    <input type="text" id="playlistName" name="playlistName" required>
-		    <button type="submit">作成</button>
+		<form id="playlistForm" action="FrontServlet" method="post"
+			target="hidden_iframe" style="display: none;">
+			<input type="hidden" name="command"
+				value="SpotifyCreatePlaylistCommand"> <input type="hidden"
+				name="responseType" value="html">
+			<!-- HTML レスポンスを要求 -->
+			<label for="playlistName">新しいプレイリスト名:</label> <input type="text"
+				id="playlistName" name="playlistName" required>
+			<button type="submit">作成</button>
 		</form>
 		<!--  ここまで -->
 
@@ -105,9 +114,10 @@
     	<div class="MyPlayList">
        
             <button onclick="loadPlaylistPage('${playlist.playlistId}')" >
+
             <c:choose>
                 <c:when test="${not empty playlist.imageUrl and fn:length(playlist.imageUrl) > 0}">
-                    <img src="${playlist.imageUrl}" alt="Playlist Image" width="100" />
+                    <img class="playlist-img" src="${playlist.imageUrl}" alt="Playlist Image" width="100" />
                 </c:when>
                 <c:otherwise>
                     <img src="${pageContext.request.contextPath}/img/no_image.png" alt="No Image" width="100" />
@@ -115,7 +125,7 @@
             </c:choose>
             <div class="buttonPL">
                 <div class="name"> ${playlist.playlistName}</div>
-                <div class="id"> ${playlist.playlistId}</div>
+                <%-- <div class="id"> ${playlist.playlistId}</div> --%>
              </div>
             </button>
             
@@ -136,8 +146,6 @@
 <iframe name="hidden_iframe" style="display: none;"></iframe>
 </div>
 <div class="resizer resizer-1"></div>
-		
-			<!-- 中央: 人気のアーティスト -->
 	<div class="content">
 		<h2>フォロー中のアーティスト</h2>
 		<%
@@ -175,37 +183,23 @@
 		</c:choose>
 
 
-	
 
-
-
-		<h1>今回新たにしゅとくしようとしているもの</h1>
 		<!-- 最近再生履歴の表示 -->
-		<h2>Recently Played Tracks</h2>
+		<h2>最近再生された曲</h2>
 		<c:if test="${not empty recentryDatas}">
 			<table>
-				<thead>
-					<tr>
-						<th>Track Name</th>
-						<th>Track ID</th>
-						<th>Image</th>
-						<th>?</th>
-					</tr>
-				</thead>
 				<tbody>
 					<c:forEach var="entry" items="${recentryDatas}">
 						<tr>
-							<td>${entry.key}</td>
-							<!-- トラック名 -->
-							<td>${entry.value.id}</td>
-							<!-- トラックID -->
+							<td>${entry.key}</td><!-- トラック名 -->
 							<td><c:if test="${not empty entry.value.image}">
 									<img src="${entry.value.image}" alt="Track Image" width="100">
-									
+
 								</c:if></td>
-							<td><button onclick="playTrack('${entry.value.id}', '${entry.key}')">再生</button></td>	
-									
-							
+							<td><button
+									onclick="playTrack('${entry.value.id}', '${entry.key}')">再生</button></td>
+
+
 						</tr>
 					</c:forEach>
 				</tbody>
@@ -217,17 +211,10 @@
 
 
 		<!-- Top Mix Tracksの表示 -->
-		<h2>Top Artist(ログインユーザーが聞いている回数が多いアーティスト過去6か月分？)</h2>
-		<h2>Recently Played Artists</h2>
+		<h2>Top Artist</h2>
 		<c:if test="${not empty artistDetails}">
 			<table>
-				<thead>
-					<tr>
-						<th>Artist Name</th>
-						<th>Artist ID</th>
-						<th>Image</th>
-					</tr>
-				</thead>
+
 				<tbody>
 					<c:forEach var="entry" items="${artistDetails}">
 						<tr>
@@ -235,9 +222,6 @@
 							<td><a href="javascript:void(0);"
 								onclick="loadArtistPage('${entry.value.id}')"> ${entry.key}
 							</a></td>
-
-							<!-- アーティストID -->
-							<td>${entry.value.id}</td>
 
 							<!-- 画像URL -->
 							<td><c:if test="${not empty entry.value.image}">
@@ -261,12 +245,6 @@
 		<h2>新着アルバム</h2>
 		<c:if test="${not empty newRelease}">
 			<table>
-				<thead>
-					<tr>
-						<th>Cover</th>
-						<th>Track Name</th>
-					</tr>
-				</thead>
 				<tbody>
 					<c:forEach var="entry" items="${newRelease}">
 						<tr>
@@ -287,40 +265,127 @@
 	<div class="resizer resizer-2"></div>
 	<!-- 右側: 詳細情報パネル -->
 	<div class="property-panel" id="propertyPanel">
-
-	    <h2>トラック詳細</h2>
-	    <p id="track-detail">再生中のトラック詳細が表示されます。</p>	    
+		<h2>トラック詳細</h2>
+		<img id="current-track-image-2" src="" alt="トラック画像"
+     style="display: none; width: 300px; height: 300px;">
+		<!-- <p id="track-detail">再生中のトラック詳細が表示されます。</p> -->
+		<strong><p id="now-playing2"></p>
+			<p id="artist-name">artist:</p>
+			<p id="album-name">album:</p>
+			
+			<!-- 消すとイメージ画像が消えたのでいったんそのままにしています。--> 
+			<p id="track-duration"></p></strong>
+			<p><span id="release-date"></span></p>
+  
     </div>
  </div>
 
-<div id="player-container">
-    <!-- 左側: 曲名表示 -->
-    <div id="player-left">
-	    <img id="current-track-image" src="" alt="トラック画像" style="display: none;">
-        <p id="now-playing">現在再生中: <span id="current-track">なし</span></p>
-    </div>
 
-    <!-- 中央: プレイヤーコントロール -->
-    <div id="player-controls">
-        <button id="repeat-track"><i class="fas fa-redo"></i></button>
-        <button id="prev"><i class="fas fa-step-backward"></i></button>
-        <button id="play-pause"><i class="fas fa-play"></i></button>
-        <button id="next"><i class="fas fa-step-forward"></i></button>
-        <button id="shuffle-toggle"><i class="fas fa-random"></i></button>
-    </div>
-    <!-- シークバーと再生時間 -->
-	<div id="seek-container">
-    	<span id="current-time">0:00</span>
-    	<input type="range" id="seek-bar" value="0" min="0" max="100">
-    	<span id="total-time">0:00</span>
 	</div>
 
-    <!-- 右側: 音量調整 -->
-    <div id="player-right">
-        <button id="mute-toggle"><i class="fas fa-volume-up"></i></button>
-        <input type="range" id="progress-bar" value="50" min="0" max="100">
-    </div>
-</div>
+	<div id="player-container">
+		<!-- 左側: 曲名表示 -->
+		<div id="player-left">
+			<img id="current-track-image" src="" alt="トラック画像"
+				style="display: none;">
+			<p id="now-playing">
+				現在再生中: <span id="current-track">なし</span>
+			</p>
+		</div>
+
+		<!-- 中央: プレイヤーコントロール -->
+		<div id="player-controls">
+			<button id="repeat-track">
+				<i class="fas fa-redo"></i>
+			</button>
+			<button id="prev">
+				<i class="fas fa-step-backward"></i>
+			</button>
+			<button id="play-pause">
+				<i class="fas fa-play"></i>
+			</button>
+			<button id="next">
+				<i class="fas fa-step-forward"></i>
+			</button>
+			<button id="shuffle-toggle">
+				<i class="fas fa-random"></i>
+			</button>
+		</div>
+		<!-- シークバーと再生時間 -->
+		<div id="seek-container">
+			<span id="current-time">0:00</span> <input type="range" id="seek-bar"
+				value="0" min="0" max="100"> <span id="total-time">0:00</span>
+		</div>
+
+		<!-- 右側: 音量調整 -->
+		<div id="player-right">
+			<button id="mute-toggle">
+				<i class="fas fa-volume-up"></i>
+			</button>
+			<input type="range" id="progress-bar" value="50" min="0" max="100">
+		</div>
+	</div>
+		<script>
+//リロード処理
+function reloadFollowedArtists() {
+    fetch('/SpotMusic/SpotifyCheckFollowStatusServlet')
+        .then(response => response.text())
+        .then(data => {
+            console.log("フォローリストを再取得しました");
+
+            // **データ取得後、ページを完全リロード**
+            window.location.reload(true); // キャッシュをクリアして完全リロード
+        })
+        .catch(error => {
+            console.error('フォローリストの更新に失敗しました:', error);
+
+            // **エラー時もページをリロード (最新データ取得を試す)**
+            window.location.reload(true);
+        });
+}
+// フォロー状態を取得し、ボタンを更新する関数
+function updateFollowButton(artistId) {
+    fetch("/SpotMusic/SpotifyCheckFollowStatusServlet?id=" + artistId + "&fromArtistPage=true")
+        .then(response => response.text())
+        .then(isFollowed => {
+            var followButton = document.getElementById("followButton");
+            var followAction = document.getElementById("followAction");
+
+            if (followButton && followAction) {  // 要素が存在するか確認
+                if (isFollowed.trim() === "true") {
+                    followButton.innerText = "リフォロー解除";
+                    followAction.value = "unfollow";
+                } else {
+                    followButton.innerText = "フォロー";
+                    followAction.value = "follow";
+                }
+            }
+        })
+        .catch(error => console.error("フォロー状態取得エラー:", error));
+}
+function updateFollowButtonFromSearchArtist(artistId) {
+    fetch("/SpotMusic/SpotifyCheckFollowStatusServlet?id=" + artistId + "&fromSearchArtistPage=true")
+        .then(response => response.text())
+        .then(isFollowed => {
+            var followButton = document.getElementById("followButton");
+            var followAction = document.getElementById("followAction");
+
+            if (followButton && followAction) {  // 要素が存在するか確認
+                if (isFollowed.trim() === "true") {
+                    followButton.innerText = "リフォロー解除";
+                    followAction.value = "unfollow";
+                } else {
+                    followButton.innerText = "フォロー";
+                    followAction.value = "follow";
+                }
+            }
+        })
+        .catch(error => console.error("フォロー状態取得エラー:", error));
+}
+
+
+</script>
+	
 	<script>
 // プレイリストの詳細を受け取った場合
 // プレイリストの詳細を表示する関数
@@ -378,7 +443,7 @@ function loadPlaylistPage(playlistId) {
 
 </script>
 
-<script>
+	<script>
 
 //プレイリスト曲削除用
 
@@ -426,41 +491,95 @@ console.log("toggleMenu スクリプトが実行されました！");
  });
 
 
-//曲削除
 
-window.removeTrack = function(playlistId, trackId, button) {
-    console.log("removeTrack が呼ばれました");
-    $.ajax({
-        type: "POST",
-        url: "FrontServlet?command=SpotifyRemoveTrack",
-        data: { playlistId: playlistId, trackId: trackId },
-        success: function(response) {
-            $(button).closest("li").remove();
-        },
-        error: function() {
-            alert("削除に失敗しました。");
+ player.addListener('player_state_changed', state => {
+	    console.log("プレイヤーの状態更新:", state);  // プレイヤー状態の確認
+
+	    const playPauseButton = document.getElementById('play-pause');
+	    const nowPlaying = document.getElementById('now-playing');
+	    const currentAlbumImage = document.getElementById('current-album-image');
+	    const currentAlbumName = document.getElementById('current-album-name');
+	    const currentReleaseDate = document.getElementById('current-release-date');
+
+	    // プレイヤーの状態が無い場合（曲が再生されていない場合）
+	    if (!state || !state.track_window || !state.track_window.current_track) {
+	        console.log("再生中の曲情報がありません");  // 再生中の曲がない場合
+	        nowPlaying.innerText = "なし";
+	        playPauseButton.innerHTML = `<i class="fas fa-play"></i>`; // 再生ボタンを表示
+	        currentAlbumImage.style.display = "none";
+	        currentAlbumName.innerText = "アルバム名: -";
+	        currentReleaseDate.innerText = "リリース日: -";
+	        return;
+	    }
+
+	    const track = state.track_window.current_track;
+	    nowPlaying.innerText = track.name || "なし";
+
+	    // 再生/停止ボタンのアイコン更新
+	    if (state.paused) {
+	        playPauseButton.innerHTML = `<i class="fas fa-play"></i>`;
+	    } else {
+	        playPauseButton.innerHTML = `<i class="fas fa-pause"></i>`;
+	    }
+
+	    // 曲の詳細情報を更新
+	    updateCurrentTrackDetails();
+	});
+
+//曲の詳細情報（アルバム名、リリース日、アルバム画像）を更新
+
+function updateCurrentTrackDetails() {
+    console.log("getCurrentTrackDetails関数を呼び出し中...");  // デバッグ用メッセージ
+
+    fetch("/SpotMusic/spotifyControl?action=getCurrentTrackDetails")
+    .then(response => response.json())
+    .then(data => {
+        console.log("Spotify APIから取得したデータ:", data);  // 追加デバッグ用
+        if (data.albumImageUrl) {
+            console.log("アルバム画像URL:", data.albumImageUrl);  // 画像URLの確認
+            currentAlbumImage.src = data.albumImageUrl;
+            currentAlbumImage.style.display = "block";
+        } else {
+            console.log("アルバム画像URLが取得できませんでした");  // 画像URLがない場合
+            currentAlbumImage.style.display = "none";
         }
+
+        // アルバム名・リリース日の更新
+        currentAlbumName.innerText = `アルバム名: ${data.albumName || "情報なし"}`;
+        currentReleaseDate.innerText = `リリース日: ${data.releaseDate || "情報なし"}`;
+    })
+    .catch(error => {
+        console.error("トラック詳細情報の取得エラー:", error);  // エラーメッセージ
     });
-};
+}
+
+
+
 </script>
 
-    
-    <script>
+
+	<script>
     //画像用JavaScript
-    	function updateCurrentTrackImage() {
-	    fetch("/SpotMusic/spotifyControl?action=getCurrentTrackImage")
-	        .then(response => response.json())
-	        .then(data => {
-	            if (data.imageUrl) {
-	                document.getElementById('current-track-image').src = data.imageUrl;
-	                document.getElementById('current-track-image').style.display = "block"; 
-	            } else {
-	                document.getElementById('current-track-image').style.display = "none";
-	            }
-	        })
-	        .catch(error => console.error("現在のトラック画像取得エラー:", error));
-	}
-	
+function updateCurrentTrackImages() {
+    fetch("/SpotMusic/spotifyControl?action=getCurrentTrackImage")
+        .then(response => response.json())
+        .then(data => {
+            if (data.imageUrl) {
+                // 1つ目の画像を更新
+                document.getElementById('current-track-image').src = data.imageUrl;
+                document.getElementById('current-track-image').style.display = "block"; 
+
+                // 2つ目の画像を更新
+                document.getElementById('current-track-image-2').src = data.imageUrl;
+                document.getElementById('current-track-image-2').style.display = "block"; 
+            } else {
+                document.getElementById('current-track-image').style.display = "none";
+                document.getElementById('current-track-image-2').style.display = "none";
+            }
+        })
+        .catch(error => console.error("現在のトラック画像取得エラー:", error));
+}
+
     //再生プレイヤー用JavaScript
         window.onSpotifyWebPlaybackSDKReady = () => {
             const token = '<%=session.getAttribute("access_token")%>';
@@ -491,32 +610,46 @@ window.removeTrack = function(playlistId, trackId, button) {
             let lastTrackId = null;   // 現在再生中のトラックIDを記憶
 
             player.addListener('player_state_changed', state => {
+                console.log("☆プレイヤーの状態更新:", state); // デバッグ用ログ
 
-           	console.log("プレイヤーの状態更新:", state); // デバッグ用ログ
+                const playPauseButton = document.getElementById('play-pause');
+                const nowPlaying = document.getElementById('now-playing');
+                const nowPlaying2 = document.getElementById('now-playing2');
+                const artistName = document.getElementById('artist-name');
+                const albumName = document.getElementById('album-name');
+                const trackDuration = document.getElementById('track-duration');
+                const releaseDate = document.getElementById('release-date'); // 追加: リリース日
 
-       	    const playPauseButton = document.getElementById('play-pause');
-           	const nowPlaying = document.getElementById('now-playing');
+                // デフォルトの状態（何も再生されていない時）
+                if (!state || !state.track_window || !state.track_window.current_track) {
+                    nowPlaying.innerText = "なし";
+                    nowPlaying2.innerText = "なしAPT";
+                    artistName.innerText = "APT";
+                    albumName.innerText = "APT";
+                    trackDuration.innerText = "APT";
+                    releaseDate.innerText = "APT"; // 追加: リリース日もリセット
+                    playPauseButton.innerHTML = `<i class="fas fa-play"></i>`; // 再生ボタンを表示
+                    return;
+                }
 
-            // デフォルトの状態（何も再生されていない時）
-            if (!state || !state.track_window || !state.track_window.current_track) {
-                nowPlaying.innerText = "なし";
-                playPauseButton.innerHTML = `<i class="fas fa-play"></i>`; // 再生ボタンを表示
-                return;
-            }
-            /* document.getElementById('now-playing').innerText = track ? track.name : "なし"; */
-  		    const track = state.track_window.current_track;
-    		nowPlaying.innerText = track.name || "なし";
+                const track = state.track_window.current_track;
+                nowPlaying.innerText = track.name || "なし";
+                nowPlaying2.innerText = track.name || "なし";
+                artistName.innerText = track.artists.map(artist => artist.name).join(", ") || "アーティスト情報なし";
+                albumName.innerText = track.album.name || "アルバム情報なし";
+                trackDuration.innerText = formatDuration(track.duration_ms) || "0:00";
+                releaseDate.innerText = track.album.release_date || ""; // 追加: リリース日を設定
 
-    	    // ** 再生/停止ボタンのアイコンを更新 **
-    	    if (state.paused) {
-    	        playPauseButton.innerHTML = `<i class="fas fa-play"></i>`; // 一時停止状態なら再生ボタンを表示
-    	    } else {
-    	        playPauseButton.innerHTML = `<i class="fas fa-pause"></i>`; // 再生中なら停止ボタンを表示
-    	    }
-			/* 画像 */
-			
-			updateCurrentTrackImage(); // 再生中の曲の画像を更新
-    	          
+                // 再生/停止ボタンのアイコンを更新
+                if (state.paused) {
+                    playPauseButton.innerHTML = `<i class="fas fa-play"></i>`; // 一時停止状態なら再生ボタンを表示
+                } else {
+                    playPauseButton.innerHTML = `<i class="fas fa-pause"></i>`; // 再生中なら停止ボタンを表示
+                }
+
+                // **2つの画像を更新**
+                updateCurrentTrackImages(); 
+
                 if (!state.paused && state.position > 0) {
                     trackStarted = true;
                     trackEnded = false; // 新しい曲が始まったのでリセット
@@ -545,7 +678,15 @@ window.removeTrack = function(playlistId, trackId, button) {
                     }
                 }
             });
-
+                        
+                       
+            // 曲の再生時間（ミリ秒）を「分:秒」の形式に変換する関数
+            function formatDuration(ms) {
+                const minutes = Math.floor(ms / 60000);
+                const seconds = Math.floor((ms % 60000) / 1000);
+                return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            }
+                       
 
 
 
@@ -669,9 +810,13 @@ window.removeTrack = function(playlistId, trackId, button) {
 
             
         }
-        async function controlSpotify(action, trackId = null, deviceId = null, player = null) {
-        	console.log("送信アクション: " + action);
-        	
+
+        async function controlSpotify(action, trackId = null, playlistId = null, deviceId = null, player = null, trackIndex = 0) {
+            console.log("送信アクション: " + action);
+            console.log("受け取った trackIndex: ", trackIndex);
+            
+
+            // プレイヤーが渡された場合は、Spotify Web Playback SDK の操作を優先
             if (player) {
                 switch (action) {
                     case 'togglePlay':
@@ -700,8 +845,26 @@ window.removeTrack = function(playlistId, trackId, button) {
             const params = new URLSearchParams();
             params.append("action", action);
             console.log("送信データ:", params.toString());
-            if (trackId) params.append("trackId", trackId);
-            if (deviceId) params.append("deviceId", deviceId);
+
+            if (trackId) {
+                params.append("trackId", trackId);
+                console.log("送信するトラック ID: ", trackId);
+            }
+
+            if (playlistId) {
+                params.append("playlistId", playlistId);
+                console.log("送信するプレイリスト ID: ", playlistId);
+            } else {
+                console.log("プレイリスト ID はなし（検索やおすすめの曲）");
+            }
+
+            if (deviceId) {
+                params.append("deviceId", deviceId);
+                console.log("送信するデバイス ID: ", deviceId);
+            }
+
+            params.append("trackIndex", trackIndex);
+            console.log("送信するトラックインデックス: ", trackIndex);
 
             try {
                 const response = await fetch("/SpotMusic/spotifyControl", {
@@ -723,15 +886,26 @@ window.removeTrack = function(playlistId, trackId, button) {
                 console.error("Request failed:", error);
             }
         }
+  
 
-        function playTrack(trackId, trackName) {
+        function playTrack(trackId, trackName, playlistId = null, trackIndex = 0) {
             console.log("送信するトラック ID: ", trackId);
-            controlSpotify("play", trackId);
+            console.log("開始するトラックのインデックス: ", trackIndex);
+
+            if (playlistId) {
+                console.log("送信するプレイリスト ID: ", playlistId);
+            } else {
+                console.log("プレイリスト ID はなし（検索やおすすめの曲）");
+            }
+
+            controlSpotify("play", trackId, playlistId, null, null, trackIndex);
+
             const propertyPanel = document.getElementById('propertyPanel');
             const trackDetail = document.getElementById('track-detail');
-            trackDetail.textContent = `トラック名: ${trackName}`;
+            trackDetail.textContent = `${trackName}`;
             propertyPanel.classList.add('active');
         }
+
 
         async function setupDevice(deviceId) {
             console.log("デバイスのセットアップを開始: ", deviceId);
@@ -766,7 +940,7 @@ window.removeTrack = function(playlistId, trackId, button) {
 	}
 
     </script>
-    <script>
+	<script>
     // artist.jspを動的に読み込む関数
     function loadArtistPage(artistId) {
         var contentDiv = document.querySelector('.content');
@@ -1022,7 +1196,7 @@ function loadAlbumPage(albumId) {
 </script>
 
 
-<script>
+	<script>
 $(document).ready(function(){
     $("#commentForm").submit(function(event){
         event.preventDefault(); // デフォルトのフォーム送信を防ぐ
@@ -1112,10 +1286,10 @@ function loadAlbumDetail(albumId) {
 
 
 function loadArtistDetail(artistId) {
-    console.log("loadArtistDetail called with ID:", artistId); // デバッグ用
+    console.log("loadArtistDetail called with ID:", artistId);
 
     const url = "/SpotMusic/FrontServlet?command=SpotifySearchCommand&action=artist&id=" + encodeURIComponent(artistId);
-    console.log("Fetch URL:", url); // デバッグ用
+    console.log("Fetch URL:", url);
 
     const contentDiv = document.querySelector('.content');
 
@@ -1127,13 +1301,50 @@ function loadArtistDetail(artistId) {
             return response.text();
         })
         .then(data => {
-            console.log("Response received for artist details."); // デバッグ用
+            console.log("Response received for artist details.");
             contentDiv.innerHTML = data;
+
+            // **searchartist.jsp を描画した後にフォロー状態を取得**
+            updateFollowButtonFromSearchArtist(artistId);
         })
         .catch(error => {
             console.error('Error loading artist details:', error);
             contentDiv.innerHTML = '<p>アーティスト情報の取得に失敗しました。</p>';
         });
+}
+
+// **フォロー状態を取得し、ボタンを更新する関数**
+function updateFollowButtonFromSearchArtist(artistId) {
+    var timestamp = new Date().getTime();  // キャッシュ防止用のタイムスタンプ
+
+    $.ajax({
+        type: "GET",
+        url: "/SpotMusic/SpotifyCheckFollowStatusServlet",
+        data: { id: artistId, fromSearchArtistPage: true, ts: timestamp },  // `ts` パラメータを追加
+        success: function(isFollowed) {
+            var followButton = document.getElementById("followButton");
+            var followAction = document.getElementById("followAction");
+
+            if (followButton && followAction) {
+                var trimmedResponse = isFollowed.trim();
+                
+                if (trimmedResponse === "true") {
+                    followButton.innerText = "リフォロー解除";
+                    followAction.value = "unfollow";
+                } else if (trimmedResponse === "false") {
+                    followButton.innerText = "フォロー";
+                    followAction.value = "follow";
+                } else {
+                    console.warn("予期しないレスポンス:", isFollowed);
+                    followButton.innerText = "フォロー (未確認)";
+                    followAction.value = "follow";
+                }
+            }
+        },
+        error: function() {
+            console.error("フォロー状態の取得に失敗しました");
+        }
+    });
 }
 
 
@@ -1164,7 +1375,7 @@ function loadPlaylistDetail(playlistId) {
 
 
 </script>
-<script>
+	<script>
 //プレイリスト削除JavaScript
 function deletePlaylist(playlistId) {
     if (!confirm("本当にこのプレイリストを削除しますか？")) {
@@ -1223,8 +1434,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-</script> 
-<script>
+</script>
+	<script>
 //プレイリスト作成ボタン
 document.getElementById("showPlaylistForm").addEventListener("click", function() {
     document.getElementById("playlistForm").style.display = "block";
@@ -1240,30 +1451,327 @@ document.getElementById("playlistForm").addEventListener("submit", function() {
 </script>
 
 
-<script>
+	<script>
 function friendlist() {
-    window.location.href = '/SpotMusic/FrontServlet?command=FriendList&userId=${sessionScope.user_id}';
-}
-</script>
+    const url = '/SpotMusic/FrontServlet?command=FriendList&userId=' + encodeURIComponent('${sessionScope.user_id}');
+    const contentDiv = document.querySelector('.content');
 
-<script>
-//リロード処理
-function reloadFollowedArtists() {
-    fetch('/SpotMusic/SpotifyCheckFollowStatusServlet')
-        .then(response => response.text())
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('サーバーエラー: ' + response.status);
+            }
+            return response.text();
+        })
         .then(data => {
-            console.log("フォローリストを再取得しました");
+            contentDiv.innerHTML = data;
+            console.log("フレンドリストページがロードされました！");
 
-            // **データ取得後、ページを完全リロード**
-            window.location.reload(true); // キャッシュをクリアして完全リロード
+            document.querySelectorAll(".menu-btn").forEach(button => {
+                button.addEventListener("click", function() {
+                    toggleMenu(this);
+                });
+            });
+
+            console.log("toggleMenu イベントを再適用しました");
         })
         .catch(error => {
-            console.error('フォローリストの更新に失敗しました:', error);
-
-            // **エラー時もページをリロード (最新データ取得を試す)**
-            window.location.reload(true);
+            console.error('エラー発生:', error);
+            contentDiv.innerHTML = '<p>フレンドリストの取得に失敗しました。</p>';
         });
 }
+
+
+function userList() {
+    const userId = encodeURIComponent('${sessionScope.user_id}'); // user_idを取得
+    const url = '/SpotMusic/FrontServlet?command=UsersList&userId=' + userId;
+    const contentDiv = document.querySelector('.content');
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('サーバーエラー: ' + response.status);
+            }
+            return response.text();
+        })
+        .then(data => {
+            contentDiv.innerHTML = data;
+            console.log("ユーザーリストページがロードされました！");
+
+            document.querySelectorAll(".menu-btn").forEach(button => {
+                button.addEventListener("click", function() {
+                    toggleMenu(this);
+                });
+            });
+
+            console.log("toggleMenu イベントを再適用しました");
+        })
+        .catch(error => {
+            console.error('エラー発生:', error);
+            contentDiv.innerHTML = '<p>ユーザーリストの取得に失敗しました。</p>';
+        });
+}
+function blockList() {
+    const userId = encodeURIComponent('${sessionScope.user_id}'); // user_idを取得
+    const url = '/SpotMusic/FrontServlet?command=BlockList&userId=' + userId;
+    const contentDiv = document.querySelector('.content');
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('サーバーエラー: ' + response.status);
+            }
+            return response.text();
+        })
+        .then(data => {
+            contentDiv.innerHTML = data;
+            console.log("ブロックリストページがロードされました！");
+
+            document.querySelectorAll(".menu-btn").forEach(button => {
+                button.addEventListener("click", function() {
+                    toggleMenu(this);
+                });
+            });
+
+            console.log("toggleMenu イベントを再適用しました");
+        })
+        .catch(error => {
+            console.error('エラー発生:', error);
+            contentDiv.innerHTML = '<p>ブロックリストの取得に失敗しました。</p>';
+        });
+}
+
+
+
+</script>
+
+
+
+
+
+	<script>
+        console.log("スクリプトが読み込まれました");
+
+        document.addEventListener("DOMContentLoaded", () => {
+            console.log("DOMContentLoaded イベント発火");
+
+            const currentTrackName = document.getElementById("currentTrackName");
+            const currentAlbumName = document.getElementById("currentAlbumName");
+            const currentReleaseDate = document.getElementById("currentReleaseDate");
+            const currentAlbumImage = document.getElementById("currentAlbumImage");
+				
+            function fetchCurrentTrackDetails() {
+                console.log("fetchCurrentTrackDetails を実行");
+
+                fetch("/SpotMusic/spotifyControl?action=getCurrentTrackDetails")
+                    .then(response => {
+                        console.log("APIレスポンスステータス:", response.status);
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Spotify APIから取得したデータ:", data);
+                    })
+                    .catch(error => {
+                        console.error("トラック詳細情報の取得エラー:", error);
+                    });
+            }
+
+            fetchCurrentTrackDetails();
+
+            document.getElementById("refreshButton").addEventListener("click", fetchCurrentTrackDetails);
+        });
+
+
+        let lastAlbumId = null; // 前回のアルバムIDを保持
+
+        player.addListener('player_state_changed', state => {
+            console.log("＄＄＄プレイヤーの状態更新:", state); // デバッグ用ログ
+
+            const playPauseButton = document.getElementById('play-pause');
+            const nowPlaying = document.getElementById('now-playing');
+            const nowPlaying2 = document.getElementById('now-playing2');
+            const artistName = document.getElementById('artist-name');
+            const albumName = document.getElementById('album-name');
+            const trackDuration = document.getElementById('track-duration');
+            const releaseDate = document.getElementById('release-date'); // 追加: リリース日
+
+            // デフォルトの状態（何も再生されていない時）
+            if (!state || !state.track_window || !state.track_window.current_track) {
+                nowPlaying.innerText = "なし";
+                nowPlaying2.innerText = "なし";
+                artistName.innerText = "";
+                albumName.innerText = "";
+                trackDuration.innerText = "";
+                releaseDate.innerText = ""; // 追加: リリース日もリセット
+                playPauseButton.innerHTML = `<i class="fas fa-play"></i>`; // 再生ボタンを表示
+                return;
+            }
+
+            const track = state.track_window.current_track;
+            nowPlaying.innerText = track.name || "なし";
+            nowPlaying2.innerText = track.name || "なし";
+            artistName.innerText = track.artists.map(artist => artist.name).join(", ") || "アーティスト情報なし";
+            albumName.innerText = track.album.name || "アルバム情報なし";
+            trackDuration.innerText = formatDuration(track.duration_ms) || "0:00";
+
+            // **リリース日を更新**
+            if (track.album.id !== lastAlbumId) {
+                lastAlbumId = track.album.id; // アルバムIDを更新
+                fetchReleaseDate(track.album.id, releaseDate); // 新しいアルバムのリリース日を取得
+            }
+
+            // 再生/停止ボタンのアイコンを更新
+            if (state.paused) {
+                playPauseButton.innerHTML = `<i class="fas fa-play"></i>`; // 一時停止状態なら再生ボタンを表示
+            } else {
+                playPauseButton.innerHTML = `<i class="fas fa-pause"></i>`; // 再生中なら停止ボタンを表示
+            }
+
+            // **2つの画像を更新**
+            updateCurrentTrackImages(); 
+
+            if (!state.paused && state.position > 0) {
+                trackStarted = true;
+                trackEnded = false; // 新しい曲が始まったのでリセット
+                lastTrackId = track ? track.id : null;
+            }
+
+            // **曲の終了判定**（最初の再生時はスキップ）
+            if (trackStarted && state.paused && state.position === 0 && !state.track_window.next_tracks.length) {
+                if (!trackEnded) {
+                    trackEnded = true; // 連続リクエスト防止
+                    console.log("曲が終了しました。次の曲へ移行します。");
+
+                    fetch("/SpotMusic/spotifyControl", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: "action=nextTrack"
+                    })
+                    .then(response => response.text())
+                    .then(() => {
+                        trackEnded = false; // 次の曲再生後にフラグをリセット
+                    })
+                    .catch(error => {
+                        console.error("次の曲への移行エラー:", error);
+                        trackEnded = false; // エラー時もリセット
+                    });
+                }
+            }
+        });
+
+        /**
+         * **Spotify Web API を使用してアルバムのリリース日を取得**
+         */
+        function fetchReleaseDate(albumId, releaseDateElement) {
+            if (!albumId) {
+                releaseDateElement.innerText = "";
+                return;
+            }
+
+            const accessToken = "YOUR_SPOTIFY_ACCESS_TOKEN"; // ここにアクセストークンをセット
+
+            fetch(`https://api.spotify.com/v1/albums/${albumId}`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${accessToken}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.release_date) {
+                    releaseDateElement.innerText = data.release_date;
+                } else {
+                    releaseDateElement.innerText = "";
+                }
+            })
+            .catch(error => {
+                console.error("リリース日取得エラー:", error);
+                releaseDateElement.innerText = "";
+            });
+        }
+
+        
+    </script>
+<script>
+//ホームに戻る
+    function loadHome() {
+        const url = '/SpotMusic/FrontServlet?command=GoToMainCommand';
+        const contentDiv = document.querySelector('.content'); // メインの表示エリアのみ更新
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('サーバーエラー: ' + response.status);
+                }
+                return response.text();
+            })
+            .then(data => {
+                const tempDiv = document.createElement('div'); // 一時的にレスポンスを挿入
+                tempDiv.innerHTML = data;
+
+                // `.content` の中身だけを更新
+                const newContent = tempDiv.querySelector('.content');
+                if (newContent) {
+                    contentDiv.innerHTML = newContent.innerHTML; // **headerには影響を与えず、.contentだけ更新**
+                }
+
+                console.log("ホームページの .content 部分がロードされました！");
+            })
+            .catch(error => {
+                console.error('エラー発生:', error);
+                contentDiv.innerHTML = '<p>ホーム画面の読み込みに失敗しました。</p>';
+            });
+    }
+</script>
+<script>
+// 曲削除
+window.removeTrack = function(playlistId, trackId, button) {
+    console.log("removeTrack が呼ばれました");
+    $.ajax({
+        type: "POST",
+        url: "FrontServlet?command=SpotifyRemoveTrack",
+        data: { playlistId: playlistId, trackId: trackId },
+        success: function(response) {
+            $(button).closest("li").remove();
+        },
+        error: function() {
+            alert("削除に失敗しました。");
+        }
+    });
+};
+
+// **ページ読み込み時にフォロー状態を更新**
+window.onload = function () {
+    var artistId = document.getElementById("artistId") ? document.getElementById("artistId").value : null;
+    if (artistId) {
+        setTimeout(() => updateFollowButtonFromSearchArtist(artistId), 500); // 0.5秒遅延で実行
+    }
+};
+
+
+// **フォローボタンのクリックイベント**
+$(document).ready(function () {
+    $("#followButton").on("click", function () {
+        var artistId = $("#artistId").val();
+        var action = $("#followAction").val();
+        var endpoint = action === "follow"
+            ? "/SpotMusic/SpotifyFollowArtistServlet"
+            : "/SpotMusic/SpotifyUnfollowArtistServlet";
+
+        $.ajax({
+            type: "POST",
+            url: endpoint,
+            data: { id: artistId },
+            success: function () {
+                console.log("フォロー操作成功");
+                updateFollowButtonFromSearchArtist(artistId); // 状態を即時更新
+            },
+            error: function () {
+                console.error("フォロー操作失敗");
+            }
+        });
+    });
+});
 </script>
 
 </body>

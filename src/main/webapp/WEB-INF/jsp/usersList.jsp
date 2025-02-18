@@ -91,11 +91,8 @@
 		    </c:if>
 		</c:forEach>
     </table>
-    <form action="FrontServlet" method="POST">
-    	<input type="hidden" name="userId" value="${sessionScope.userId}">
-        <input type="hidden" name="command" value="FriendList">
-        <button type="submit">フレンドリストへ</button>
-    </form>
+    		<button type="button" onclick="friendlist()">フレンドリストへ</button>
+
     <br><br>
 </body>
 </html>

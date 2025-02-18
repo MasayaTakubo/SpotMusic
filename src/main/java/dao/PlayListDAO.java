@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,21 +17,31 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import bean.PlayListBean;
 import connector.MySQLConnector;
 
 public class PlayListDAO {
 	//MySQLに保存するメソッド
 	public void savePlaylistReview(String playlistId, String userId) throws SQLException {
-	    // プレイリストIDとユーザーIDを保存するSQL文
-	    String sql = "INSERT INTO PLAYLIST_REVIEW (PLAYLIST_ID, USER_ID) VALUES (?, ?)";
-	    
-	    try (Connection conn = MySQLConnector.getConn();
-	         PreparedStatement stmt = conn.prepareStatement(sql)) {
-	        stmt.setString(1, playlistId); // プレイリストID
-	        stmt.setString(2, userId); // ユーザーID
-	        stmt.executeUpdate();
+	    String checkSql = "SELECT COUNT(*) FROM playlists WHERE playlist_id = ?";
+	    String insertSql = "INSERT INTO playlists (playlist_id, user_id) VALUES (?, ?)";
+
+	    try (Connection con = MySQLConnector.getConn();
+	         PreparedStatement checkStmt = con.prepareStatement(checkSql);
+	         PreparedStatement insertStmt = con.prepareStatement(insertSql)) {
+	        
+	        checkStmt.setString(1, playlistId);
+	        ResultSet rs = checkStmt.executeQuery();
+	        if (rs.next() && rs.getInt(1) > 0) {
+	            return; // すでに登録されている場合は何もしない
+	        }
+
+	        insertStmt.setString(1, playlistId);
+	        insertStmt.setString(2, userId);
+	        insertStmt.executeUpdate();
 	    }
 	}
+
 	
 	//Spotifyから取得するコード達
 	public JSONObject getSpotifyPlaylists(String accessToken) throws Exception {
@@ -147,6 +158,50 @@ public class PlayListDAO {
         in.close();
 
         return new JSONObject(response.toString());
+    }
+    public List<String> getFriends(String userId) {
+        List<String> Friends = new ArrayList<>();
+        String sql = "SELECT USER1_ID,USER2_ID FROM Relation WHERE (User1_Id = ? OR User2_Id = ?) AND status = 'ACCEPT'";
+        String user1 = null;
+        String user2 = null;
+        try (Connection conn = MySQLConnector.getConn();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, userId);
+            stmt.setString(2, userId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                user1 = rs.getString("USER1_ID");
+                user2 = rs.getString("USER2_ID");
+                if(user2.equals(userId)) {
+                	Friends.add(user1);//user2が自分ならuser1をフレンドリストに入れる
+                }else {
+                	Friends.add(user2);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return Friends;
+    }
+    
+    public List<PlayListBean> getFriendPlayList(String friendsId){
+        List<PlayListBean> FriendsPlayLists = new ArrayList<>();
+        String sql = "SELECT playlist_id,user_id FROM playlists where user_Id = ?";
+        try (Connection conn = MySQLConnector.getConn();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, friendsId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+            	PlayListBean FriendsPlayList = new PlayListBean(
+            		rs.getString("PLAYLIST_ID"),
+            		rs.getString("USER_ID")
+                );
+                FriendsPlayLists.add(FriendsPlayList);  // メッセージをリストに追加
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return FriendsPlayLists;
     }
 }
 

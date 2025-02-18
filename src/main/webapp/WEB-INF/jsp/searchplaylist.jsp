@@ -67,6 +67,5 @@
         <p>収録曲が見つかりませんでした。</p>
     </c:if>
 
-    <a href="javascript:history.back()" class="back-button">戻る</a>
 </body>
 </html>
