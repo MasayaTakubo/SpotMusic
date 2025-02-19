@@ -88,7 +88,7 @@ public class SpotifyAuthEntication extends HttpServlet {
 
                 // デバイスの種類を確認し、モバイルデバイスならモバイル向けURLを作成
                 String userAgent = request.getHeader("User-Agent");
-                String mobileURL = "FrontServlet?command=FriendList&userId=" + URLEncoder.encode(userId, "UTF-8");
+                String mobileURL = "FrontServlet?command=FriendListMobile&userId=" + URLEncoder.encode(userId, "UTF-8");
                 if (userAgent != null && userAgent.contains("Mobile")) {
                     // モバイルデバイスの場合
                     response.sendRedirect(mobileURL);

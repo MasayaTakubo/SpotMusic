@@ -136,9 +136,6 @@
     <button type="button" onclick="submitLoginForm()">ログイン</button>
 </form>
 
-<div class="content">
-    <!-- チャットページがここに表示される -->
-</div>
 
 	                </td>
 	            </tr>
