@@ -1,0 +1,52 @@
+/* css/error.css */
+
+/* Spotify風のダークテーマ */
+body {
+    background-color: #121212;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* 画面全体を占める */
+}
+
+/* 中央揃えのコンテンツボックス */
+.container {
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.1); /* 半透明の背景 */
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 400px; /* レスポンシブ対応 */
+}
+
+/* エラーメッセージ */
+h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+/* ボタンのデザイン */
+button {
+    background-color: #1DB954;
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1rem;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #17a44d;
+}
