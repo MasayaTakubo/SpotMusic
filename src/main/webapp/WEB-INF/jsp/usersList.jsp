@@ -40,7 +40,7 @@
 		                    
 		                </c:forEach>
 		                <c:choose>
-		                    <c:when test="${friendStatus == 'ACCEPT'}">
+		                                    <c:when test="${friendStatus == 'ACCEPT'}">
 		                        フレンドです
 		                    </c:when>
 		                    <c:when test="${friendStatus == 'CANCEL'}">
@@ -48,44 +48,30 @@
 		                    </c:when>
 		                    <c:when test="${friendStatus == 'PENDING'}">
 		                    <c:if test="${user1Id != userId}">
-		                        <form action="FrontServlet" method="post">
-		                            <input type="hidden" name="userId" value="${sessionScope.userId}">
-		                            <input type="hidden" name="relationId" value="${relationId}">
-		                            <input type="hidden" name="command" value="DeleteRelation">
-		                            <button type="submit">フレンド申請解除</button>
-		                        </form>
+		                        <button type="button" onclick="deleteRelation('${relationId}', '${sessionScope.userId}')">フレンド申請解除</button>		                        
 		                    </c:if>
 		                    <c:if test="${user1Id == userId}">
 		                    	<p>フレンド申請が来ています</p>
 		                    </c:if>
 		                    </c:when>
 		                    <c:otherwise>
-		                        <form action="FrontServlet" method="post">
-		                            <input type="hidden" name="user1Id" value="${sessionScope.userId}">
-		                            <input type="hidden" name="user2Id" value="${userId}">
-		                            <input type="hidden" name="command" value="AddRelation">
-		                            <button type="submit">フレンド申請送信</button>
-		                        </form>
+								<button type="button" onclick="addRelation('${sessionScope.userId}', '${userId}')">フレンド申請送信</button>
+		                        
 		                    </c:otherwise>
 		                </c:choose>
 		            </td>
 		            <td>
-	                    <form action="FrontServlet" method="POST">
+
 	                        <c:choose>
-	                            <c:when test="${blocked}">
-	                            	<input type="hidden" name="userId" value="${sessionScope.userId}"/>
-	                                <input type="hidden" name="blockId" value="${blockId}"/>
-	                                <input type="hidden" name="command" value="RemoveBlock"/>
-	                                <button type="submit">ブロック解除</button>
-	                            </c:when>
+	                        <c:when test="${blocked}">
+
+	                            <button type="button" onclick="removeBlock('${blockId}','${sessionScope.userId}')">ブロック解除</button>
+	                           </c:when>
 	                            <c:otherwise>
-					                <input type="hidden" name="blockedId" value="${userId}">
-					                <input type="hidden" name="blockerId" value="${sessionScope.userId}">
-	                                <input type="hidden" name="command" value="AddBlockUser"/>
-	                                <button type="submit">ブロック</button>
+	                            	<button type="button" onclick="addBlockUser('${userId}', '${sessionScope.userId}')">ブロック</button>
+	                                
 	                            </c:otherwise>
 	                        </c:choose>
-	                    </form>
 	                </td>
 		        </tr>
 		    </c:if>

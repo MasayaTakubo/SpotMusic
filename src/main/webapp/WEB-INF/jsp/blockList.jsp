@@ -24,12 +24,9 @@
                 </c:if>
             </c:forEach>
 			<th>
-			    <form action="FrontServlet" method="POST">
-			    	<input type="hidden" name="userId" value="${sessionScope.userId}">
-			    	<input type="hidden" name="blockId" value="${block.blockId}">
-			        <input type="hidden" name="command" value="RemoveBlock">
-			        <button type="submit">ブロック解除</button>
-			    </form>
+
+					    <button type="button" onclick="removeBlock('${block.blockId}','${userId}')">ブロック解除</button>
+
 			</th>
 		</tr>
 		</c:forEach>

@@ -8,21 +8,22 @@
     <meta charset="UTF-8">
     <title>Chat</title>
     <style>
-body, html {
+/* CSSをmain.jsp内に限定 */
+.chat-container {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f1f1f1;
     height: 100%;
-    overflow: hidden; /* ページ全体のスクロールを防ぐ */
+    overflow: hidden;
 }
 
-h1 {
+.chat-container h1 {
     text-align: center;
     color: #007bff;
 }
 
-h3 {
+.chat-container h3 {
     position: absolute;
     top: 10px;
     left: 20px;
@@ -31,16 +32,9 @@ h3 {
     margin: 0;
 }
 
-.chat-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh; /* 画面全体を埋める */
-    overflow: hidden; /* コンテンツがはみ出てもスクロールしない */
-}
-
 .chat-box {
     flex: 1;
-    overflow-y: auto; /* ここだけスクロール可能にする */
+    overflow-y: auto;
     background-color: #f8f9fa;
     display: flex;
     flex-direction: column-reverse;
@@ -102,7 +96,7 @@ h3 {
     border-top: 1px solid #ccc;
 }
 
-textarea {
+.chat-container textarea {
     width: 100%;
     padding: 10px;
     font-size: 14px;
@@ -114,7 +108,7 @@ textarea {
     box-sizing: border-box;
 }
 
-button {
+.chat-container button {
     background-color: #007bff;
     color: white;
     border: none;
@@ -125,11 +119,11 @@ button {
     transition: background-color 0.3s;
 }
 
-button:hover {
+.chat-container button:hover {
     background-color: #0056b3;
 }
 
-button:disabled {
+.chat-container button:disabled {
     background-color: #d6d6d6;
     cursor: not-allowed;
 }
@@ -152,7 +146,7 @@ button:disabled {
     margin-top: 20px;
 }
 
-
+}
     </style>
 </head>
 <body>
@@ -193,144 +187,129 @@ button:disabled {
 
     <script>
         // サーバーから受け取ったJSONメッセージをパースして表示
-        //ChatCommandからのデータ
         const messages = <%= jsonResponse != null ? jsonResponse : "[]" %>;
         const userMap = <%= new org.json.JSONObject(userMap) %>;
-        // チャットウィンドウにメッセージを表示
-	    const chatBox = document.getElementById('chat-box');
-		messages.forEach(message => {
-	        addMessageToBox(message);
-	    });
+        const chatBox = document.getElementById('chat-box');
+        messages.forEach(message => {
+            addMessageToBox(message);
+        });
         chatBox.scrollTop = chatBox.scrollHeight;
-        // BroadcastChannelの作成
+
         const channel = new BroadcastChannel('chat_channel');
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
-        const userId = document.getElementById('userId').value; // セッションから渡されたuserIdを取得
+        const userId = document.getElementById('userId').value;
         const relationId = document.getElementById('relationId').value;
-        // メッセージ送信イベント
-		sendButton.addEventListener('click', function () {
-		    const message = messageInput.value;
-		    if (message.trim()) {
-		    	fetch('FrontServlet', {
-		    	    method: 'POST',
-		    	    headers: {
-			    	    'Accept': 'application/json',
-		    	        'Content-Type': 'application/x-www-form-urlencoded'
-			    	},
-		    	    body: new URLSearchParams({
-		    	        command: 'AddMessage',
-		    	        message: message,
-		    	        userId: userId,
-		    	        relationId: relationId
-		    	    })
-		    	})
-		    	.then(response => {
-		    	    if (!response.ok) {
-		    	        throw new Error('Network response was not ok');
-		    	    }
-		    	    return response.json();
-		    	})
-		    	.then(data => {
-			    	chatBox.innerHTML = '';
-		    	    messageInput.value = '';
-		    	    channel.postMessage(data);
-		    	    data.forEach(message => addMessageToBox(message));
-		    	})
-		    	.catch(error => console.error('Error:', error));
-		    }
-		});
-        // 他タブからのメッセージ受信イベント
-		channel.onmessage = function (event) {
-		    if (typeof event.data === 'object') {
-			    chatBox.innerHTML='';
-		    	event.data.forEach(message => addMessageToBox(message));
-		    } else {
-		        console.error('Received data is not an object:', event.data);
-		    }
-		};
-		function escapeHTML(str) {
-		    return str.replace(/&/g, "&amp;")
-		              .replace(/</g, "&lt;")
-		              .replace(/>/g, "&gt;")
-		              .replace(/"/g, "&quot;")
-		              .replace(/'/g, "&#039;");
-		}
 
-		function addMessageToBox(message) {
-		    const blockTime = new Date("${param.blockTime}");
-		    const messageTime = new Date(message.sendTime);
-		    
-		    if (messageTime > blockTime) {
-		        return;
-		    }
+        sendButton.addEventListener('click', function () {
+            const message = messageInput.value;
+            if (message.trim()) {
+                fetch('FrontServlet', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        command: 'AddMessage',
+                        message: message,
+                        userId: userId,
+                        relationId: relationId
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    chatBox.innerHTML = '';
+                    messageInput.value = '';
+                    channel.postMessage(data);
+                    data.forEach(message => addMessageToBox(message));
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
 
-		    const messageContainer = document.createElement('div');
-		    messageContainer.classList.add('chat-message');
+        channel.onmessage = function (event) {
+            if (typeof event.data === 'object') {
+                chatBox.innerHTML = '';
+                event.data.forEach(message => addMessageToBox(message));
+            } else {
+                console.error('Received data is not an object:', event.data);
+            }
+        };
 
-		    // ログインユーザーの ID を取得（JSP から埋め込む）
-		    const loggedInUserId = "${sessionScope.userId}";
+        function escapeHTML(str) {
+            return str.replace(/&/g, "&amp;")
+                      .replace(/</g, "&lt;")
+                      .replace(/>/g, "&gt;")
+                      .replace(/"/g, "&quot;")
+                      .replace(/'/g, "&#039;");
+        }
 
-		    // ログインユーザーのメッセージなら右寄せ、それ以外は左寄せ
-		    if (message.userId === loggedInUserId) {
-		        messageContainer.classList.add('right');
-		    } else {
-		        messageContainer.classList.add('left');
-		    }
+        function addMessageToBox(message) {
+            const blockTime = new Date("${param.blockTime}");
+            const messageTime = new Date(message.sendTime);
 
-		    // ユーザー名を表示
-		    const userSpan = document.createElement('span');
-		    userSpan.classList.add('user');
-		    if (message.userId !== loggedInUserId) {  // 自分のメッセージでは名前を表示しない
-		        userSpan.textContent = userMap[message.userId] || message.userId;
-		    }
+            if (messageTime > blockTime) {
+                return;
+            }
 
-		    // メッセージ内容
-		    const messageSpan = document.createElement('span');
-		    messageSpan.classList.add('message');
-		    messageSpan.innerHTML = escapeHTML(message.sendMessage).replace(/\n/g, '<br>');
+            const messageContainer = document.createElement('div');
+            messageContainer.classList.add('chat-message');
 
-		    // メッセージ送信時刻
-		    const timeSpan = document.createElement('span');
-		    timeSpan.classList.add('time');
-		    const date = new Date(message.sendTime);
-		    const formattedTime = date.toLocaleString('ja-JP', {
-		        year: 'numeric',
-		        month: '2-digit',
-		        day: '2-digit',
-		        hour: '2-digit',
-		        minute: '2-digit',
-		        second: '2-digit',
-		        hour12: false // 24時間表示
-		    });
-		    timeSpan.textContent = formattedTime;
+            const loggedInUserId = "${sessionScope.userId}";
 
-		    // メッセージの組み立て
-		    messageContainer.appendChild(userSpan);
-		    //messageContainer.appendChild(document.createElement('br'));
-		    messageContainer.appendChild(messageSpan);
-		    //messageContainer.appendChild(document.createElement('br'));
-		    messageContainer.appendChild(timeSpan);
-		    //messageContainer.appendChild(document.createElement('br'));
+            if (message.userId === loggedInUserId) {
+                messageContainer.classList.add('right');
+            } else {
+                messageContainer.classList.add('left');
+            }
 
-		    // チャットボックスに追加
-		    chatBox.appendChild(messageContainer);
-		}
+            const userSpan = document.createElement('span');
+            userSpan.classList.add('user');
+            if (message.userId !== loggedInUserId) {
+                userSpan.textContent = userMap[message.userId] || message.userId;
+            }
 
+            const messageSpan = document.createElement('span');
+            messageSpan.classList.add('message');
+            messageSpan.innerHTML = escapeHTML(message.sendMessage).replace(/\n/g, '<br>');
 
+            const timeSpan = document.createElement('span');
+            timeSpan.classList.add('time');
+            const date = new Date(message.sendTime);
+            const formattedTime = date.toLocaleString('ja-JP', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            });
+            timeSpan.textContent = formattedTime;
 
-		//ロード時にisBlockがtrueならチャットの送信ボタンが押せないようにする
-		document.addEventListener("DOMContentLoaded", function () {
-	        var isBlock = "${isBlock}";
-	        
-	        var sendButton = document.getElementById("sendButton");
-	        var messageInput = document.getElementById("messageInput");
-	
-	        if (isBlock === "true") {
-	            sendButton.disabled = true;
-	            messageInput.disabled = true;
-	        }
-	    });
+            messageContainer.appendChild(userSpan);
+            messageContainer.appendChild(messageSpan);
+            messageContainer.appendChild(timeSpan);
+
+            chatBox.appendChild(messageContainer);
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var isBlock = "${isBlock}";
+            var sendButton = document.getElementById("sendButton");
+            var messageInput = document.getElementById("messageInput");
+
+            if (isBlock === "true") {
+                sendButton.disabled = true;
+                messageInput.disabled = true;
+            }
+        });
     </script>
 </body>
 </html>
