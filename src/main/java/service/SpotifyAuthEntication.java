@@ -1,6 +1,7 @@
 package service;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -64,35 +65,37 @@ public class SpotifyAuthEntication extends HttpServlet {
                 session.setAttribute("user_name", userName);
                 session.setAttribute("command", command);
 
-
                 // Listを保存する
                 List<String> artistIds = spotifyAuthService.getArtistIds(accessToken, 50);
                 List<String> artistNames = spotifyAuthService.getArtistNames(accessToken, 50);
                 session.setAttribute("artistIds", artistIds);
                 session.setAttribute("artistNames", artistNames);
                 System.out.println("アーティスト情報取得完了");
-                
-                
-                
+
                 //再生履歴
-                //アーティスト名がキー、値が、IDと画像イメージのセット
                 Map<String, Map<String, String>> recentlyDatas = spotifyAuthService.getRecentlyPlayedTrackDetails(accessToken, 25);
                 Map<String, Map<String, String>> topArtistsDatas = spotifyAuthService.getTopArtists(accessToken, 25);
-                
                 Map<String, Map<String, String>> newRelease = spotifyAuthService.getNewReleases(accessToken, 25);
 
                 session.setAttribute("recentryDatas", recentlyDatas);
                 session.setAttribute("artistDetails", topArtistsDatas);
-                session.setAttribute("newRelease",newRelease);
-                
-                
+                session.setAttribute("newRelease", newRelease);
+
                 // Mapを保存する
                 Map<String, String> userInfoMap = Map.of("userId", userId, "accessToken", accessToken, "refreshToken", refreshToken);
                 session.setAttribute("userInfoMap", userInfoMap);
                 System.out.println("ユーザー情報Map登録完了");
 
-                // リダイレクト先へ
-                response.sendRedirect(frontURL);
+                // デバイスの種類を確認し、モバイルデバイスならモバイル向けURLを作成
+                String userAgent = request.getHeader("User-Agent");
+                String mobileURL = "FrontServlet?command=FriendList&userId=" + URLEncoder.encode(userId, "UTF-8");
+                if (userAgent != null && userAgent.contains("Mobile")) {
+                    // モバイルデバイスの場合
+                    response.sendRedirect(mobileURL);
+                } else {
+                    // デスクトップなど、通常のリダイレクト先
+                    response.sendRedirect(frontURL);
+                }
                 System.out.println("リダイレクト完了");
 
             } catch (IOException | SQLException e) {
@@ -120,6 +123,4 @@ public class SpotifyAuthEntication extends HttpServlet {
         session.setAttribute("access_token", newAccessToken);
         System.out.println("アクセストークンがリフレッシュされました。");
     }
-    
-
 }
