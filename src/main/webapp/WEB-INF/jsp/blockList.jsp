@@ -5,12 +5,10 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>ブロックリスト</title>
+<title>SpotMusic - Web Player：すべての人に音楽を</title>
 </head>
 <body>
-<h1>ブロックリスト</h1>
-
-<h1>${sessionScope.user_name}がブロックしている相手のリスト</h1>
+<h2>ブロックしたユーザー一覧</h2>
     <table border="1">
         <tr>
             <th>ブロックした相手のユーザー名</th>
