@@ -157,11 +157,8 @@
         String jsonResponse = (String) request.getAttribute("messages");
         Map<String, String> userMap = (Map<String, String>) request.getAttribute("userMap");
     %>
-<form action="FrontServlet" method="POST">
-    <input type="hidden" name="userId" value="${sessionScope.userId}">
-    <input type="hidden" name="command" value="FriendList">
-    <button type="submit" class="friend-list-button">フレンドリストへ</button>
-</form>
+        		<button type="button" onclick="friendlist()" class="friend-list-button">フレンドリストへ</button>
+
 <div class="chat-container">
     <h1>Chat Room</h1>
     <h3>ログインユーザー：${sessionScope.user_name }</h3>

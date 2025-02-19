@@ -1893,7 +1893,7 @@ function sendMessage(relationId, userId) {
     const messageInput = document.getElementById("messageInput");
 
     if (!relationId || !userId) {
-        console.error("エラー: relationId または userId が未指定です");
+        console.error("エラー: relationId または userId が未指定です");	
         return;
     }
 
