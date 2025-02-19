@@ -175,12 +175,12 @@
     <c:if test="${isBlock eq 'true'}">
         <p class="warning-message">ブロック中のため、メッセージを送信できません。</p>
     </c:if>
-        <form action="FrontServlet" method="POST" id="chatForm" onsubmit="return false;">
+        <form  method="POST" id="chatForm" onsubmit="return false;">
             <textarea name="message" id="messageInput" placeholder="Type your message here..." required></textarea>
             <input type="hidden" name="relationId" id="relationId" value="${param.relationId}">
             <input type="hidden" name="userId" id="userId" value="${sessionScope.userId}">
             <input type="hidden" name="command" value="AddMessage">
-            <button id="sendButton" name="sendButton" type="submit" ${isBlock eq 'true' ? 'disabled' : ''}>送信</button>
+			<button type="button" onclick="sendMessage('${param.relationId}', '${sessionScope.userId}')">送信</button>
         </form>
     </div>
 </div>

@@ -1889,6 +1889,48 @@ function addBlockUser(blockedId, blockerId) {
 }
 
 
+function sendMessage(relationId, userId) {
+    const messageInput = document.getElementById("messageInput");
+
+    if (!relationId || !userId) {
+        console.error("エラー: relationId または userId が未指定です");
+        return;
+    }
+
+    if (!messageInput || !messageInput.value.trim()) {
+        alert("メッセージを入力してください。");
+        return;
+    }
+
+    const message = messageInput.value.trim();
+    const encodedRelationId = encodeURIComponent(relationId);
+    const encodedUserId = encodeURIComponent(userId);
+    const encodedMessage = encodeURIComponent(message);
+    const command = "AddMessage";
+
+    const url = '/SpotMusic/FrontServlet?command=' + command +
+                '&relationId=' + encodedRelationId +
+                '&userId=' + encodedUserId +
+                '&message=' + encodedMessage;
+
+    console.log("送信URL:", url); // デバッグ用
+
+    fetch(url, { method: "POST" })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('サーバーエラー: ' + response.status);
+            }
+            return response.text();
+        })
+        .then(data => {
+            console.log("メッセージが送信されました！", data);
+            messageInput.value = ""; // 送信後に入力欄をクリア
+        })
+        .catch(error => {
+            console.error('エラー発生:', error);
+            alert('メッセージの送信に失敗しました。');
+        });
+}
 
 
 </script>
