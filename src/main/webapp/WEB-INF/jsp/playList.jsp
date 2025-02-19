@@ -101,7 +101,7 @@
  <ul id="commentList">
     <c:forEach var="comment" items="${comments}">
         <li>
-            <strong>${comment.userId}</strong>: ${comment.sendComment}<br>
+            <strong>${fn:escapeXml(comment.userId)}</strong>: ${fn:escapeXml(comment.sendComment)}<br>
             <small>${comment.sendTime}</small>
         </li>
     </c:forEach>
