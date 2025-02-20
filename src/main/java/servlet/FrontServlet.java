@@ -51,6 +51,13 @@ public class FrontServlet extends HttpServlet {
 
             // リクエスト処理（ここで CommandFactory からコマンド取得などが行われる）
             ResponseContext resc = app.handleRequest(reqc);
+            
+            // LogoutCommand の場合、HTML を直接レスポンスとして出力
+            if ("LogoutCommand".equals(reqc.getCommandPath())) {
+                res.setContentType("text/html");
+                res.getWriter().write((String) resc.getResult());
+                return;
+            }
 
             // レスポンスに設定
             resc.setResponse(res);
