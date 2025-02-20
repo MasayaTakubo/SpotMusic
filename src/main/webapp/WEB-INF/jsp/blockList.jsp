@@ -5,12 +5,10 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>ブロックリスト</title>
+<title>SpotMusic - Web Player：すべての人に音楽を</title>
 </head>
 <body>
-<h1>ブロックリスト</h1>
-
-<h1>${sessionScope.user_name}がブロックしている相手のリスト</h1>
+<h2>ブロックしたユーザー一覧</h2>
     <table border="1">
         <tr>
             <th>ブロックした相手のユーザー名</th>
@@ -24,12 +22,9 @@
                 </c:if>
             </c:forEach>
 			<th>
-			    <form action="FrontServlet" method="POST">
-			    	<input type="hidden" name="userId" value="${sessionScope.userId}">
-			    	<input type="hidden" name="blockId" value="${block.blockId}">
-			        <input type="hidden" name="command" value="RemoveBlock">
-			        <button type="submit">ブロック解除</button>
-			    </form>
+
+					    <button type="button" onclick="removeBlock('${block.blockId}','${userId}')">ブロック解除</button>
+
 			</th>
 		</tr>
 		</c:forEach>

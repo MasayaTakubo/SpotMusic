@@ -631,6 +631,11 @@ hr{
 
 	 
  }
+ .no-image-space {
+    display: inline-block;
+    width: 18px; /* 必要に応じて調整 */
+}
+
 
  
  .name{

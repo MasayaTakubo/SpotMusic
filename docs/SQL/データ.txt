@@ -79,8 +79,6 @@ VALUES ('31rqkz3mglwnl47b2g4thwqfih4a', 'l3t4fygmdhchwz9yh3lpgkqhf', 'PENDING');
 
 -- PENDING 状態でブロック
 -- リレーションIDを動的に設定
-INSERT INTO relation (USER1_ID, USER2_ID, STATUS) 
-VALUES ('31rqkz3mglwnl47b2g4thwqfih4a', 'l3t4fygmdhchwz9yh3lpgkqhf', 'PENDING'); -- satou <=> takubo
 INSERT INTO blocked_user (BLOCKER_ID, BLOCKED_ID) 
 VALUES ('31rqkz3mglwnl47b2g4thwqfih4a', 'l3t4fygmdhchwz9yh3lpgkqhf'); -- satou ブロック takubo
 
@@ -95,8 +93,6 @@ VALUES ('31iu3d27fuexgadotnfmmv3knrhu', '31gqpyn64ycd6uq37qkbmtngl26q', 'CANCEL'
 
 -- CANCEL 状態でブロック
 -- リレーションIDを動的に設定
-INSERT INTO relation (USER1_ID, USER2_ID, STATUS) 
-VALUES ('31iu3d27fuexgadotnfmmv3knrhu', '31gqpyn64ycd6uq37qkbmtngl26q', 'CANCEL'); -- saino <=> thau
 INSERT INTO blocked_user (BLOCKER_ID, BLOCKED_ID) 
 VALUES ('31iu3d27fuexgadotnfmmv3knrhu', '31gqpyn64ycd6uq37qkbmtngl26q'); -- saino ブロック thau
 

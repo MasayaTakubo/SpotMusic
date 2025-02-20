@@ -13,27 +13,27 @@ import context.ResponseContext;
 import controller.ApplicationController;
 import controller.WebApplicationController;
 
-public class FrontServlet extends HttpServlet{
-    protected void doGet(HttpServletRequest req,HttpServletResponse res)
-        throws ServletException,IOException{
-            doPost(req,res);
-        }       
+public class FrontServlet extends HttpServlet {
+    protected void doGet(HttpServletRequest req, HttpServletResponse res)
+            throws ServletException, IOException {
+        doPost(req, res);
+    }       
+    
     public void doPost(HttpServletRequest req, HttpServletResponse res)
             throws IOException, ServletException {
 
-    	res.setContentType("application/json");
+        res.setContentType("application/json");
         req.setCharacterEncoding("UTF-8");
         System.out.println("FrontServletに処理が来ました。");
-        
 
-        ApplicationController app = new WebApplicationController();	
+        ApplicationController app = new WebApplicationController();    
         HttpSession session = req.getSession();
         
         String userId = req.getParameter("userId");
         if(userId != null && !userId.isEmpty()) {
-        	session.setAttribute("userId", userId);
-        	
+            session.setAttribute("userId", userId);
         }
+        
         // リクエストデータをログ出力
         System.out.println("Request Received:");
         System.out.println("Request URI: " + req.getRequestURI());
@@ -42,36 +42,33 @@ public class FrontServlet extends HttpServlet{
         System.out.println("UserId: " + req.getParameter("userId"));
         System.out.println("SessionUserId: " + session.getAttribute("user_id"));
         
+        try {
+            // リクエストコンテキスト取得
+            RequestContext reqc = app.getRequest(req);
 
-        // リクエストコンテキスト取得
-        RequestContext reqc = app.getRequest(req);
+            // デバッグ用ログ出力
+            System.out.println("Command Path: " + reqc.getCommandPath());
 
-        // デバッグ用のログ
-        System.out.println("Command Path: " + reqc.getCommandPath());
+            // リクエスト処理（ここで CommandFactory からコマンド取得などが行われる）
+            ResponseContext resc = app.handleRequest(reqc);
 
-        // リクエスト処理
-        ResponseContext resc = app.handleRequest(reqc);
-        
-        // LogoutCommand の場合、HTML を直接レスポンスとして出力
-        if ("LogoutCommand".equals(reqc.getCommandPath())) {
-            res.setContentType("text/html");
-            res.getWriter().write((String) resc.getResult());
-            return;
+            // レスポンスに設定
+            resc.setResponse(res);
+
+            // ターゲットURIのログ出力
+            System.out.println("Target URI: " + resc.getTarget());
+            
+            // トラックデバッグ
+            System.out.println("Command: " + req.getParameter("command"));
+            System.out.println("Track ID: " + req.getParameter("trackId"));
+
+            // レスポンス処理
+            app.handleResponse(reqc, resc);
+        } catch (RuntimeException e) {
+            // 例外発生時（例：コマンドが見つからない等）
+            e.printStackTrace();
+            // WEB-INF内の error.jsp にフォワード
+            req.getRequestDispatcher("/WEB-INF/jsp/error.jsp").forward(req, res);
         }
-        
-
-        // レスポンスに設定
-        resc.setResponse(res);
-
-        // ターゲットの確認
-        System.out.println("Target URI: " + resc.getTarget());
-        
-        //トラックデバッグ
-        System.out.println("Command: " + req.getParameter("command"));
-        System.out.println("Track ID: " + req.getParameter("trackId"));
-
-        // レスポンス処理
-        app.handleResponse(reqc, resc);
     }
-
 }

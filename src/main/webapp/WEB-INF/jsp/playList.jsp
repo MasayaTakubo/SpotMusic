@@ -12,6 +12,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
    	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+   	
     <link rel="stylesheet" type="text/css" href="<c:url value='/css/delete.css' />">
     <title>プレイリスト詳細</title>
     <style>
@@ -39,7 +40,6 @@
     </style>
 </head>
 <body>
-    <h2>プレイリストのトラック一覧</h2>
 
     <%
 	  	//セッションからuserIdを取得
@@ -49,34 +49,30 @@
     %>
 
 <c:if test="${not empty trackList}">
-    <ul class="track-list">
-	<c:forEach var="track" items="${trackList}" varStatus="status">
-	    <li>
-	        <strong>トラック名:</strong> ${fn:escapeXml(track.trackName)}<br> 
-	        <strong>アーティスト名:</strong> ${fn:escapeXml(track.artistName)}<br>
-	
-	        <!-- 画像がある場合のみ表示 -->
-	        <c:if test="${not empty track.trackImageUrl}">
-	            <img src="${track.trackImageUrl}" alt="${fn:escapeXml(track.trackName)}" width="100" />
-	        </c:if>
-	
-	           <button onclick="console.log('クリック: trackIndex=', ${status.index}); playTrack('${track.trackId}', '${track.trackName}', '${param.playlistId}', ${status.index})">再生</button>
-	        
-	        
-	        
-	
-	        <!-- メニュー用のボタン -->
-	        <div class="track-menu">
-	            <button class="menu-btn" onclick="toggleMenu(this)">&#x22EE;</button>
-	            <div class="menu-content">
-	                <button onclick="removeTrack('${param.playlistId}', '${track.trackId}', this)">削除</button>
-	            </div>
-	        </div>
-	    </li>
-	</c:forEach>
+<ul class="track-list">
+	    <h2>プレイリストのトラック一覧</h2>
+    <c:forEach var="track" items="${trackList}" varStatus="status">
+        <li>
+            <!-- トラック画像 -->
+            <c:if test="${not empty track.trackImageUrl}">
+                <img src="${track.trackImageUrl}" alt="${fn:escapeXml(track.trackName)}">
+            </c:if>
+
+            <!-- トラック情報 -->
+            <div class="track-info">
+                <strong>${fn:escapeXml(track.trackName)}</strong>
+                <span>${fn:escapeXml(track.artistName)}</span>
+            </div>
+                <button onclick="console.log('クリック: trackIndex=', ${status.index}); playTrack('${track.trackId}', '${track.trackName}', '${param.playlistId}', ${status.index})">再生</button>
+        
+                <button class="delete-btn" onclick="removeTrack('${param.playlistId}', '${track.trackId}', this)">
+                    🗑️
+                </button>
+        </li>
+    </c:forEach>
+</ul>
 
 
-    </ul>
 </c:if>
 
 
@@ -101,7 +97,7 @@
  <ul id="commentList">
     <c:forEach var="comment" items="${comments}">
         <li>
-            <strong>${comment.userId}</strong>: ${comment.sendComment}<br>
+            <strong>${fn:escapeXml(comment.userId)}</strong>: ${fn:escapeXml(comment.sendComment)}<br>
             <small>${comment.sendTime}</small>
         </li>
     </c:forEach>
