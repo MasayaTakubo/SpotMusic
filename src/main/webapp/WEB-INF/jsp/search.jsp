@@ -5,19 +5,20 @@
 <html>
 <head>
     <title>検索結果</title>
-<!-- <link rel="stylesheet" type="text/css" href="<c:url value='/css/styles.css' />"> -->    
+
 	
 </head>
 <body>
-<div class="content">
+<div class="SearchPage">
+
 <!-- タブメニュー -->
 <c:set var="noImageUrl" value="${fn:escapeXml(pageContext.request.contextPath)}/img/no_image.png" />
 <div class="tab-menu">
     <button class="active" onclick="showTab('all')">すべて</button>
-    <button onclick="showTab('tracks')">曲</button>
-    <button onclick="showTab('albums')">アルバム</button>
-    <button onclick="showTab('artists')">アーティスト</button>
-    <button onclick="showTab('playlists')">プレイリスト</button>
+    <button class="track" onclick="showTab('tracks')">曲</button>
+    <button class="albums"onclick="showTab('albums')">アルバム</button>
+    <button class="artits"onclick="showTab('artists')">アーティスト</button>
+    <button class="playlists"onclick="showTab('playlists')">プレイリスト</button>
 </div>
 
 <!-- すべての結果（デフォルト） -->
@@ -27,17 +28,19 @@
     <!-- 曲のリスト -->
     <c:if test="${not empty tracks}">
         <h3>曲</h3>
-        <ul class="track-list">
+        <div class="track-list">
             <c:forEach var="track" items="${tracks}">
-                <li class="track-item">
+                <div class="track-item">
+                	<div class="trackImg">
                     <c:choose>
                         <c:when test="${not empty track.image}">
-                            <img src="${track.image}" alt="アルバム画像" width="50">
+                            <img src="${track.image}" alt="アルバム画像">
                         </c:when>
                         <c:otherwise>
-                            <img src="<c:url value='/img/no_image.png' />" alt="No Image" width="50">
+                            <img src="<c:url value='/img/no_image.png' />" alt="No Image">
                         </c:otherwise>
                     </c:choose>
+                    </div>
 
                     ${track.track_number}. ${track.name}
 
@@ -50,64 +53,65 @@
 				            <option value="${playlist.id}">${playlist.name}</option>
 				        </c:forEach>
 				    </select>
-				    <button class="add-button" type="submit">追加</button>
-				    <button type="button" onclick="playTrack('${track.id}', '${track.name}')">再生</button>
+				    <button class="add-button" type="submit"><i class='bx bxs-folder-plus'></i></button>
+				    <button type="button" onclick="playTrack('${track.id}', '${track.name}')"><i class='bx bx-play-circle' ></i></button>
 				</form>
 
-                </li>
+                </div>
             </c:forEach>
-        </ul>
+        </div>
     </c:if>
 
     <!-- アルバムのリスト -->
     <c:if test="${not empty albums}">
         <h3>アルバム</h3>
-        <ul class="album-list">
+        <div class="Album">
 			<c:forEach var="album" items="${albums}">
-			    <li class="album-item">
+			   
 			        <a href="javascript:void(0);" 
 			           onclick="loadAlbumDetail('${album.id}')">
-			            <img src="${album.image}" width="100">
+			            <img src="${album.image}">
 			            ${album.name}
 			        </a>
-			    </li>
+			    
 			</c:forEach>
+</div>
 
-        </ul>
+        
     </c:if>
 
     <!-- アーティストのリスト -->
     <c:if test="${not empty artists}">
         <h3>アーティスト</h3>
-        <ul class="artist-list">
+        <div class="TopAr">
 			<c:forEach var="artist" items="${artists}">
-			    <li class="artist-item">
+			   
 			        <a href="javascript:void(0);" 
 			           onclick="loadArtistDetail('${artist.id}')">
-			            <img src="${artist.image}" width="100">
+			            <img src="${artist.image}">
 			            ${artist.name}
 			        </a>
-			    </li>
+			    
 			</c:forEach>
 
-        </ul>
+        </div>
     </c:if>
 
     <!-- プレイリストのリスト -->
     <c:if test="${not empty playlists}">
         <h3>プレイリスト</h3>
-        <ul class="playlist-list">
+        <div class="Album">
 			<c:forEach var="playlist" items="${playlists}">
-			    <li class="playlist-item">
+			    
 			        <a href="javascript:void(0);" 
 			           onclick="loadPlaylistDetail('${playlist.id}')">
-			            <img src="${playlist.image}" width="100">
+			            <img src="${playlist.image}">
 			            ${playlist.name}
 			        </a>
-			    </li>
+			    
 			</c:forEach>
 
-        </ul>
+        </div>
     </c:if>
 </div>
 
@@ -115,17 +119,20 @@
 <div id="tracks" class="tab-content">
     <h2>曲</h2>
     <c:if test="${not empty tracks}">
-        <ul class="track-list">
+        <h3>曲</h3>
+        <div class="track-list">
             <c:forEach var="track" items="${tracks}">
-                <li class="track-item">
+                <div class="track-item">
+                	<div class="trackImg">
                     <c:choose>
                         <c:when test="${not empty track.image}">
-                            <img src="${track.image}" alt="アルバム画像" width="50">
+                            <img src="${track.image}" alt="アルバム画像">
                         </c:when>
                         <c:otherwise>
-                            <img src="<c:url value='/img/no_image.png' />" alt="No Image" width="50">
+                            <img src="<c:url value='/img/no_image.png' />" alt="No Image">
                         </c:otherwise>
                     </c:choose>
+                    </div>
 
                     ${track.track_number}. ${track.name}
 
@@ -138,53 +145,56 @@
 				            <option value="${playlist.id}">${playlist.name}</option>
 				        </c:forEach>
 				    </select>
-				    <button class="add-button" type="submit">追加</button>
-				    <button type="button" onclick="playTrack('${track.id}', '${track.name}')">再生</button>
+				    <button class="add-button" type="submit"><i class='bx bxs-folder-plus'></i></button>
+				    <button type="button" onclick="playTrack('${track.id}', '${track.name}')"><i class='bx bx-play-circle' ></i></button>
 				</form>
-                </li>
+
+                </div>
             </c:forEach>
-        </ul>
+        </div>
     </c:if>
 </div>
 
 <!-- アルバムタブ -->
 <div id="albums" class="tab-content">
     <h2>アルバム</h2>
+    <div class="Album">
     <c:if test="${not empty albums}">
-        <ul class="album-list">
+        
 			<c:forEach var="album" items="${albums}">
-			    <li class="album-item">
+			    
 			        <a href="javascript:void(0);" 
 			           onclick="loadAlbumDetail('${album.id}')">
-			            <img src="${album.image}" width="100">
+			            <img src="${album.image}">
 			            ${album.name}
 			        </a>
-			    </li>
+			    
 			</c:forEach>
 
-        </ul>
+        
     </c:if>
     <c:if test="${empty albums}">
         <p>アルバムが見つかりませんでした。</p>
     </c:if>
+    </div>
 </div>
 
 <!-- アーティストタブ -->
 <div id="artists" class="tab-content">
     <h2>アーティスト</h2>
     <c:if test="${not empty artists}">
-        <ul class="artist-list">
+        <div class="TopAr">
 			<c:forEach var="artist" items="${artists}">
-			    <li class="artist-item">
+			   
 			        <a href="javascript:void(0);" 
 			           onclick="loadArtistDetail('${artist.id}')">
-			            <img src="${artist.image}" width="100">
+			            <img src="${artist.image}">
 			            ${artist.name}
 			        </a>
-			    </li>
+			    
 			</c:forEach>
 
-        </ul>
+        </div>
     </c:if>
     <c:if test="${empty artists}">
         <p>アーティストが見つかりませんでした。</p>
@@ -195,23 +205,23 @@
 <div id="playlists" class="tab-content">
     <h2>プレイリスト</h2>
     <c:if test="${not empty playlists}">
-        <ul class="playlist-list">
+        <div class="Album">
 			<c:forEach var="playlist" items="${playlists}">
-			    <li class="playlist-item">
+			    
 			        <a href="javascript:void(0);" 
 			           onclick="loadPlaylistDetail('${playlist.id}')">
-			            <img src="${playlist.image}" width="100">
+			            <img src="${playlist.image}">
 			            ${playlist.name}
 			            
 			        </a>
-			    </li>
+			    
 			</c:forEach>
-        </ul>
+        </div>
     </c:if>
     <c:if test="${empty playlists}">
         <p>プレイリストが見つかりませんでした。</p>
     </c:if>
-</div>
+
 
 <!-- 隠し iframe（リクエスト処理用） -->
 <iframe name="hidden_iframe" style="display: none;"></iframe>
@@ -234,12 +244,15 @@
     <c:if test="${not empty message}">
         <p>${message}</p>
     </c:if>
+</div>
+</div>
+
 <script>
 function showTab(tabName) {
-    // すべてのタブコンテンツを非表示にする
+/*     // すべてのタブコンテンツを非表示にする
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.style.display = "none";
-    });
+    }); */
 
     // すべてのタブボタンのアクティブ状態を解除
     document.querySelectorAll('.tab-menu button').forEach(button => {
