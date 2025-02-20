@@ -95,6 +95,12 @@ public class SpotifyWebPlaybackSDK extends HttpServlet {
 
                             String playlistUri = "spotify:playlist:" + playlistId;
                             spotifyService.playTrack(session, accessToken, playlistUri, trackIndex);
+                            
+                            // **プレイリスト再生の後にリピート設定を適用**
+                            String currentRepeatState = (String) session.getAttribute("repeatState");
+                            if (currentRepeatState != null && !currentRepeatState.equals("off")) {
+                                spotifyService.setRepeatMode(accessToken, currentRepeatState);
+                            }
                         } else {
                             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                             response.getWriter().write("Error: プレイリストに曲がありません");
