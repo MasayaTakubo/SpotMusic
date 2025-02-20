@@ -45,13 +45,15 @@
 	        <img src="<c:url value='/img/spotify.png' />" alt="ロゴを配置" class="reload-icon">
 	    </a>
 	</div>
-    		<a href="javascript:void(0);" onclick="loadHome()">HOME</a>
+<div class="home">
+    		<a href="javascript:void(0);" onclick="loadHome()" class="homeBtn"><i class='bx bx-home-alt' ></i></a>
 <div class="find">  
 <form onsubmit="event.preventDefault(); loadSearchPage();" class="findForm">
     <input type="text" id="searchQuery" name="query" class="search" placeholder="何を再生したいですか？" required>
     <button class="search-button" type="submit"><i class='bx bx-search'></i></button>
 </form>
 </div>  
+</div>
     
     <div class="actions">
         <!-- アカウントアイコン -->
@@ -82,14 +84,19 @@
 
 		<!-- プレイリスト作成フォーム (デフォルトは非表示) -->
 		<form id="playlistForm" action="FrontServlet" method="post"
-			target="hidden_iframe" style="display: none;">
+			target="hidden_iframe" style="display:none; ">
 			<input type="hidden" name="command"
 				value="SpotifyCreatePlaylistCommand"> <input type="hidden"
 				name="responseType" value="html">
 			<!-- HTML レスポンスを要求 -->
-			<label for="playlistName">新しいプレイリスト名:</label> <input type="text"
-				id="playlistName" name="playlistName" required>
+			<div class="addPL">
+			<label for="playlistName"></label> 
+			
+			<input type="text"
+				id="playlistName"placeholder="新しプレイリスト名" name="playlistName" required  >
 			<button type="submit">作成</button>
+			</div>
+			
 		</form>
 		<!--  ここまで -->
 
@@ -117,10 +124,10 @@
 
             <c:choose>
                 <c:when test="${not empty playlist.imageUrl and fn:length(playlist.imageUrl) > 0}">
-                    <img class="playlist-img" src="${playlist.imageUrl}" alt="Playlist Image" width="100" />
+                    <img class="playlist-img" src="${playlist.imageUrl}" alt="Playlist Image"  />
                 </c:when>
                 <c:otherwise>
-                    <img src="${pageContext.request.contextPath}/img/no_image.png" alt="No Image" width="100" />
+                    <img src="${pageContext.request.contextPath}/img/no_image.png" alt="No Image" />
                 </c:otherwise>
             </c:choose>
             <div class="buttonPL">
@@ -147,7 +154,9 @@
 </div>
 <div class="resizer resizer-1"></div>
 	<div class="content">
-		<h2>フォロー中のアーティスト</h2>
+	<h2>フォロー中のアーティスト</h2>
+		<div class="flAr">
+		
 		<%
 		List<String> followedArtistNames = (List<String>) session.getAttribute("followedArtistNames");
 		List<String> followedArtistImages = (List<String>) session.getAttribute("followedArtistImages");
@@ -168,106 +177,119 @@
 						<li>
 							<!-- アーティストの画像と名前を表示 --> <c:if
 								test="${not empty followedArtistImages[status.index]}">
-								<img src="${followedArtistImages[status.index]}"
-									alt="${artistName}" width="100" />
-							</c:if> <a href="javascript:void(0);"
+								
+									
+							</c:if> 
+							<a href="javascript:void(0);"
 							onclick="loadArtistPage('${sessionScope.artistIds[status.index]}')">
+							<img src="${followedArtistImages[status.index]}"
+									alt="${artistName}" />
 								${artistName} </a>
+								
 						</li>
 					</c:forEach>
 				</ul>
 			</c:when>
+			
 			<c:otherwise>
+			
 				<p>フォロー中のアーティストが見つかりませんでした。</p>
 			</c:otherwise>
 		</c:choose>
+		</div>
+		
 
 
 
 		<!-- 最近再生履歴の表示 -->
 		<h2>最近再生された曲</h2>
+		
 		<c:if test="${not empty recentryDatas}">
-			<table>
-				<tbody>
+			<div class="songList">
 					<c:forEach var="entry" items="${recentryDatas}">
-						<tr>
-							<td>${entry.key}</td><!-- トラック名 -->
-							<td><c:if test="${not empty entry.value.image}">
-									<img src="${entry.value.image}" alt="Track Image" width="100">
+						
+							
+							
+							<button onclick="playTrack('${entry.value.id}', '${entry.key}')"><c:if test="${not empty entry.value.image}">
+									<img src="${entry.value.image}" alt="Track Image"></c:if>
+								${entry.key}<!-- トラック名 -->
+							</button>
 
-								</c:if></td>
-							<td><button
-									onclick="playTrack('${entry.value.id}', '${entry.key}')">再生</button></td>
 
-
-						</tr>
+						
 					</c:forEach>
-				</tbody>
-			</table>
+			</div>
 		</c:if>
 		<c:if test="${empty recentryDatas}">
 			<p>No recently played tracks found.</p>
 		</c:if>
 
 
+
 		<!-- Top Mix Tracksの表示 -->
 		<h2>Top Artist</h2>
+		<div class="TopAr">
 		<c:if test="${not empty artistDetails}">
-			<table>
+			
 
-				<tbody>
+				
 					<c:forEach var="entry" items="${artistDetails}">
-						<tr>
+					
 							<!-- アーティスト名 -->
-							<td><a href="javascript:void(0);"
-								onclick="loadArtistPage('${entry.value.id}')"> ${entry.key}
-							</a></td>
+							<a href="javascript:void(0);"
+								onclick="loadArtistPage('${entry.value.id}')"> <!-- 画像URL -->
+							<c:if test="${not empty entry.value.image}">
+									<img src="${entry.value.image}" alt="Artist Image">
+								</c:if>${entry.key}
+							</a>
 
-							<!-- 画像URL -->
-							<td><c:if test="${not empty entry.value.image}">
-									<img src="${entry.value.image}" alt="Artist Image"
-										style="width: 100px; height: 100px;">
-								</c:if></td>
-						</tr>
+							
+					
 					</c:forEach>
-				</tbody>
-			</table>
+				
+			
 		</c:if>
 
 		<c:if test="${empty artistDetails}">
 			<p>No recently played artists found.</p>
 		</c:if>
 
+</div>
 
 
 
 		<!-- 新着のデータの表示 -->
 		<h2>新着アルバム</h2>
+		
 		<c:if test="${not empty newRelease}">
-			<table>
-				<tbody>
+		<div class="Album">
+			
 					<c:forEach var="entry" items="${newRelease}">
-						<tr>
-							<td><img src="${entry.value.image}" alt="Cover Image"
-								width="100"></td>
-							<td><a href="javascript:void(0);" class="load-album-link"
-								data-playlist-id="${entry.value.id}"> ${entry.key} </a></td>
-						</tr>
+						
+							
+							<a href="javascript:void(0);" class="load-album-link"
+								data-playlist-id="${entry.value.id}">
+								<img src="${entry.value.image}" alt="Cover Image">
+								 ${entry.key}
+							 </a>
+						
 					</c:forEach>
-				</tbody>
-			</table>
+		</div>
+				
 		</c:if>
 		<c:if test="${empty newRelease}">
 			<p>No recommended tracks found.</p>
 		</c:if>
 
+
 	</div>
 	<div class="resizer resizer-2"></div>
 	<!-- 右側: 詳細情報パネル -->
 	<div class="property-panel" id="propertyPanel">
+	<div class="track">
 		<h2>トラック詳細</h2>
 		<img id="current-track-image-2" src="" alt="トラック画像"
-     style="display: none; width: 300px; height: 300px;">
+     style="display: none;">
 		<!-- <p id="track-detail">再生中のトラック詳細が表示されます。</p> -->
 		<strong><p id="now-playing2"></p>
 			<p id="artist-name">artist:</p>
@@ -277,6 +299,7 @@
 			<p id="track-duration"></p></strong>
 			<p><span id="release-date"></span></p>
   
+    </div>
     </div>
  </div>
 
@@ -1772,6 +1795,46 @@ $(document).ready(function () {
         });
     });
 });
+</script>
+<script>
+const resizer = document.querySelector('.resizer-1');
+const sidebar = document.querySelector('.sidebar');
+const content = document.querySelector('.content');
+let isResizing = false;
+
+resizer.addEventListener('mousedown', (e) => {
+    isResizing = true;
+    document.addEventListener('mousemove', handleResize);
+    document.addEventListener('mouseup', () => {
+        isResizing = false;
+        document.removeEventListener('mousemove', handleResize);
+    });
+});
+
+function handleResize(e) {
+    if (isResizing) {
+        // Tính toán độ rộng mới của sidebar
+        const newWidth = window.innerWidth - e.clientX;
+        const minWidth = window.innerWidth * 0.05;  // 5%
+        const maxWidth = window.innerWidth * 0.18;  // 18%
+
+        // Giới hạn độ rộng của sidebar
+        if (newWidth >= minWidth && newWidth <= maxWidth) {
+            sidebar.style.width = `${newWidth}px`;
+            content.style.width = `calc(100% - ${newWidth}px - 15px)`; // Điều chỉnh độ rộng content
+
+            // Thêm class 'narrow' khi sidebar thu hẹp dưới 5%
+            if (newWidth <= minWidth) {
+                sidebar.classList.add('narrow');
+            } else {
+                sidebar.classList.remove('narrow');
+            }
+        }
+    }
+}
+
+
+
 </script>
 
 </body>
