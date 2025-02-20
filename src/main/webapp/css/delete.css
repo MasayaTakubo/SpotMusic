@@ -53,3 +53,198 @@
 .plus-button:hover {
     background-color: #444;
 }
+
+/* 0220 */
+/* トラックリストのスタイル */
+.track-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 80%;
+    margin: auto;
+    color: #fff;
+    font-family: Arial, sans-serif;
+}
+
+/* 各トラックのレイアウト */
+.track-list li {
+    display: flex;
+    align-items: center; /* すべての要素を垂直方向で中央揃え */
+    justify-content: space-between;
+    padding: 10px;
+    border-radius: 5px;
+    transition: background 0.3s;
+    height: 70px; /* 全ての行の高さを統一 */
+    position: relative; /* メニューの位置調整用 */    
+    /* 追加 */
+    min-height: 70px; /* 最低高さを指定 */
+    box-sizing: border-box; /* padding や border を含めたサイズ管理 */
+}
+
+
+/* ホバー時の背景変更 */
+.track-list li:hover {
+    background-color: #282828;
+}
+
+/* 画像のスタイル */
+.track-list li img {
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+    object-fit: cover;
+    flex-shrink: 0; /* 画像のサイズを固定 */
+    margin-right: 10px;
+}
+
+/* トラック情報のスタイル */
+.track-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* 中央寄せ */
+    min-width: 0; /* 曲名の折り返しを防ぐ */
+    margin-right: auto; /* 左寄せ */
+    flex-grow: 1; /* 均等にスペースを確保 */
+}
+
+/* トラック名とアーティスト名 */
+.track-info strong {
+    font-size: 14px;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    line-height: 1.2;
+}
+
+.track-info span {
+    font-size: 12px;
+    color: #b3b3b3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+/* ボタンのコンテナ */
+.track-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* ボタンの共通スタイル */
+.track-list button {
+    background: #1db954;
+    border: none;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    height: 32px; /* 高さを統一 */
+}
+
+.track-list button:hover {
+    background: #1ed760;
+}
+
+/* メニューのボタン（…） */
+.menu-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #fff;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    height: 32px; /* 高さを統一 */
+}
+
+/* メニュー内容のスタイル */
+.menu-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 30px;
+    background: #282828;
+    border-radius: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+}
+
+.menu-content button {
+    background: none;
+    border: none;
+    color: #fff;
+    padding: 8px 12px;
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    text-align: left;
+}
+
+.menu-content button:hover {
+    background: #3e3e3e;
+}
+
+/* メニュー表示切替 */
+.track-menu {
+    position: relative;
+}
+
+.track-menu:hover .menu-content {
+    display: block;
+}
+
+/* トラック情報のスタイル */
+.track-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* 中央寄せ */
+    min-width: 0; /* 折り返し防止 */
+    flex-grow: 1; /* 均等にスペースを確保 */
+    margin-right: auto; /* 左寄せ */
+    
+    /* 追加 */
+    width: 250px; /* テキスト幅を固定 */
+    max-width: 250px; /* 最大幅を固定 */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* トラック名とアーティスト名 */
+.track-info strong,
+.track-info span {
+    font-size: 14px;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: block;
+}
+
+/* ゴミ箱アイコンボタン */
+.delete-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #b3b3b3;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    height: 32px;
+    transition: color 0.3s ease-in-out;
+}
+
+.delete-btn:hover {
+    color: #ff4444; /* 赤色に変化して削除感を出す */
+}

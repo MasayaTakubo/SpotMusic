@@ -77,7 +77,7 @@
 		<!-- (プレイリスト作成用)非表示の iframe を用意し、フォーム送信をその中で処理 -->
 		<iframe name="hidden_iframe" style="display: none;"></iframe>
 		
-        <div class="listIcon"><i class='bx bxs-playlist'></i><h2>マイプレイリスト</h2>
+        <div class="listIcon"><i class='bx bxs-playlist'></i><h4>マイプレイリスト</h4>
         <!-- プレイリスト作成ボタン -->
 		<button id="showPlaylistForm" class="plus-button">+</button>
 	</div>
@@ -128,6 +128,7 @@
                 </c:when>
                 <c:otherwise>
                     <img src="${pageContext.request.contextPath}/img/no_image.png" alt="No Image" />
+                    <span class="no-image-space"></span> <!-- 余白用のspan -->
                 </c:otherwise>
             </c:choose>
             <div class="buttonPL">

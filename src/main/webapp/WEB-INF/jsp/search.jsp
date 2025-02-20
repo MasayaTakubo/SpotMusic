@@ -9,7 +9,6 @@
 	
 </head>
 <body>
-<div class="content">
 <!-- タブメニュー -->
 <c:set var="noImageUrl" value="${fn:escapeXml(pageContext.request.contextPath)}/img/no_image.png" />
 <div class="tab-menu">
@@ -211,7 +210,7 @@
     <c:if test="${empty playlists}">
         <p>プレイリストが見つかりませんでした。</p>
     </c:if>
-</div>
+
 
 <!-- 隠し iframe（リクエスト処理用） -->
 <iframe name="hidden_iframe" style="display: none;"></iframe>
@@ -236,10 +235,10 @@
     </c:if>
 <script>
 function showTab(tabName) {
-    // すべてのタブコンテンツを非表示にする
+/*     // すべてのタブコンテンツを非表示にする
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.style.display = "none";
-    });
+    }); */
 
     // すべてのタブボタンのアクティブ状態を解除
     document.querySelectorAll('.tab-menu button').forEach(button => {
