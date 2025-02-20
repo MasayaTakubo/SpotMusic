@@ -52,29 +52,19 @@
                 </c:when>
             </c:choose>
 		    <c:if test="${relation.user1Id != sessionScope.userId}">
+		    
 		    <td>
-             <form action="FrontServlet" method="POST">
-                 <input type="hidden" name="relationId" value="${relation.relationId}">
-                 <input type="hidden" name="userId" value="${sessionScope.userId}">
-                 <input type="hidden" name="command" value="AcceptRelation">
-                 <input type="submit" value="承認">
-             </form>
-             <form action="FrontServlet" method="POST">
-                 <input type="hidden" name="relationId" value="${relation.relationId}">
-                 <input type="hidden" name="userId" value="${sessionScope.userId}">
-                 <input type="hidden" name="command" value="CancelRelation">
-                 <input type="submit" value="拒否">
-             </form>
+				<button type="button" onclick="acceptRelation('${relation.relationId}', '${sessionScope.userId}')">承認</button>
+
+
+				<button type="button" onclick="cancelRelation('${relation.relationId}')">拒否</button>
+
              </td>
              </c:if>
              <c:if test="${relation.user1Id == sessionScope.userId}">
              <td>
-             <form action="FrontServlet" method="POST">
-                 <input type="hidden" name="relationId" value="${relation.relationId}">
-                 <input type="hidden" name="userId" value="${sessionScope.userId}">
-                 <input type="hidden" name="command" value="DeleteRelation">
-                 <input type="submit" value="フレンド申請取消">
-             </form>
+					<button type="button" onclick="deleteRelation('${relation.relationId}', '${sessionScope.userId}')">フレンド申請取消</button>
+
              </td>
              </c:if>
         </tr>
@@ -123,28 +113,28 @@
 	                    <form action="FrontServlet" method="POST">
 	                        <input type="hidden" name="userId" value="${sessionScope.userId}"/>
 	                        <c:choose>
-	                            <c:when test="${blocked}">
-	                                <input type="hidden" name="blockId" value="${blockId}"/>
-	                                <input type="hidden" name="command" value="RemoveBlock"/>
-	                                <button type="submit">ブロック解除</button>
-	                            </c:when>
+					<c:when test="${blocked}">
+					    <button type="button" onclick="removeBlock('${blockId}','${userId}')">ブロック解除</button>
+					</c:when>
+	                            
 	                            <c:otherwise>
-	                                <input type="hidden" name="relationId" value="${relation.relationId}"/>
-	                                <input type="hidden" name="command" value="AddBlockFriend"/>
-	                                <button type="submit">ブロック</button>
-	                            </c:otherwise>
+								    <button type="button" onclick="addBlock('${userId}', '${relation.relationId}')">ブロック</button>
+								</c:otherwise>
+	                            
 	                        </c:choose>
 	                    </form>
 	                </td>
 	                <td>
-	                    <form action="FrontServlet" method="POST">
-	                        <input type="hidden" name="relationId" value="${relation.relationId}"/>
-	                        <input type="hidden" name="userId" value="${sessionScope.userId}"/>
-	                        <input type="hidden" name="command" value="ChatCommand"/>
-	                        <input type="hidden" name="isBlock" value="${blocked}"/>
-	                        <input type="hidden" name="blockTime" value="${blockTime}">
-	                        <button type="submit">ログイン</button>
-	                    </form>
+<form id="loginForm">
+    <input type="hidden" id="relationId" value="${relation.relationId}"/>
+    <input type="hidden" id="userId" value="${sessionScope.userId}"/>
+    <input type="hidden" id="command" value="ChatCommand"/>
+    <input type="hidden" id="isBlock" value="${blocked}"/>
+    <input type="hidden" id="blockTime" value="${blockTime}">
+    <button type="button" onclick="submitLoginForm()">ログイン</button>
+</form>
+
+
 	                </td>
 	            </tr>
 	        </c:if>
