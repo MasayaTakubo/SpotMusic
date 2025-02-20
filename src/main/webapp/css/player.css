@@ -348,7 +348,36 @@ button {
 
 
 
+/* リピートボタンの位置を固定 */
+#repeat-track {
+    position: relative; /* 位置を固定 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    min-width: 40px;
+    height: 40px;
+}
 
+/* アイコンの動きを防ぐ */
+#repeat-track  {
+    position: relative; /* アイコン自体の位置を変えない */
+}
+
+/* 1曲リピート時に「①」アイコンを表示 */
+#repeat-track.track::after {
+    content: '①';
+    font-size: 12px;
+    position: relative;
+   /* top: 1;   ボタンの上に配置 
+    left: 1; *//* 右上に配置 */
+    transform: translate(50%, -50%); /* 右上に適切に配置 */
+    color: #1DB954;
+    background-color: black; /* 背景色を黒に */
+    border-radius: 50%; /* 丸くする */
+    padding: 2px 4px; /* サイズ調整 */
+    font-weight: bold;
+}
 
 
 /* 仮ここまで */

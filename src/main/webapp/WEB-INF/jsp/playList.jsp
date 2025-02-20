@@ -37,10 +37,134 @@
 		#sendButton:active {
 		    transform: scale(0.95); /* 押した時に少し縮む */
 }
+
+/* コメント*/
+/* コメントセクション全体 */
+.comment-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch; /* 高さを均等に揃える */
+    width: 70%;
+    margin: 40px auto;
+    gap: 20px;
+}
+
+/* コメント入力フォームとコメント一覧を同じ大きさに */
+.comment-input-container,
+.comment-list-container {
+    flex: 1;
+    background: #222;
+    padding: 20px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 400px; /* 高さを統一 */
+    max-height: 400px; /* 必要に応じて調整 */
+}
+
+.comment-input-container {
+    width: 100%; /* 横幅を最大に */
+    max-width: 100%; /* 最大幅制限を解除 */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; /* 中身をフル幅に */
+}
+
+/* コメント入力エリアの高さを調整 */
+#commentInput {
+    width: 100%;
+    height: 250px; /* 高さをさらに広げる */
+    padding: 10px; /* 余白を少し減らす */
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    resize: none;
+    font-size: 16px; /* 文字サイズを大きく */
+    flex-grow: 1; /* 上下いっぱいに広がる */
+    box-sizing: border-box;
+}
+
+/* 送信ボタンの配置 */
+#sendButton {
+    width: 100%;
+    background-color: #1DB954;
+    color: white;
+    font-size: 18px; /* ボタンの文字を少し大きく */
+    font-weight: bold;
+    padding: 12px 20px; /* ボタンのサイズを調整 */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+    margin-top: 15px; /* 入力欄との間の余白を調整 */
+}
+
+#sendButton:hover {
+    background-color: #17a444;
+}
+
+#sendButton:active {
+    transform: scale(0.95);
+}
+
+/* コメントリストを統一サイズにしてスクロールバーを1つに */
+.comment-list-container {
+    overflow: hidden; /* 二重スクロール防止 */
+}
+
+#commentList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto;
+    flex-grow: 1;
+    width: 100%;
+    max-height: 330px; /* スクロールの最大高さ */
+}
+
+/* 各コメントのスタイル */
+#commentList li {
+    padding: 10px;
+    border-bottom: 1px solid #444;
+    color: #fff;
+    font-size: 14px;
+}
+
+/* 最後のコメントの下線を削除 */
+#commentList li:last-child {
+    border-bottom: none;
+}
+
+/* ユーザー名を強調 */
+#commentList li strong {
+    color: #1DB954;
+    font-size: 16px;
+}
+
+/* スクロールバーのデザイン (Chrome, Edge) */
+#commentList::-webkit-scrollbar {
+    width: 8px;
+}
+
+#commentList::-webkit-scrollbar-track {
+    background: #333;
+    border-radius: 10px;
+}
+
+#commentList::-webkit-scrollbar-thumb {
+    background: #1DB954;
+    border-radius: 10px;
+}
+
+#commentList::-webkit-scrollbar-thumb:hover {
+    background: #17a444;
+}
+
+
+
     </style>
 </head>
 <body>
-
     <%
 	  	//セッションからuserIdを取得
 		String userId = (String) session.getAttribute("userId");
@@ -50,7 +174,7 @@
 
 <c:if test="${not empty trackList}">
 <ul class="track-list">
-	    <h2>プレイリストのトラック一覧</h2>
+	    <h4>プレイリストのトラック一覧</h4>
     <c:forEach var="track" items="${trackList}" varStatus="status">
         <li>
             <!-- トラック画像 -->
@@ -81,35 +205,42 @@
     <c:if test="${empty trackList}">
         <p>トラック情報が見つかりません。</p>
     </c:if>
-<h3>コメントを入力</h3>
-<form action="FrontServlet" method="POST" id="commentForm">
-    <textarea name="comment" id="commentInput" placeholder="コメントを入力してください..." required></textarea>
-    <input type="hidden" name="playlistId" id="playlistId" value="${param.playlistId}">
-    <input type="hidden" name="userId" id="userId" value="${sessionScope.userId}">
-    <input type="hidden" name="command" value="AddComment">
-    <button id="sendButton" type="submit">送信</button>
-</form>
+<div class="comment-section">
+    <!-- 左側：コメント入力フォーム -->
+    <div class="comment-input-container">
+        <h5>コメントを入力</h5>
+        <form action="FrontServlet" method="POST" id="commentForm">
+            <textarea name="comment" id="commentInput" placeholder="コメントを入力してください..." required></textarea>
+            <input type="hidden" name="playlistId" id="playlistId" value="${param.playlistId}">
+            <input type="hidden" name="userId" id="userId" value="${sessionScope.userId}">
+            <input type="hidden" name="command" value="AddComment">
+            <button id="sendButton" type="submit">送信</button>
+        </form>
+    </div>
 
-<hr>
+    <!-- 右側：コメント一覧 -->
+    <div class="comment-list-container">
+        <h6>コメント一覧</h6>
+        <c:if test="${not empty comments}">
+            <ul id="commentList">
+                <c:forEach var="comment" items="${comments}">
+                    <li>
+                        <strong>${fn:escapeXml(comment.userId)}</strong>: ${fn:escapeXml(comment.sendComment)}<br>
+                        <small>${comment.sendTime}</small>
+                    </li>
+                </c:forEach>
+            </ul>
+        </c:if>
+        
+        <c:if test="${empty comments}">
+            <p>まだコメントがありません。</p>
+        </c:if>
+    </div>
+</div>
 
-<h2>コメント一覧</h2>
-<c:if test="${not empty comments}">
- <ul id="commentList">
-    <c:forEach var="comment" items="${comments}">
-        <li>
-            <strong>${fn:escapeXml(comment.userId)}</strong>: ${fn:escapeXml(comment.sendComment)}<br>
-            <small>${comment.sendTime}</small>
-        </li>
-    </c:forEach>
-</ul>
-</c:if>
-    
-<c:if test="${empty comments}">
-    <p>まだコメントがありません。</p>
-</c:if>
 
 
-    
+
 <script>
 $(document).ready(function(){
     $("#commentForm").submit(function(event){
@@ -189,6 +320,9 @@ function loadPlaylistPage(playlistId) {
             contentDiv.innerHTML = '<p>プレイリスト情報の取得に失敗しました。</p>';
         });
 }
+
+
 </script>
+
 </body>
 </html>

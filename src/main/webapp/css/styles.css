@@ -799,7 +799,7 @@ hr{
 
 /* 曲リストのデザイン */
 /* 曲リストのデザイン */
-.track-list {
+/*.track-list {
 	background-color: rgba(0, 0, 0, 0.1);
 	border-radius: 20px;
     padding: 10px 0 10px 0;
@@ -839,7 +839,7 @@ overflow-y: auto;
 	border-radius:10px ;
 	
 }
-
+*/
 .track-item {
     background-color: rgba(34,34,34,0.5);
     padding: 10px;
@@ -1139,5 +1139,27 @@ overflow-y: auto;
 	
 }
 
+/* .main に padding-bottom を追加してプレイヤーの分を確保 */
+.main {
+    min-height: 100vh; /* ビューポート全体の高さ */
+    padding-bottom: 210px; /* プレイヤーの高さ分の余白を確保（調整可） */
+}
 
+/* 検索したときの画像のコンテナ `.trackImg` を調整なんかでかい */
+.trackImg {
+    width: 80px; /* 画像の幅 */
+    height: 80px; /* 画像の高さ */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* はみ出た部分をカット */
+}
+
+/* 検索したときの画像のサイズ調整 なんかでかい*/
+.trackImg img {
+    width: 100%; /* 親要素の幅にフィット */
+    height: 100%; /* 親要素の高さにフィット */
+    object-fit: cover; /* アスペクト比を保ちつつ中央配置 */
+    border-radius: 5px; /* 角丸にする */
+}
 
