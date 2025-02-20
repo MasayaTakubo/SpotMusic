@@ -136,7 +136,6 @@
 
 /* ボタンの共通スタイル */
 .track-list button {
-    background: #1db954;
     border: none;
     color: #fff;
     padding: 5px 10px;
@@ -149,9 +148,9 @@
     height: 32px; /* 高さを統一 */
 }
 
-.track-list button:hover {
+/*.track-list button:hover {
     background: #1ed760;
-}
+}*/
 
 /* メニューのボタン（…） */
 .menu-btn {
