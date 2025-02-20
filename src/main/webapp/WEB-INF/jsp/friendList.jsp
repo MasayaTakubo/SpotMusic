@@ -10,11 +10,9 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>フレンドリスト</title>
 </head>
 <body>
-    <h1>フレンドリスト</h1>
-    <h1>${sessionScope.user_name}</h1>
+    <h2>フレンド一覧</h2>
     <p>申請中のユーザー</p>
     <table border="1">
         <tr>

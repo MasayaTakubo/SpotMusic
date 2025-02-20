@@ -5,12 +5,10 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>ユーザーリスト</title>
+    <title>SpotMusic - Web Player：すべての人に音楽を</title>
 </head>
 <body>
-    <h1>ユーザーリスト</h1>
-    <h1>${sessionScope.user_name}</h1>
-    
+<h2>ユーザー一覧</h2>    
     <table border="1">
         <tr>
             <th>ユーザー名</th>
