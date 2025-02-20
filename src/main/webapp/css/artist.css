@@ -34,14 +34,31 @@
 .PlAr{
 	display: flex;
 	align-items: flex-start;
-	min-height:330px;
+	min-height:35px;
 	width: 100%;
-	overflow-x: auto;
+	overflow-x: hidden;
 	overflow-y: hidden;
+	transition: max-height 0.2 ease-in-out;
 }
+.PlAr:hover {
+    overflow-x: auto; 
+}
+
 .PlAr::-webkit-scrollbar {
-    display: none;
+    width: 20px;
 }
+
+.PlAr::-webkit-scrollbar-track {
+    background: none;
+    border-radius: 10px;
+}
+
+.PlAr::-webkit-scrollbar-thumb {
+    background: rgba(222, 222, 222, 0.3);
+    border-radius: 10px;
+    
+}
+
 .PlAr img{
 	width: 220px;
 	height: 230px;

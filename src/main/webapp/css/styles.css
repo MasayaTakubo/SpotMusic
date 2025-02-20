@@ -1,4 +1,5 @@
 /* 共通設定 */
+
 body {
     font-family: Arial, sans-serif;
     background-color: black; /* Spotify のようなダークモード */
@@ -87,22 +88,20 @@ h2{
 
 .flAr {
     width: 100%;
-    overflow-x: auto;
+    overflow-x:hidden;
     overflow-y: hidden; 
     white-space: nowrap; 
     display: flex;
     align-items: center;
     padding: 10px;
-    min-height: 300px;
+    min-height: 330px;
     height: 300px;
     -ms-overflow-style: none; 
-    scrollbar-width: none;
+    
+    transition: max-height 0.2s ease-in-out;
 }
 
-.flAr::-webkit-scrollbar {
-    display: none; 
 
-}
 .flAr ul {
     display: flex;
     gap: 10px;
@@ -148,14 +147,13 @@ h2{
 .songList{
 	display: flex;
 	align-items: flex-start;
-	min-height:330px;
+	min-height:390px;
 	width: 100%;
-	overflow-x: auto;
+	overflow-x: hidden;
 	overflow-y: hidden;
+	transition: max-height 0.2s ease-in-out;
 }
-.songList::-webkit-scrollbar {
-    display: none;
-}
+
 .songList img{
 	width: 220px;
 	height: 230px;
@@ -180,14 +178,13 @@ h2{
 .TopAr{
 	display: flex;
 	align-items: flex-start;
-	min-height:330px;
+	min-height:340px;
 	width: 100%;
-	overflow-x: auto;
+	overflow-x: hidden;
 	overflow-y: hidden;
+	transition: max-height 0.2s ease-in-out;
 }
-.TopAr::-webkit-scrollbar {
-    display: none;
-}
+
 .TopAr img{
 	width: 220px;
 	height: 230px;
@@ -214,14 +211,42 @@ h2{
 .Album{
 	display: flex;
 	align-items: flex-start;
-	min-height:330px;
+	min-height:360px;
 	width: 100%;
-	overflow-x: auto;
+	transition: max-height 0.2s ease-in-out;
+	overflow-x: hidden;
 	overflow-y: hidden;
 }
-.Album::-webkit-scrollbar {
-    display: none;
+.TopAr:hover{
+	overflow-x: auto;
 }
+.Album:hover{
+	overflow-x: auto;
+} 
+.songList:hover{
+	overflow-x: auto;
+} 
+.flAr:hover {
+    overflow-x: auto;
+}
+
+.TopAr::-webkit-scrollbar, .Album::-webkit-scrollbar, .songList::-webkit-scrollbar, .flAr::-webkit-scrollbar {
+    width: 20px;
+}
+
+.TopAr::-webkit-scrollbar-track, .Album::-webkit-scrollbar-track, .songList::-webkit-scrollbar-track, .flAr::-webkit-scrollbar-track {
+    background: none;
+    border-radius: 10px;
+}
+
+.TopAr::-webkit-scrollbar-thumb, .Album::-webkit-scrollbar-thumb, .songList::-webkit-scrollbar-thumb, .flAr::-webkit-scrollbar-thumb {
+    background: rgb(222,222,222,0.3);
+    border-radius: 10px;
+}
+
+
+
+
 .Album img{
 	width: 220px;
 	height: 230px;
@@ -251,12 +276,14 @@ h2{
 	color:rgb(222, 222, 222);
 	font-weight: bold;
 	
+	
 	}
 .track{
 	display: flex;
 	justify-content: center;
 	flex-direction: column;
 	align-items: center;
+	overflow: hidden;
 }
 .track img{
 	
@@ -469,6 +496,7 @@ hr{
 .listIcon h2{
 	 margin-left:30px;
 	 font-size: 25px;
+	 white-space: nowrap;
  }
  #showPlaylistForm{
 	 position: absolute; 
@@ -671,21 +699,30 @@ hr{
 }
 /* プレイリスト詳細ページの再生ボタンのみ黒くする */
 .track-list button {
-    background-color: transparent;
+    background-color:none;
     color: white !important; /* 文字・アイコン色を黒に */
-    font-size: 16px;
-    border: 1px solid black; /* ボタンの枠線も黒に */
+    
+    border: none;
     padding: 5px 10px;
     cursor: pointer;
     transition: color 0.3s, transform 0.2s;
 }
 
 /* ホバー時に少し明るめの黒 */
-.track-list button:hover {
+.track-list i:hover {
     color: #222 !important;
     border-color: #222;
     transform: scale(1.05);
 }
+.track-list i{
+	font-size: 35px;
+}
+.playlistId{
+	width: 25px;
+	height: 8px;
+}
+
+
 
 /* ヘッダー */
 
@@ -763,23 +800,55 @@ hr{
 /* 曲リストのデザイン */
 /* 曲リストのデザイン */
 .track-list {
-    list-style-type: none;
-    padding: 0;
+	background-color: rgba(0, 0, 0, 0.1);
+	border-radius: 20px;
+    padding: 10px 0 10px 0;
+    max-height: 500px;
     display: flex;
     flex-direction: column;
-    align-items: center; /* 真ん中寄せ */
+  	align-items: center;
+    width: 95%;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    transition: max-height 0.2s ease-in-out;
+    scrollbar-gutter: stable; 
+    box-shadow: 0 2px 4px rgba(222,222,222,0.2);
+    
+}
+.track-list:hover{
+overflow-y: auto;	
+}
+
+.track-list::-webkit-scrollbar {
+    width: 20px;
+}
+
+.track-list::-webkit-scrollbar-track {
+    background: none;
+    border-radius: 10px;
+}
+
+.track-list::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    height: 40%;
+}
+.track-list img{
+	width: 75px;
+	height: 80px;
+	border-radius:10px ;
+	
 }
 
 .track-item {
-    background-color: #181818;
+    background-color: rgba(34,34,34,0.5);
     padding: 10px;
     margin: 5px 0;
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 80%; /* 真ん中寄せのための幅調整 */
-    max-width: 500px; /* 最大幅を設定 */
+    width: 80%;
 }
 
 
@@ -832,7 +901,7 @@ hr{
 }
 
 /* アルバム、アーティスト、プレイリストのグリッド表示 */
-.album-list,
+
 .artist-list,
 .playlist-list {
     display: grid;
@@ -843,7 +912,7 @@ hr{
 }
 
 /* 各アイテムのスタイル */
-.album-item,
+
 .artist-item{
     background-color: #181818;
     padding: 15px;
@@ -857,7 +926,7 @@ hr{
 }
 
 /* 画像サイズの統一 */
-.album-item img,
+
 .artist-item img {
     width: 150px;
     height: 150px;
@@ -866,7 +935,7 @@ hr{
 }
 
 /* テキストの統一 */
-.album-item a,
+
 .artist-item a{
     display: block;
     color: #1DB954;
@@ -876,7 +945,7 @@ hr{
     flex-grow: 1; /* タイトルの高さを均等に */
 }
 
-.album-item a:hover,
+
 .artist-item a:hover{
     text-decoration: underline;
 }
@@ -976,22 +1045,88 @@ hr{
     cursor: pointer;
 }
 
+
+
+/* タブコンテンツのスタイル */
+.tab-content {
+    display: none;
+    width: 100%;
+   
+    
+}
+
+.tab-content.active {
+    display: block;
+    width: 100%;
+    
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;   
+}
+
+
+.SearchPage {
+    padding-top: 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: max-height 0.2s ease-in-out;
+    overflow-y: hidden; 
+    overflow-x: hidden;
+    padding-left: 20px;
+    scrollbar-gutter: stable; 
+}
+.SearchPage:Hover{
+	overflow-y: auto;
+}
+
+
+.SearchPage::-webkit-scrollbar {
+    width: 20px; 
+}
+.SearchPage::-webkit-scrollbar-track {
+    background: none;
+    border-radius: 10px;
+}
+
+.SearchPage::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3); 
+    border-radius: 10px;
+    height: 40%;
+}
+
+
 /* タブメニューのスタイル */
 .tab-menu {
     display: flex;
     justify-content: center;
-    gap: 10px;
+    align-items: center;
     margin-bottom: 20px;
+    height: 100px;
+    width: 100%;
+    
+    
+    
 }
 
 .tab-menu button {
     background-color: #181818;
     color: white;
     border: none;
-    padding: 10px 20px;
     border-radius: 20px;
     cursor: pointer;
+    font-size: 15px;
     transition: 0.3s;
+    width: 120px;
+    height:40px ;
+    margin-left: 20px;
+    font-weight: bold;
+    
+}
+.tab-menu button:hover{
+	color:rgb(222, 222, 222);
+	background-color: rgb(34, 34, 34);
 }
 
 .tab-menu button.active {
@@ -999,14 +1134,10 @@ hr{
     color: black;
     font-weight: bold;
 }
-
-/* タブコンテンツのスタイル */
-.tab-content {
-    display: none;
+ h3{
+	font-size: 50px;	
+	
 }
 
-.tab-content.active {
-    display: block;
-}
 
 
