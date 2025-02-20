@@ -1,0 +1,132 @@
+.Artist{
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	width: 100%;
+	padding-top:10px ;
+}
+.InfAr{
+	display: flex;
+	justify-content:center;
+	align-items: center;
+}
+.InfAr img{
+	width: 300px;
+	height: 300px;
+	border-radius: 50%;
+	box-shadow: 0 0 10px rgba(255,255,255,0.8);
+	margin-right: 20px;
+}
+.information{
+	display: flex;
+	flex-direction: column;
+	align-items:flex-start;
+	
+	font-size: 20px;
+	font-weight: bold;
+}
+.information i{
+	color: white;
+	font-size: 40px;
+	margin-right: 10px;
+}
+
+.PlAr{
+	display: flex;
+	align-items: flex-start;
+	min-height:330px;
+	width: 100%;
+	overflow-x: auto;
+	overflow-y: hidden;
+}
+.PlAr::-webkit-scrollbar {
+    display: none;
+}
+.PlAr img{
+	width: 220px;
+	height: 230px;
+	margin-bottom: 20px;
+	border-radius: 10px;
+	
+}
+.PlAr a{
+	display: flex;
+	flex-direction: column;
+	font-size: 18px;
+	font-weight: bold;
+	color: rgb(222, 222, 222);
+	padding: 20px;
+	text-decoration: none;
+}
+.PlAr a:hover{
+	background-color: rgba(255, 255, 255, 0.3);
+	color: rgb(222, 222, 222);
+	border-radius: 10px;
+}
+
+h1 {
+    font-size: 35px;
+    color: white;
+    margin-top:20px;
+    }
+
+.followers{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin:10px 0 10px 0;
+	
+	
+}
+
+.nameAr{
+	font-size: 80px;
+	font-weight: bold;
+	color:white;
+	margin-bottom: 30px;
+}
+.flButton{
+	
+	border-radius: 20px;
+	background:white;
+	width: 100px;
+	height: 40px;
+	color: rgb(34,34,34);
+	font-weight: bold;
+}
+.flButton:hover{
+	color: rgb(34,34,34);
+	background: rgb(222, 222, 222);
+}
+
+
+.load-album-btn {
+        background-color: #4CAF50; /* 背景色（緑色） */
+        color: white; /* 文字色（白色） */
+        border: none; /* 枠線なし */
+        padding: 10px 20px; /* 内側の余白 */
+        text-align: center; /* 文字を中央揃え */
+        text-decoration: none; /* 下線なし */
+        display: inline-block; /* インラインブロック */
+        font-size: 16px; /* フォントサイズ */
+        margin: 4px 2px; /* マージン（余白） */
+        cursor: pointer; /* ポインタ（マウスカーソル） */
+        border-radius: 8px; /* 角丸 */
+        transition: background-color 0.3s ease; /* 背景色が変わるアニメーション */
+    }
+
+    /* ホバー時に背景色を変化させる */
+    .load-album-btn:hover {
+        background-color: #45a049; /* 背景色を少し濃い緑に */
+    }
+
+    /* フォーカス時にボタンが光る */
+    .load-album-btn:focus {
+        outline: none; /* フォーカス時のアウトラインを消す */
+        box-shadow: 0 0 8px rgba(0, 128, 0, 0.5); /* 緑色の光を追加 */
+    }
+
+    /* アクティブ時（クリック時）の効果 */
+    .load-album-btn:active {
+        background-color: #3e8e41; /* クリック時に背景色をさらに濃く */
+    }

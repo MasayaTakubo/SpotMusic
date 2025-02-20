@@ -19,83 +19,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>アーティスト詳細情報</title>
 
-<style>
-    .load-album-btn {
-        background-color: #4CAF50; /* 背景色（緑色） */
-        color: white; /* 文字色（白色） */
-        border: none; /* 枠線なし */
-        padding: 10px 20px; /* 内側の余白 */
-        text-align: center; /* 文字を中央揃え */
-        text-decoration: none; /* 下線なし */
-        display: inline-block; /* インラインブロック */
-        font-size: 16px; /* フォントサイズ */
-        margin: 4px 2px; /* マージン（余白） */
-        cursor: pointer; /* ポインタ（マウスカーソル） */
-        border-radius: 8px; /* 角丸 */
-        transition: background-color 0.3s ease; /* 背景色が変わるアニメーション */
-    }
-
-    /* ホバー時に背景色を変化させる */
-    .load-album-btn:hover {
-        background-color: #45a049; /* 背景色を少し濃い緑に */
-    }
-
-    /* フォーカス時にボタンが光る */
-    .load-album-btn:focus {
-        outline: none; /* フォーカス時のアウトラインを消す */
-        box-shadow: 0 0 8px rgba(0, 128, 0, 0.5); /* 緑色の光を追加 */
-    }
-
-    /* アクティブ時（クリック時）の効果 */
-    .load-album-btn:active {
-        background-color: #3e8e41; /* クリック時に背景色をさらに濃く */
-    }
-</style>
+<link rel="stylesheet" type="text/css" href="<c:url value='/css/artist.css' />">
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 
 </head>
 <body>
-	<div class="content">
+<div class="Artist">
     <h1>アーティスト詳細情報</h1>
-
-    <!-- アーティスト情報を表示 -->
-    <p><strong>名前:</strong> ${artistBean.artistName}</p>
-    <p><strong>ジャンル:</strong> ${artistBean.artistGenres}</p>
-    <p><strong>フォロワー数:</strong> ${artistBean.followers}</p>
-
-    <!-- アーティスト画像の表示 -->
+    
+	<div class="InfAr">
+	<!-- アーティスト画像の表示 -->
     <c:if test="${not empty artistBean.artistImageUrl}">
-        <p><strong>アーティスト画像:</strong></p>
-        <img src="${artistBean.artistImageUrl}" alt="アーティスト画像" style="width:200px;height:auto;">
+        <img src="${artistBean.artistImageUrl}" alt="アーティスト画像">
     </c:if>
-    <!--  フォローボタン追加 -->
-	<form id="followForm" action="FrontServlet" method="post" target="hidden_iframe">
-	    <input type="hidden" name="command" value="followArtist"> <!-- コマンド指定 -->
-	    <input type="hidden" name="artistId" value="${artistBean.artistId}">
-	    <input type="hidden" id="followAction" name="action" value="<%= isFollowed ? "unfollow" : "follow" %>">
-	    <button type="submit" id="followButton">
-	        <%= isFollowed ? "リフォロー解除" : "フォロー" %>
-	    </button>
-	</form>
+   
+	    
+	<div class="information">
+	    <!-- アーティスト情報を表示 -->
+	    <div class="nameAr">${artistBean.artistName}</div>
+	    <div class="Genres">${artistBean.artistGenres}</div>
+	    <div class="followers"><i class='bx bxs-heart'></i><div>${artistBean.followers}</div></div>
+	     <!--  フォローボタン追加 -->
+		<form id="followForm" action="FrontServlet" method="post" target="hidden_iframe">
+		    <input type="hidden" name="command" value="followArtist"> <!-- コマンド指定 -->
+		    <input type="hidden" name="artistId" value="${artistBean.artistId}">
+		    <input type="hidden" id="followAction" name="action" value="<%= isFollowed ? "unfollow" : "follow" %>">
+		    <button type="submit" id="followButton" class="flButton">
+		       <%= isFollowed ? "リフォロー解除" : "フォロー" %>
+		    </button>
+		</form>
+    </div>
+
+    
+	
+</div>
 	<iframe name="hidden_iframe" style="display:none;"></iframe>
 
 
     <h2>プレイリスト</h2>
+<div class="PlAr">
 
-<ul>
     <c:forEach var="playlist" items="${artistBean.playlists}">
+    
         <!-- リンクに変更 -->
         <a href="javascript:void(0);" class="load-album-link" data-playlist-id="${playlist.playlistId}">
-            ${playlist.playlistName}
-        </a>
-
         <!-- プレイリストのアルバム画像を表示 -->
         <c:if test="${not empty playlist.albumImageUrl}">
             <br>
-            <img src="${playlist.albumImageUrl}" alt="アルバム画像" style="width:100px;height:auto;">
+            <img src="${playlist.albumImageUrl}" alt="アルバム画像">
         </c:if>
+            ${playlist.playlistName}
+        </a>
+
+        
+      
     </c:forEach>
-</ul>
+    </div>
+
 </div>
+
 
 <!-- スクリプトを <body> タグの最後に置く -->
 <script>
