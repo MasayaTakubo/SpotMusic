@@ -172,6 +172,8 @@
     <%
 	  	//セッションからuserIdを取得
 		String userId = (String) session.getAttribute("userId");
+    	//セッションからuser_nameを取得
+    	//String userName = (String) session.getAttribute("user_name");
         // セッションスコープからトラック情報を取得
         List<TrackBean> trackList = (List<TrackBean>) session.getAttribute("trackList");
     %>
@@ -209,6 +211,7 @@
     <c:if test="${empty trackList}">
         <p>トラック情報が見つかりません。</p>
     </c:if>
+
 <div class="comment-section">
     <!-- 左側：コメント入力フォーム -->
     <div class="comment-input-container">
@@ -217,10 +220,13 @@
             <textarea name="comment" id="commentInput" placeholder="コメントを入力してください..." required></textarea>
             <input type="hidden" name="playlistId" id="playlistId" value="${param.playlistId}">
             <input type="hidden" name="userId" id="userId" value="${sessionScope.userId}">
+            <input type="hidden" name="userName" id="userName" value="${sessionScope.user_name}">
             <input type="hidden" name="command" value="AddComment">
             <button id="sendButton" type="submit">送信</button>
         </form>
     </div>
+    
+    
 
     <!-- 右側：コメント一覧 -->
     <div class="comment-list-container">
@@ -229,7 +235,7 @@
             <ul id="commentList">
                 <c:forEach var="comment" items="${comments}">
                     <li>
-                        <strong>${fn:escapeXml(comment.userId)}</strong>: ${fn:escapeXml(comment.sendComment)}<br>
+                        <strong>${fn:escapeXml(comment.userName)}</strong>: ${fn:escapeXml(comment.sendComment)}<br>
                         <small>${comment.sendTime}</small>
                     </li>
                 </c:forEach>
@@ -241,6 +247,8 @@
         </c:if>
     </div>
 </div>
+
+
 
 
 
@@ -279,7 +287,7 @@ $(document).ready(function(){
         comments.forEach(comment => {
             commentList.append(`
                 <li>
-                    <strong>${comment.userId}</strong>: ${comment.sendComment}<br>
+                    <strong>${comment.userName}</strong>: ${comment.sendComment}<br>
                     <small>${comment.sendTime}</small>
                     </li>
                     `);
