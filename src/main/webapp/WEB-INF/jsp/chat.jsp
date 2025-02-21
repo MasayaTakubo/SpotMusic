@@ -5,6 +5,7 @@
 <%@ page import="java.util.Date" %>
 <html>
 <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta charset="UTF-8">
     <title>Chat</title>
     <style>
@@ -151,6 +152,50 @@ button:disabled {
     font-size: 1.2em;
     margin-top: 20px;
 }
+
+@media (max-width: 600px) {
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* 画面全体を占める */
+    overflow: hidden;
+}
+
+h1 {
+    height: 15vh; /* 画面の20%を確保 */
+    line-height: 20vh;
+    text-align: center;
+    background-color: white;
+    margin: 0;
+    padding: 0;
+}
+
+.chat-box {
+    height: 55vh; /* 画面の60% */
+    overflow-y: auto; /* スクロール可能にする */
+    background-color: #f8f9fa;
+    display: flex;
+    flex-direction: column-reverse;
+    padding: 10px;
+}
+
+.chatWindow {
+    height: 30vh; /* 画面の20% */
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    padding: 10px;
+    border-top: 1px solid #ccc;
+}
+
+}
+
+
+
+
+
+
+
 
 
     </style>
@@ -332,6 +377,28 @@ button:disabled {
 	            messageInput.disabled = true;
 	        }
 	    });
+
+		function adjustChatBoxPadding() {
+		    const chatBox = document.querySelector('.chat-box');
+		    const chatWindow = document.querySelector('.chatWindow');
+
+		    if (chatBox && chatWindow) {
+		        const chatWindowHeight = chatWindow.offsetHeight; // .chatWindow の高さ
+		        chatBox.style.paddingBottom = `${chatWindowHeight}px`; // padding-bottom を動的に設定
+		    }
+		}
+
+		// スマホの時のみイベントリスナーを追加
+		if (window.matchMedia("(max-width: 600px)").matches) {
+		    window.addEventListener('load', adjustChatBoxPadding);
+		    window.addEventListener('resize', adjustChatBoxPadding);
+
+		    // メッセージ入力欄がフォーカスされたときも適用
+		    document.getElementById("messageInput").addEventListener("focus", adjustChatBoxPadding);
+		    document.getElementById("messageInput").addEventListener("blur", adjustChatBoxPadding);
+		}
+
+			    
     </script>
 </body>
 </html>
