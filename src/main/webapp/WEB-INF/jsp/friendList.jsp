@@ -125,14 +125,14 @@
 	                    </form>
 	                </td>
 	                <td>
-<form id="loginForm">
-    <input type="hidden" id="relationId" value="${relation.relationId}"/>
-    <input type="hidden" id="userId" value="${sessionScope.userId}"/>
-    <input type="hidden" id="command" value="ChatCommand"/>
-    <input type="hidden" id="isBlock" value="${blocked}"/>
-    <input type="hidden" id="blockTime" value="${blockTime}">
-    <button type="button" onclick="submitLoginForm()">ログイン</button>
+<form action="FrontServlet" method="POST" target="_blank">
+    <input type="hidden" name="relationId" value="${relation.relationId}"/>
+    <input type="hidden" name="userId" value="${sessionScope.userId}"/>
+    <input type="hidden" name="command" value="ChatCommand"/>
+    <input type="hidden" name="isBlock" value="${blocked}"/>
+    <button type="submit">ログイン</button>
 </form>
+
 
 
 	                </td>
