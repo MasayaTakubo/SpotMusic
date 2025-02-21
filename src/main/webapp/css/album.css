@@ -1,0 +1,100 @@
+/* 全体を中央寄せ */
+body, html {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center; /* 中央寄せ */
+    align-items: flex-start; /* 上から配置 */
+    background: linear-gradient(to bottom, #444, #000);
+    color: white;
+}
+
+/* メインコンテナを中央寄せ */
+.album-container {
+    width: 80%;
+    max-width: 1100px; /* 最大幅を広げる */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: auto; /* これだけでは中央に来ないことがあるので他のスタイルと併用 */
+}
+
+/* トラックリストのスタイル */
+.track-list {
+    list-style: none;
+    padding: 0;
+    width: 80%;
+    max-width: 1000px;
+    margin: auto;
+    color: #fff;
+    font-family: Arial, sans-serif;
+}
+
+/* 各トラックのレイアウト */
+.track-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px; /* 少し余白を増やす */
+    border-radius: 8px;
+    transition: background 0.3s;
+    height: 80px; /* 高さを少し増やす */
+    min-height: 80px;
+    width: 100%;
+    max-width: 900px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    background: #222;
+}
+
+/* 画像のスタイル */
+.track-item img {
+    width: 65px; /* 画像サイズも少し大きく */
+    height: 65px;
+    border-radius: 5px;
+    object-fit: cover;
+    flex-shrink: 0;
+    margin-right: 15px;
+}
+
+/* トラック情報のスタイル */
+.track-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-grow: 1;
+    min-width: 200px;
+    max-width: 350px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+}
+
+/* 🎵 トラック名とアーティスト名のフォントサイズを大きく */
+.track-info strong {
+    font-size: 18px; /* 16px → 18px に */
+    font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.track-info span {
+    font-size: 16px; /* 14px → 16px に */
+    color: #b3b3b3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ボタンとフォームのスタイル */
+.track-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px; /* 隙間を少し増やす */
+}

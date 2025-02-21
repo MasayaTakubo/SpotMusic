@@ -2227,6 +2227,18 @@ function handleResize(e) {
 
 
 </script>
+<script>
+window.onload = function() {
+    // 現在のURLを履歴に追加
+    history.pushState(null, null, location.href);
 
+    window.onpopstate = function(event) {
+        // 戻るボタンが押されたらリロードする
+        location.reload();
+        history.pushState(null, null, location.href);
+    };
+};
+
+</script>
 </body>
 </html>
