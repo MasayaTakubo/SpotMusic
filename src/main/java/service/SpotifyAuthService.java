@@ -108,7 +108,7 @@ public class SpotifyAuthService {
                 SpotifyPlayListBean playListBean = new SpotifyPlayListBean(playlist, userId);
 
                 // プレイリストIDとユーザーIDをデータベースに保存
-                playListDAO.savePlaylistReview(playListBean.getPlaylistId(), playListBean.getUserId());
+                playListDAO.savePlaylistReview(playListBean.getPlaylistId(), playListBean.getUserId(),playListBean.getPlaylistName());
 
                 // ここでプレイリスト名やトラック情報はBean内に保持
                 System.out.println("プレイリスト名: " + playListBean.getPlaylistName());

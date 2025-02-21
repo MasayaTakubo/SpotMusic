@@ -791,11 +791,33 @@ hr{
 /* プレイリスト詳細ページの調整 */
 
 /* レスポンシブデザイン */
+/* スマホ用の固定幅を適用 */
 @media (max-width: 600px) {
+    body {
+        width: 375px; /* iPhone 標準サイズ */
+        max-width: 100%;
+        margin: 0 auto;
+        overflow-x: hidden; /* 横スクロール防止 */
+        overflow-y: hidden; /* 外側のスクロールを無効化 */
+        height: 100vh; /* 画面全体をカバー */
+    }
+
+    .content {
+        width: 100%;
+        max-width: 375px; /* スマホサイズに調整 */
+        height: 100vh; /* 画面全体をカバー */
+        overflow-y: auto; /* 内側のスクロールのみ有効 */
+        margin: 0 auto;
+        padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 130px); /* メニューバーの高さ + 余白 */
+    }
+
     li {
         width: 95%;
     }
 }
+
+
+
 
 /* 曲リストのデザイン */
 /* 曲リストのデザイン */
