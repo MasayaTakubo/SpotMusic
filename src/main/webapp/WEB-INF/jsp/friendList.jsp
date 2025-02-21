@@ -130,6 +130,7 @@
     <input type="hidden" name="userId" value="${sessionScope.userId}"/>
     <input type="hidden" name="command" value="ChatCommand"/>
     <input type="hidden" name="isBlock" value="${blocked}"/>
+    <input type="hidden" name="blockTime" value="${blockTime}"/>
     <button type="submit">ログイン</button>
 </form>
 

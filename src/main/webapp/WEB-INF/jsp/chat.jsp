@@ -305,6 +305,7 @@ h1 {
 
 		function addMessageToBox(message) {
 		    const blockTime = new Date("${param.blockTime}");
+		    
 		    const messageTime = new Date(message.sendTime);
 		    
 		    if (messageTime > blockTime) {
