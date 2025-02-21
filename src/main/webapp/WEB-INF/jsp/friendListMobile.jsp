@@ -8,6 +8,7 @@
 <%@ page import="bean.PlayListBean"%>
 <!DOCTYPE html>
 <html>
+<link rel="stylesheet" type="text/css" href="<c:url value='/css/styles.css' />">
 <head>
     <meta charset="UTF-8">
     <title>フレンドリスト</title>

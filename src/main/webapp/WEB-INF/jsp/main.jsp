@@ -138,13 +138,13 @@
             </button>
             
             
-			<form action="FrontServlet" method="post" target="hidden_iframe">
-			    <input type="hidden" name="command" value="SpotifyDeletePlaylistCommand">
-			    <input type="hidden" name="playlistId" value="${playlist.playlistId}">
-			    <input type="hidden" name="trackId" value="${track.trackId}">
-			    <input type="hidden" name="responseType" value="html"> <!-- HTML レスポンスを要求 -->
-			    <button class="delete"type="submit"><i class='bx bx-minus-circle'></i></button>
-			</form>
+<form id="deletePlaylistForm" action="FrontServlet" method="post" target="hidden_iframe" onsubmit="return confirmDelete()">
+    <input type="hidden" name="command" value="SpotifyDeletePlaylistCommand">
+    <input type="hidden" name="playlistId" value="${playlist.playlistId}">
+    <input type="hidden" name="trackId" value="${track.trackId}">
+    <input type="hidden" name="responseType" value="html"> <!-- HTML レスポンスを要求 -->
+    <button class="delete" type="submit"><i class='bx bx-minus-circle'></i></button>
+</form>
 			
 		</div>            
         
@@ -350,6 +350,10 @@
 		</div>
 	</div>
 		<script>
+		function confirmDelete() {
+		    return confirm("このプレイリストを削除しますか？");
+		}
+		
 //リロード処理
 function reloadFollowedArtists() {
     fetch('/SpotMusic/SpotifyCheckFollowStatusServlet')
