@@ -23,11 +23,10 @@
 
 <!-- すべての結果（デフォルト） -->
 <div id="all" class="tab-content active">
-    <h2>すべて</h2>
+  
 
     <!-- 曲のリスト -->
     <c:if test="${not empty tracks}">
-        <h3>曲</h3>
         <div class="track-list">
             <c:forEach var="track" items="${tracks}">
                 <div class="track-item">
@@ -42,7 +41,7 @@
                     </c:choose>
                     </div>
 
-                    ${track.track_number}. ${track.name}
+                    ${track.name}
 
                     <!-- プレイリスト追加フォーム -->
 				<form class="add-track-form" action="FrontServlet" method="post" target="hidden_iframe">
@@ -117,9 +116,8 @@
 
 <!-- 曲のみ -->
 <div id="tracks" class="tab-content">
-    <h2>曲</h2>
+   
     <c:if test="${not empty tracks}">
-        <h3>曲</h3>
         <div class="track-list">
             <c:forEach var="track" items="${tracks}">
                 <div class="track-item">
@@ -134,7 +132,7 @@
                     </c:choose>
                     </div>
 
-                    ${track.track_number}. ${track.name}
+                    ${track.name}
 
                     <!-- プレイリスト追加フォーム -->
 				<form class="add-track-form" action="FrontServlet" method="post" target="hidden_iframe">
@@ -157,7 +155,7 @@
 
 <!-- アルバムタブ -->
 <div id="albums" class="tab-content">
-    <h2>アルバム</h2>
+ 
     <div class="Album">
     <c:if test="${not empty albums}">
         
@@ -181,7 +179,7 @@
 
 <!-- アーティストタブ -->
 <div id="artists" class="tab-content">
-    <h2>アーティスト</h2>
+ 
     <c:if test="${not empty artists}">
         <div class="TopAr">
 			<c:forEach var="artist" items="${artists}">
@@ -203,7 +201,7 @@
 
 <!-- プレイリストタブ -->
 <div id="playlists" class="tab-content">
-    <h2>プレイリスト</h2>
+ 
     <c:if test="${not empty playlists}">
         <div class="Album">
 			<c:forEach var="playlist" items="${playlists}">
