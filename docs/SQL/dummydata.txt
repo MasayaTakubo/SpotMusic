@@ -9,7 +9,6 @@ playlistのダミーデータ
 佐藤のプレイリストにコメントのダミーデータが入っている
 \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
-
 INSERT INTO USERS (USER_ID, ACCESS_TOKEN, REFRESH_TOKEN, EXPIRES_IN,USER_NAME) VALUES('31rqkz3mglwnl47b2g4thwqfih4a', NULL, NULL, NULL,'佐藤択弥');
 INSERT INTO USERS (USER_ID, ACCESS_TOKEN, REFRESH_TOKEN, EXPIRES_IN,USER_NAME) VALUES('31iu3d27fuexgadotnfmmv3knrhu', NULL, NULL, NULL, 'kohei');
 INSERT INTO USERS (USER_ID, ACCESS_TOKEN, REFRESH_TOKEN, EXPIRES_IN,USER_NAME) VALUES('31psxtlyvyd6jh2bypyeg7zd4hym', NULL, NULL, NULL,'張');
@@ -90,28 +89,28 @@ INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('3fiWEjZfRq0MBhQ4zO1mOD', '
 INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('4q2ZKAz7hHvBG4oooMsMda', '31iu3d27fuexgadotnfmmv3knrhu');
 INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('5rKSNA7nNtSDBO2u0UcIr1', '31iu3d27fuexgadotnfmmv3knrhu');
 INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('7mFiXothMmzYq2ndEaGrV0', '31iu3d27fuexgadotnfmmv3knrhu');
-INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('dummy1playlist1', 'dummyid1');
-INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('dummy1playlist2', 'dummyid1');
-INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('dummy2playlist1', 'dummyid2');
-INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('dummy2playlist2', 'dummyid2');
-INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('dummy3playlist1', 'dummyid3');
-INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('dummy3playlist2', 'dummyid3');
-INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('dummy4playlist1', 'dummyid4');
-INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('dummy4playlist2', 'dummyid4');
-INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('dummy5playlist1', 'dummyid5');
-INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('dummy5playlist2', 'dummyid5');
-INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('dummy6playlist1', 'dummyid6');
-INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('dummy6playlist2', 'dummyid6');
-INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('dummy7playlist1', 'dummyid7');
-INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('dummy7playlist2', 'dummyid7');
-INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('dummy8playlist1', 'dummyid8');
-INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('dummy8playlist2', 'dummyid8');
-INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('dummy9playlist1', 'dummyid9');
-INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('dummy9playlist2', 'dummyid9');
-INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('dummy10playlist1', 'dummyid10');
-INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('dummy10playlist2', 'dummyid10');
-INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('dummy11playlist1', 'dummyid11');
-INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID) VALUES ('dummy11playlist2', 'dummyid11');
+INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID, PLAYLIST_NAME) VALUES ('dummy1playlist1id', 'dummyid1', 'dummy1playlist1');
+INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID, PLAYLIST_NAME) VALUES ('dummy1playlist2id', 'dummyid1', 'dummy1playlist2');
+INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID, PLAYLIST_NAME) VALUES ('dummy2playlist1id', 'dummyid2', 'dummy2playlist1');
+INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID, PLAYLIST_NAME) VALUES ('dummy2playlist2id', 'dummyid2', 'dummy2playlist2');
+INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID, PLAYLIST_NAME) VALUES ('dummy3playlist1id', 'dummyid3', 'dummy3playlist1');
+INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID, PLAYLIST_NAME) VALUES ('dummy3playlist2id', 'dummyid3', 'dummy3playlist2');
+INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID, PLAYLIST_NAME) VALUES ('dummy4playlist1id', 'dummyid4', 'dummy4playlist1');
+INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID, PLAYLIST_NAME) VALUES ('dummy4playlist2id', 'dummyid4', 'dummy4playlist2');
+INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID, PLAYLIST_NAME) VALUES ('dummy5playlist1id', 'dummyid5', 'dummy5playlist1');
+INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID, PLAYLIST_NAME) VALUES ('dummy5playlist2id', 'dummyid5', 'dummy5playlist2');
+INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID, PLAYLIST_NAME) VALUES ('dummy6playlist1id', 'dummyid6', 'dummy6playlist1');
+INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID, PLAYLIST_NAME) VALUES ('dummy6playlist2id', 'dummyid6', 'dummy6playlist2');
+INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID, PLAYLIST_NAME) VALUES ('dummy7playlist1id', 'dummyid7', 'dummy7playlist1');
+INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID, PLAYLIST_NAME) VALUES ('dummy7playlist2id', 'dummyid7', 'dummy7playlist2');
+INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID, PLAYLIST_NAME) VALUES ('dummy8playlist1id', 'dummyid8', 'dummy8playlist1');
+INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID, PLAYLIST_NAME) VALUES ('dummy8playlist2id', 'dummyid8', 'dummy8playlist2');
+INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID, PLAYLIST_NAME) VALUES ('dummy9playlist1id', 'dummyid9', 'dummy9playlist1');
+INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID, PLAYLIST_NAME) VALUES ('dummy9playlist2id', 'dummyid9', 'dummy9playlist2');
+INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID, PLAYLIST_NAME) VALUES ('dummy10playlist1id', 'dummyid10', 'dummy10playlist1');
+INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID, PLAYLIST_NAME) VALUES ('dummy10playlist2id', 'dummyid10', 'dummy10playlist2');
+INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID, PLAYLIST_NAME) VALUES ('dummy11playlist1id', 'dummyid11', 'dummy11playlist1');
+INSERT INTO PLAYLISTS (PLAYLIST_ID, USER_ID, PLAYLIST_NAME) VALUES ('dummy11playlist2id', 'dummyid11', 'dummy11playlist2');
 INSERT INTO COMMENT (PLAYLIST_ID,USER_ID,SEND_COMMENT) VALUES ('1lZGQliJOQ8Xabg4k2SYvl', 'dummyid1', '<h1>大きくなるh1タグ</h1>');
 INSERT INTO COMMENT (PLAYLIST_ID,USER_ID,SEND_COMMENT) VALUES ('5DZAPR2Yi6t8yA2N6nMVHN', 'dummyid1', '<h1>大きくなるh1タグ</h1>');
 INSERT INTO COMMENT (PLAYLIST_ID,USER_ID,SEND_COMMENT) VALUES ('1lZGQliJOQ8Xabg4k2SYvl', 'dummyid8', '${sessionScope.user_id}');

@@ -134,7 +134,7 @@
 	            	<c:forEach var="user" items="${messages.users}">
                         <c:if test="${user.userId eq playlist.userId}">${user.userName}<br></c:if>
                     </c:forEach>
-	                <strong>プレイリストID：</strong> ${playlist.playlistId}<br>
+	                <strong>プレイリスト名：</strong> ${playlist.playlistName}<br>
 	            </button>
 	        </li><br>
 	    </c:forEach>

@@ -53,7 +53,7 @@ public class MyPlayListCommand extends AbstractCommand {
                 SpotifyPlayListBean bean = new SpotifyPlayListBean(playlistJson, userId);
                 
                 // プレイリストIDを保存
-                playlistDAO.savePlaylistReview(bean.getPlaylistId(), userId); // 追加
+                playlistDAO.savePlaylistReview(bean.getPlaylistId(), userId,bean.getPlaylistName()); // 追加
 
                 // 各プレイリストに対するトラック情報を取得し、Track Beanに格納
                 List<TrackBean> trackList = new ArrayList<>();

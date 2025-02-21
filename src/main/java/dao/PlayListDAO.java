@@ -22,9 +22,9 @@ import connector.MySQLConnector;
 
 public class PlayListDAO {
 	//MySQLに保存するメソッド
-	public void savePlaylistReview(String playlistId, String userId) throws SQLException {
+	public void savePlaylistReview(String playlistId, String userId, String playlistName) throws SQLException {
 	    String checkSql = "SELECT COUNT(*) FROM playlists WHERE playlist_id = ?";
-	    String insertSql = "INSERT INTO playlists (playlist_id, user_id) VALUES (?, ?)";
+	    String insertSql = "INSERT INTO playlists (playlist_id, user_id, playlist_name) VALUES (?, ?, ?)";
 
 	    try (Connection con = MySQLConnector.getConn();
 	         PreparedStatement checkStmt = con.prepareStatement(checkSql);
@@ -38,6 +38,7 @@ public class PlayListDAO {
 
 	        insertStmt.setString(1, playlistId);
 	        insertStmt.setString(2, userId);
+	        insertStmt.setString(3, playlistName);
 	        insertStmt.executeUpdate();
 	    }
 	}
@@ -186,7 +187,7 @@ public class PlayListDAO {
     
     public List<PlayListBean> getFriendPlayList(String friendsId){
         List<PlayListBean> FriendsPlayLists = new ArrayList<>();
-        String sql = "SELECT playlist_id,user_id FROM playlists where user_Id = ?";
+        String sql = "SELECT playlist_id,user_id, playlist_name FROM playlists where user_Id = ?";
         try (Connection conn = MySQLConnector.getConn();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, friendsId);
@@ -194,6 +195,7 @@ public class PlayListDAO {
             while (rs.next()) {
             	PlayListBean FriendsPlayList = new PlayListBean(
             		rs.getString("PLAYLIST_ID"),
+            		rs.getString("PLAYLIST_NAME"),
             		rs.getString("USER_ID")
                 );
                 FriendsPlayLists.add(FriendsPlayList);  // メッセージをリストに追加
