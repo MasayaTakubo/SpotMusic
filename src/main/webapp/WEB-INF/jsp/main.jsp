@@ -288,7 +288,7 @@
 	<!-- 右側: 詳細情報パネル -->
 	<div class="property-panel" id="propertyPanel">
 	<div class="track">
-		<h2>トラック詳細</h2>
+		<h2>NowPlaying</h2>
 		<img id="current-track-image-2" src="" alt="トラック画像"
      style="display: none;">
 		<!-- <p id="track-detail">再生中のトラック詳細が表示されます。</p> -->
@@ -377,7 +377,7 @@ function updateFollowButton(artistId) {
 
             if (followButton && followAction) {  // 要素が存在するか確認
                 if (isFollowed.trim() === "true") {
-                    followButton.innerText = "リフォロー解除";
+                    followButton.innerText = "フォロー解除";
                     followAction.value = "unfollow";
                 } else {
                     followButton.innerText = "フォロー";
@@ -396,7 +396,7 @@ function updateFollowButtonFromSearchArtist(artistId) {
 
             if (followButton && followAction) {  // 要素が存在するか確認
                 if (isFollowed.trim() === "true") {
-                    followButton.innerText = "リフォロー解除";
+                    followButton.innerText = "フォロー解除";
                     followAction.value = "unfollow";
                 } else {
                     followButton.innerText = "フォロー";
@@ -995,7 +995,7 @@ function updateCurrentTrackImages() {
 
                 if (followButton && followAction) {  // 要素が存在するか確認
                     if (isFollowed.trim() === "true") {
-                        followButton.innerText = "リフォロー解除";
+                        followButton.innerText = "フォロー解除";
                         followAction.value = "unfollow";
                     } else {
                         followButton.innerText = "フォロー";
@@ -1353,7 +1353,7 @@ function updateFollowButtonFromSearchArtist(artistId) {
                 var trimmedResponse = isFollowed.trim();
                 
                 if (trimmedResponse === "true") {
-                    followButton.innerText = "リフォロー解除";
+                    followButton.innerText = "フォロー解除";
                     followAction.value = "unfollow";
                 } else if (trimmedResponse === "false") {
                     followButton.innerText = "フォロー";

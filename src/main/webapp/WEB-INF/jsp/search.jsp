@@ -350,7 +350,7 @@ function updateFollowButtonFromSearchArtist(artistId) {
                 var trimmedResponse = isFollowed.trim();
                 
                 if (trimmedResponse === "true") {
-                    followButton.innerText = "リフォロー解除";
+                    followButton.innerText = "フォロー解除";
                     followAction.value = "unfollow";
                 } else if (trimmedResponse === "false") {
                     followButton.innerText = "フォロー";

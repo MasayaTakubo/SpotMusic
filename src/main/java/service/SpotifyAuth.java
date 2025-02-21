@@ -1,4 +1,4 @@
-package service;
+/*package service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -64,3 +64,4 @@ public class SpotifyAuth {
         return jsonResponse.getString("id");
     }
 }
+*/

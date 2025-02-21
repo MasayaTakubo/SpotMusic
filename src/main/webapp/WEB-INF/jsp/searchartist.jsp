@@ -28,7 +28,7 @@
 		    <input type="hidden" name="artistId" value="${artist.id}">
 		    <input type="hidden" id="followAction" name="action" value="${sessionScope.isFollowed ? 'unfollow' : 'follow'}">
 		    <button type="submit" id="followButton">
-		        ${sessionScope.isFollowed ? 'リフォロー解除' : 'フォロー'}
+		        ${sessionScope.isFollowed ? 'フォロー解除' : 'フォロー'}
 		    </button>
 		</form>
 		
@@ -110,7 +110,7 @@ function updateFollowButtonFromSearchArtist(artistId) {
                 var trimmedResponse = isFollowed.trim();
                 
                 if (trimmedResponse === "true") {
-                    followButton.innerText = "リフォロー解除";
+                    followButton.innerText = "フォロー解除";
                     followAction.value = "unfollow";
                 } else if (trimmedResponse === "false") {
                     followButton.innerText = "フォロー";
