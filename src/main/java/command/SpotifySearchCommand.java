@@ -33,7 +33,7 @@ public class SpotifySearchCommand extends AbstractCommand {
         String action = request.getParameter("action");
         String query = request.getParameter("query");
         String id = request.getParameter("id");
-        System.out.println("?? Received action: " + action + ", query: " + query + ", id: " + id);
+        System.out.println("?? Received action: " + action + ", query: " + query + ", id: " + id + "&market=JP&locale=ja_JP");
 
         String accessToken = (String) request.getSession().getAttribute("access_token");
         if (accessToken == null) {
@@ -147,7 +147,7 @@ public class SpotifySearchCommand extends AbstractCommand {
     /*** ?? Spotify検索APIを実行 ***/
     private String searchSpotify(String query, String accessToken) throws IOException {
         String encodedQuery = URLEncoder.encode(query, StandardCharsets.UTF_8.toString());
-        String urlString = SPOTIFY_API_URL + "?q=" + encodedQuery + "&type=track,album,artist,playlist&limit=10";
+        String urlString = SPOTIFY_API_URL + "?q=" + encodedQuery + "&type=track,album,artist,playlist&limit=10&market=JP&locale=ja_JP";
         return sendSpotifyRequest(urlString, accessToken);
     }
 
