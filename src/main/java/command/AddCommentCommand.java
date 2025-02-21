@@ -20,12 +20,14 @@ public class AddCommentCommand extends AbstractCommand {
         
         String playlistId = reqc.getParameter("playlistId")[0];
         String userId     = (String)session.getAttribute("user_id");
+        String userName = (String) session.getAttribute("user_name");
         String comment    = reqc.getParameter("comment") != null ? reqc.getParameter("comment")[0] : "Default Comment";
         
         //確認用(全部OK)
         //System.out.println("プレイリストID : "+playlistId);
         //System.out.println("ユーザーID : "+userId);		   
-        //System.out.println("コメント : "+comment);		   
+        //System.out.println("コメント : "+comment);		
+        //System.out.println("ユーザー名 : "+userName);
         
         
         if (comment.isEmpty()) {
@@ -36,6 +38,7 @@ public class AddCommentCommand extends AbstractCommand {
         CommentBean commentBean = new CommentBean();
         commentBean.setPlayListId(playlistId);
         commentBean.setUserId(userId);
+        commentBean.setUserName(userName);
         commentBean.setSendComment(comment);
         commentBean.setSendTime(new Timestamp(System.currentTimeMillis()));
 

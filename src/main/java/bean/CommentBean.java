@@ -5,16 +5,18 @@ import java.sql.Timestamp;
 
 public class CommentBean implements Serializable{
     private int commentId;
-    private String userId;
     private String playlistId;
+    private String userId;
+    private String userName;
     private Timestamp sendTime;
     private String sendComment;
     
     public CommentBean() {}
-    public CommentBean(int commentId, String playlistId, String userId, Timestamp sendTime, String sendComment){
+    public CommentBean(int commentId, String playlistId, String userId, String userName,Timestamp sendTime, String sendComment){
         this.commentId=commentId;
         this.playlistId=playlistId;
         this.userId=userId;
+        this.userName=userName;
         this.sendTime=sendTime;
         this.sendComment=sendComment;
     }
@@ -39,6 +41,14 @@ public class CommentBean implements Serializable{
     public void setUserId(String userId) {
         this.userId=userId;
     }
+    
+    public String getUserName() {
+        return userName;
+    }
+    public void setUserName(String userName) {
+        this.userName=userName;
+    }
+    
     public Timestamp getSendTime() {
         return sendTime;
     }

@@ -14,7 +14,7 @@ import connector.MySQLConnector;
 public class CommentDAO {
 	
 	public void addComment(CommentBean commentBean) {
-		String sql = "INSERT INTO COMMENT (PLAYLIST_ID, USER_ID, SEND_COMMENT, SEND_TIME) VALUES (?,?,?,?)";
+		String sql = "INSERT INTO COMMENT (PLAYLIST_ID, USER_ID, USER_NAME, SEND_COMMENT, SEND_TIME) VALUES (?,?,?,?,?)";
 		try (Connection conn = MySQLConnector.getConn();
 			PreparedStatement stmt = conn.prepareStatement(sql)) {
 			
@@ -24,8 +24,9 @@ public class CommentDAO {
          
             stmt.setString(1, commentBean.getPlayListId());
             stmt.setString(2, commentBean.getUserId()); 
-            stmt.setString(3, commentBean.getSendComment());
-            stmt.setTimestamp(4, currentTime);  // 投稿時間を追加
+            stmt.setString(3, commentBean.getUserName());
+            stmt.setString(4, commentBean.getSendComment());
+            stmt.setTimestamp(5, currentTime);  // 投稿時間を追加
             stmt.executeUpdate();
             conn.commit();
         } catch (SQLException e) {
@@ -35,7 +36,7 @@ public class CommentDAO {
 	
 	public List<CommentBean> getComment(String playlistId) {
         List<CommentBean> comments = new ArrayList<>();
-        String sql = "SELECT * FROM COMMENT WHERE PLAYLIST_ID = ? ORDER BY SEND_TIME";
+        String sql = "SELECT * FROM COMMENT WHERE PLAYLIST_ID = ? ORDER BY SEND_TIME DESC";
         try (Connection conn = MySQLConnector.getConn();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, playlistId);
@@ -45,6 +46,7 @@ public class CommentDAO {
                         rs.getInt("COMMENT_ID"),
                         rs.getString("PLAYLIST_ID"),
                         rs.getString("USER_ID"),
+                        rs.getString("USER_NAME"),
                         rs.getTimestamp("SEND_TIME"),
                         rs.getString("SEND_COMMENT")
                 );
