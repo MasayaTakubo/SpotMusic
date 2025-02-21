@@ -10,11 +10,13 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="<c:url value='/css/friendList.css' />">
 </head>
 <body>
+<div class="friendlist">
     <h2>フレンド一覧</h2>
     <p>申請中のユーザー</p>
-    <table border="1">
+    <table>
         <tr>
             <th>ユーザー名</th>
             <th>状態</th>
@@ -27,18 +29,14 @@
                 <c:when test="${relation.user1Id != sessionScope.userId}">
                     <td>
                         <c:forEach var="user" items="${messages.users}">
-                            <c:if test="${user.userId eq relation.user1Id}">
-                                ${user.userName}
-                            </c:if>
+                            <c:if test="${user.userId eq relation.user1Id}">${user.userName}</c:if>
                         </c:forEach>
                     </td>
                 </c:when>
                 <c:when test="${relation.user2Id != sessionScope.userId}">
                     <td>
                         <c:forEach var="user" items="${messages.users}">
-                            <c:if test="${user.userId eq relation.user2Id}">
-                                ${user.userName}
-                            </c:if>
+                            <c:if test="${user.userId eq relation.user2Id}">${user.userName}</c:if>
                         </c:forEach>
                     </td>
                 </c:when>
@@ -52,19 +50,14 @@
                 </c:when>
             </c:choose>
 		    <c:if test="${relation.user1Id != sessionScope.userId}">
-		    
 		    <td>
 				<button type="button" onclick="acceptRelation('${relation.relationId}', '${sessionScope.userId}')">承認</button>
-
-
 				<button type="button" onclick="cancelRelation('${relation.relationId}')">拒否</button>
-
              </td>
              </c:if>
              <c:if test="${relation.user1Id == sessionScope.userId}">
              <td>
 					<button type="button" onclick="deleteRelation('${relation.relationId}', '${sessionScope.userId}')">フレンド申請取消</button>
-
              </td>
              </c:if>
         </tr>
@@ -72,7 +65,7 @@
     </c:forEach>
     </table>
     <p>フレンド</p>
-	<table border="1">
+	<table>
 		<th>ユーザー名</th>
 		<th>Action</th>
 		<th>チャット</th>
@@ -93,18 +86,14 @@
 		                <c:when test="${relation.user1Id != sessionScope.userId}">
 		                    <td>
 		                        <c:forEach var="user" items="${messages.users}">
-		                            <c:if test="${user.userId eq relation.user1Id}">
-		                                ${user.userName}
-		                            </c:if>
+		                            <c:if test="${user.userId eq relation.user1Id}">${user.userName}</c:if>
 		                        </c:forEach>
 		                    </td>
 		                </c:when>
 		                <c:when test="${relation.user2Id != sessionScope.userId}">
 		                    <td>
 		                        <c:forEach var="user" items="${messages.users}">
-		                            <c:if test="${user.userId eq relation.user2Id}">
-		                                ${user.userName}
-		                            </c:if>
+		                            <c:if test="${user.userId eq relation.user2Id}">${user.userName}</c:if>
 		                        </c:forEach>
 		                    </td>
 		                </c:when>
@@ -116,25 +105,21 @@
 					<c:when test="${blocked}">
 					    <button type="button" onclick="removeBlock('${blockId}','${userId}')">ブロック解除</button>
 					</c:when>
-	                            
-	                            <c:otherwise>
+	                             <c:otherwise>
 								    <button type="button" onclick="addBlock('${userId}', '${relation.relationId}')">ブロック</button>
 								</c:otherwise>
-	                            
-	                        </c:choose>
+	                             </c:choose>
 	                    </form>
 	                </td>
 	                <td>
-<form action="FrontServlet" method="POST" target="_blank">
-    <input type="hidden" name="relationId" value="${relation.relationId}"/>
-    <input type="hidden" name="userId" value="${sessionScope.userId}"/>
-    <input type="hidden" name="command" value="ChatCommand"/>
-    <input type="hidden" name="isBlock" value="${blocked}"/>
-    <button type="submit">ログイン</button>
-</form>
-
-
-
+	                    <form id="loginForm">
+	                        <input type="hidden" id="relationId" value="${relation.relationId}"/>
+	                        <input type="hidden" id="userId" value="${sessionScope.userId}"/>
+	                        <input type="hidden" id="command" value="ChatCommand"/>
+	                        <input type="hidden" id="isBlock" value="${blocked}"/>
+	                        <input type="hidden" id="blockTime" value="${blockTime}">
+	                        <button type="button" onclick="submitLoginForm()">ログイン</button>
+	                    </form>
 	                </td>
 	            </tr>
 	        </c:if>
@@ -147,9 +132,7 @@
 	            <button onclick="loadPlaylistPage('${playlist.playlistId}')">
 	            	<strong>ユーザー名  ：</strong>
 	            	<c:forEach var="user" items="${messages.users}">
-                        <c:if test="${user.userId eq playlist.userId}">
-                            ${user.userName}<br>
-                        </c:if>
+                        <c:if test="${user.userId eq playlist.userId}">${user.userName}<br></c:if>
                     </c:forEach>
 	                <strong>プレイリストID：</strong> ${playlist.playlistId}<br>
 	            </button>
@@ -195,7 +178,7 @@
 	</script>
 
     <p>フレンド申請をキャンセルしたユーザー</p>
-	<table border="1">
+	<table>
 	    <tr>
 	        <th>ユーザー名</th>
 	    </tr>
@@ -206,18 +189,14 @@
 	                <c:when test="${relation.user1Id != sessionScope.userId}">
 	                    <td>
 	                        <c:forEach var="user" items="${messages.users}">
-	                            <c:if test="${user.userId eq relation.user1Id}">
-	                                ${user.userName}
-	                            </c:if>
+	                            <c:if test="${user.userId eq relation.user1Id}">${user.userName}</c:if>
 	                        </c:forEach>
 	                    </td>
 	                </c:when>
 	                <c:when test="${relation.user2Id != sessionScope.userId}">
 	                    <td>
 	                        <c:forEach var="user" items="${messages.users}">
-	                            <c:if test="${user.userId eq relation.user2Id}">
-	                                ${user.userName}
-	                            </c:if>
+	                            <c:if test="${user.userId eq relation.user2Id}">${user.userName}</c:if>
 	                        </c:forEach>
 	                    </td>
 	                </c:when>
@@ -228,5 +207,7 @@
 	</table>
 		<button type="button" onclick="userList()">ユーザーリストへ</button>
 		<button type="button" onclick="blockList()">ブロックリストへ</button>
+		
+</div>
 </body>
 </html>

@@ -1,0 +1,55 @@
+.custom-table table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+
+.custom-table th, .custom-table td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: left;
+}
+
+.custom-table th {
+    background-color: #333;
+    color: white;
+    font-weight: bold;
+}
+
+.custom-table tr:nth-child(even) {
+    background-color: #444;
+    color: white;
+}
+
+.custom-table button {
+    padding: 5px 10px;
+    background-color: #333;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 4px;
+    margin: 5px;
+}
+
+.custom-table ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.custom-table li {
+    margin-bottom: 10px;
+}
+
+.custom-table li button {
+    width: 100%;
+    padding: 10px;
+    background-color: #333;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: left;
+    border-radius: 4px;
+}
