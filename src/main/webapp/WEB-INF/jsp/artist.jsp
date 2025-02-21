@@ -45,7 +45,7 @@
 		    <input type="hidden" name="artistId" value="${artistBean.artistId}">
 		    <input type="hidden" id="followAction" name="action" value="<%= isFollowed ? "unfollow" : "follow" %>">
 		    <button type="submit" id="followButton" class="flButton">
-		       <%= isFollowed ? "リフォロー解除" : "フォロー" %>
+		       <%= isFollowed ? "フォロー解除" : "フォロー" %>
 		    </button>
 		</form>
     </div>
@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 var followAction = document.getElementById("followAction");
 
                 if (isFollowed.trim() === "true") {
-                    followButton.innerText = "リフォロー解除";
+                    followButton.innerText = "フォロー解除";
                     followAction.value = "unfollow";
                 } else {
                     followButton.innerText = "フォロー";
@@ -144,7 +144,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(response => response.text())
         .then(data => {
-            console.log("フォロー/リフォロー処理完了:", data);
+            console.log("フォロー/フォロー処理完了:", data);
             // フォロー処理後に再度状態を取得し、最新のボタン状態を反映
             updateFollowButton(artistId);
         })

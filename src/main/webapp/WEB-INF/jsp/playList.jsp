@@ -16,27 +16,31 @@
     <link rel="stylesheet" type="text/css" href="<c:url value='/css/delete.css' />">
     <title>プレイリスト詳細</title>
     <style>
-	    #sendButton {
-		    background-color: #1DB954; /* Spotify風の緑 */
-		    color: white; /* 文字色 */
-		    font-size: 16px; /* 文字サイズ */
-		    font-weight: bold; /* 文字を太く */
-		    padding: 10px 20px; /* 内側の余白 */
-		    border: none; /* 枠線なし */
-		    border-radius: 8px; /* 角丸 */
-		    cursor: pointer; /* マウスオーバー時のカーソル */
-		    transition: background-color 0.3s, transform 0.1s; /* アニメーション */
-		}
-		
-		/* ホバー時のスタイル */
-		#sendButton:hover {
-		    background-color: #17a444; /* 少し濃い緑 */
-		}
-		
-		/* クリック時のスタイル */
-		#sendButton:active {
-		    transform: scale(0.95); /* 押した時に少し縮む */
-}
+/* 送信ボタンを黒白デザインに変更 */
+	#sendButton {
+	    width: 100%;
+	    background-color: #222 !important; /* ダークグレー */
+	    color: #fff !important; /* 白文字 */
+	    font-size: 16px !important;
+	    font-weight: bold !important;
+	    padding: 12px 20px !important;
+	    border: none !important;
+	    border-radius: 8px !important;
+	    cursor: pointer !important;
+	    transition: background-color 0.3s, transform 0.1s !important;
+	    margin-top: 10px !important;
+	}
+	
+	/* ホバー時は少し明るいグレー */
+	#sendButton:hover {
+	    background-color: #444 !important;
+	}
+	
+	/* クリック時に縮小 */
+	#sendButton:active {
+	    transform: scale(0.95) !important;
+	}
+
 
 /* コメント*/
 /* コメントセクション全体 */
@@ -137,7 +141,7 @@
 
 /* ユーザー名を強調 */
 #commentList li strong {
-    color: #1DB954;
+    color: #fff; /* 白色で統一 */
     font-size: 16px;
 }
 
@@ -147,17 +151,17 @@
 }
 
 #commentList::-webkit-scrollbar-track {
-    background: #333;
+    background: #222;
     border-radius: 10px;
 }
 
 #commentList::-webkit-scrollbar-thumb {
-    background: #1DB954;
+    background: #888; 
     border-radius: 10px;
 }
 
 #commentList::-webkit-scrollbar-thumb:hover {
-    background: #17a444;
+    background: #bbb;
 }
 
 

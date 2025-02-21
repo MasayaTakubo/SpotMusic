@@ -135,7 +135,7 @@ public class SpotifyFollowArtistCommand extends AbstractCommand {
             + "<script>"
             + "var parentDoc = window.parent.document;"
             + "var followButton = parentDoc.getElementById('followButton');"
-            + "if (followButton) { followButton.innerText = '" + (isFollowed ? "リフォロー解除" : "フォロー") + "'; }"
+            + "if (followButton) { followButton.innerText = '" + (isFollowed ? "フォロー解除" : "フォロー") + "'; }"
             + "var actionInput = parentDoc.querySelector('#followForm input[name=action]');"
             + "if (actionInput) { actionInput.value = '" + newAction + "'; }"
             + "window.parent.fetch('/SpotMusic/SpotifyCheckFollowStatusServlet?id=" + artistId + "')"

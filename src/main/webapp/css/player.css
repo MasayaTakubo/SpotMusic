@@ -58,7 +58,7 @@ button {
 }
 
 button:hover {
-    color: #1DB954;
+    color: dodgerblue;
     /*transform: scale(1.1);*/
 }
 
@@ -107,7 +107,7 @@ button#shuffle-toggle::before {
 
 /* シャッフルボタンの状態 */
 #shuffle-toggle.active {
-    color: #1DB954;
+    color: dodgerblue;
 }
 
 /* リピートボタンの状態 */
@@ -116,11 +116,11 @@ button#shuffle-toggle::before {
 }
 
 #repeat-track.playlist {
-    color: #1DB954;
+    color: dodgerblue;
 }
 
 #repeat-track.track {
-    color: #1DB954;
+    color:dodgerblue;
     font-weight: bold;
 }
 
@@ -140,7 +140,7 @@ button#shuffle-toggle::before {
 
 #seek-bar::-webkit-slider-thumb, #progress-bar::-webkit-slider-thumb {
     appearance: none;
-    background: #1DB954;
+    background: gray;
     width: 10px;
     height: 10px;
     border-radius: 50%;
@@ -233,11 +233,11 @@ button {
 }
 
 #repeat-track.playlist {
-    color: #1DB954;
+    color: dodgerblue;
 }
 
 #repeat-track.track {
-    color: #1DB954;
+    color: dodgerblue;
     font-weight: bold;
     position: relative;
 }
@@ -249,7 +249,7 @@ button {
     position: absolute;
     top: -5px;
     right: -5px;
-    color: #1DB954;
+    color: gray;
 }
 
 /* ミュートボタンのデザイン */
@@ -263,12 +263,12 @@ button {
 }
 
 #mute-toggle:hover {
-    color: #1DB954;
+    color: gray;
 }
 
 /* ミュート時のスタイル */
 #mute-toggle.muted {
-    color: white;
+    color: dodgerblue;
 }
 
 /* 右側（音量調整: コントロールボタンの右側へ） */
@@ -343,7 +343,9 @@ button {
     font-size: 20px; /* ボタンを大きく */
     min-width: 40px; /* 幅を統一 */
     height: 40px;
-    margin-bottom :10px;
+    margin-bottom :20px;
+    position: relative; /* 位置調整を有効にする */
+    top: -20px; /* 10px 上げる（調整可能） */
 }
 
 
@@ -372,7 +374,7 @@ button {
    /* top: 1;   ボタンの上に配置 
     left: 1; *//* 右上に配置 */
     transform: translate(50%, -50%); /* 右上に適切に配置 */
-    color: #1DB954;
+    color: dodgerblue;
     background-color: black; /* 背景色を黒に */
     border-radius: 50%; /* 丸くする */
     padding: 2px 4px; /* サイズ調整 */
