@@ -33,8 +33,8 @@ import dao.UsersDAO;
 
 public class SpotifyAuthService {
 
-    static final String CLIENT_ID = "277b350dfbe146e8b5b48171bc6ceaed";
-    private static final String CLIENT_SECRET = "5cdda2ff3df040de9b8ba8cbf0122885";
+    static final String CLIENT_ID = "47d25dfe57a84365a5560a0d4d5b904c";
+    private static final String CLIENT_SECRET = "85177e25506d47c4b8b2b8de65e68d3b";
     static final String REDIRECT_URI = "http://localhost:8080/SpotMusic/auth";
     private static final String TOKEN_URL = "https://accounts.spotify.com/api/token";
     private UsersDAO userDAO = new UsersDAO();
@@ -157,7 +157,7 @@ public class SpotifyAuthService {
     //ユーザーがフォローしているアーティストを取得
     public JSONObject getFollowedArtists(String accessToken) throws Exception {
         // Spotifyのフォロー中アーティスト情報を取得するURL
-        URL url = new URL("https://api.spotify.com/v1/me/following?type=artist");
+    	URL url = new URL("https://api.spotify.com/v1/me/following?type=artist&market=JP&locale=ja_JP");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.setRequestProperty("Authorization", "Bearer " + accessToken);
@@ -178,7 +178,7 @@ public class SpotifyAuthService {
     //track情報を取得
     public JSONObject getPlaylistTracks(String accessToken, String playlistId) throws Exception {
         // Spotifyのプレイリスト内のトラック情報を取得するURL
-        URL url = new URL("https://api.spotify.com/v1/playlists/" + playlistId + "/tracks");
+        URL url = new URL("https://api.spotify.com/v1/playlists/" + playlistId + "/tracks?market=JP&locale=ja_JP");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.setRequestProperty("Authorization", "Bearer " + accessToken);
@@ -199,7 +199,7 @@ public class SpotifyAuthService {
     //全てのtrack情報を取得する。
     public List<JSONObject> getAllPlaylistTracks(String accessToken, String playlistId) throws Exception {
         List<JSONObject> allTracks = new ArrayList<>();
-        String nextUrl = "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks";
+        String nextUrl = "https://api.spotify.com/v1/playlists/" + playlistId + "/tracks?market=JP&locale=ja_JP";
 
         while (nextUrl != null) {
             URL url = new URL(nextUrl);
@@ -380,7 +380,7 @@ public class SpotifyAuthService {
     
     public List<String> getArtistNames(String accessToken, int limit) throws IOException {
         // アクセストークンを使ってSpotifyからフォローしているアーティストの情報を取得
-        URL url = new URL("https://api.spotify.com/v1/me/following?type=artist&limit=" + limit);
+        URL url = new URL("https://api.spotify.com/v1/me/following?type=artist&limit=" + limit+"&market=JP&locale=ja_JP");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.setRequestProperty("Authorization", "Bearer " + accessToken);
@@ -447,7 +447,7 @@ public class SpotifyAuthService {
     
     public List<String> getArtistIds(String accessToken, int limit) throws IOException {
         // アクセストークンを使ってSpotifyからフォローしているアーティスト情報を取得
-        URL url = new URL("https://api.spotify.com/v1/me/following?type=artist&limit=" + limit);
+        URL url = new URL("https://api.spotify.com/v1/me/following?type=artist&limit=" + limit+"&market=JP&locale=ja_JP");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.setRequestProperty("Authorization", "Bearer " + accessToken);
@@ -501,13 +501,13 @@ public class SpotifyAuthService {
     
  // アーティストの詳細情報を取得
     public JSONObject getArtistDetails(String accessToken, String artistId) throws Exception {
-        String url = "https://api.spotify.com/v1/artists/" + artistId;
+        String url = "https://api.spotify.com/v1/artists/" + artistId+"?market=JP&locale=ja_JP";
         return sendGetRequest(accessToken, url);
     }
 
     // アーティストの人気曲を取得
     public JSONArray getArtistTopTracks(String accessToken, String artistId) throws Exception {
-        String url = "https://api.spotify.com/v1/artists/" + artistId + "/top-tracks?market=US";
+        String url = "https://api.spotify.com/v1/artists/" + artistId + "/top-tracks?market=JP";
         JSONObject response = sendGetRequest(accessToken, url);
         return response.getJSONArray("tracks");
     }
@@ -515,7 +515,7 @@ public class SpotifyAuthService {
     // アーティストのプレイリスト(アルバム？)を取得
     //もしかしたらplaylistでエンドポイントが違ったのでアルバムかもしれないです。
     public JSONArray getArtistPlaylists(String accessToken, String artistId) throws Exception {
-    	String url = "https://api.spotify.com/v1/artists/" + artistId + "/albums";
+    	String url = "https://api.spotify.com/v1/artists/" + artistId + "/albums?market=JP&locale=ja_JP";
         JSONObject response = sendGetRequest(accessToken, url);
         return response.getJSONArray("items");
     }
@@ -557,7 +557,7 @@ public class SpotifyAuthService {
     
     public JSONArray getAllAlbumTracks(String accessToken, String albumId) throws Exception {
         JSONArray allTracks = new JSONArray();  // 変更：JSONArrayに変更
-        String nextUrl = "https://api.spotify.com/v1/albums/" + albumId + "/tracks";
+        String nextUrl = "https://api.spotify.com/v1/albums/" + albumId + "/tracks?market=JP&locale=ja_JP";
 
         while (nextUrl != null) {
             URL url = new URL(nextUrl);
@@ -600,7 +600,8 @@ public class SpotifyAuthService {
         JSONObject albumDetails = new JSONObject();
         
         // アルバム詳細情報の取得URL
-        String albumDetailsUrl = "https://api.spotify.com/v1/albums/" + albumId;
+        String albumDetailsUrl = "https://api.spotify.com/v1/albums/" + albumId + "?market=JP&locale=ja_JP";
+
 
         // APIリクエストを送信してレスポンスを取得
         URL url = new URL(albumDetailsUrl);
@@ -726,7 +727,7 @@ public class SpotifyAuthService {
     //ログインユーザーが聞いているアーティストの情報
     public Map<String, Map<String, String>> getTopArtists(String accessToken, int limit) throws IOException {
         // Spotify APIのエンドポイントURL
-        URL url = new URL("https://api.spotify.com/v1/me/top/artists?limit=" + limit);
+    	URL url = new URL("https://api.spotify.com/v1/me/top/artists?limit=" + limit + "&market=JP&locale=ja_JP");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.setRequestProperty("Authorization", "Bearer " + accessToken);
@@ -768,7 +769,7 @@ public class SpotifyAuthService {
     // TopMixの中の曲を取得
     public Map<String, String> getTopMixTracks(String accessToken, int limit) throws IOException {
         // Spotify APIのエンドポイントURL
-        URL url = new URL("https://api.spotify.com/v1/me/top/tracks?limit=" + limit);
+        URL url = new URL("https://api.spotify.com/v1/me/top/tracks?limit=" + limit+"&market=JP&locale=ja_JP");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.setRequestProperty("Authorization", "Bearer " + accessToken);
@@ -808,7 +809,7 @@ public class SpotifyAuthService {
     
     public Map<String, Map<String, String>> getNewReleases(String accessToken, int limit) throws IOException {
         // Spotify APIのエンドポイントURL（新しいリリース）
-        String apiUrl = "https://api.spotify.com/v1/browse/new-releases?limit=" + limit;
+        String apiUrl = "https://api.spotify.com/v1/browse/new-releases?limit=" + limit+"&market=JP&locale=ja_JP";
 
         System.out.println("APIURL:::" + apiUrl);
         URL url = new URL(apiUrl);
@@ -1141,12 +1142,12 @@ public class SpotifyAuthService {
     }
 
     public String getCurrentTrackImage(String accessToken) throws IOException {
-        String url = "https://api.spotify.com/v1/me/player/currently-playing";
-        
+        String url = "https://api.spotify.com/v1/me/player/currently-playing?market=JP&locale=ja_JP";
+
         HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Authorization", "Bearer " + accessToken);
-        
+
         int responseCode = conn.getResponseCode();
         if (responseCode != HttpURLConnection.HTTP_OK) {
             return "{}"; // 再生中の曲がない場合
@@ -1162,18 +1163,33 @@ public class SpotifyAuthService {
             JSONObject jsonResponse = new JSONObject(response.toString());
             JSONObject item = jsonResponse.getJSONObject("item");
 
-            // アルバム画像URLを取得
+            // **アルバム画像URLを取得**
             String imageUrl = item.getJSONObject("album")
                                   .getJSONArray("images")
                                   .getJSONObject(0) // 最も大きい画像を取得
                                   .getString("url");
 
+            // **アーティスト名を取得**
+            JSONArray artists = item.getJSONArray("artists");
+            List<String> artistNames = new ArrayList<>();
+            for (int i = 0; i < artists.length(); i++) {
+                artistNames.add(artists.getJSONObject(i).getString("name"));
+            }
+            String artistName = String.join(", ", artistNames); // 複数のアーティスト名をカンマ区切りで結合
+
+            // **レスポンスJSONを作成**
             JSONObject responseJson = new JSONObject();
             responseJson.put("imageUrl", imageUrl);
+            responseJson.put("artistName", artistName); // **アーティスト名を追加！**
+
+            // **デバッグログ**
+            System.out.println("🎵 取得したアルバム画像URL: " + imageUrl);
+            System.out.println("🎤 取得したアーティスト名: " + artistName);
 
             return responseJson.toString();
         }
     }
+
 
     private static final String SPOTIFY_PLAYLISTS_API = "https://api.spotify.com/v1/me/playlists";
 
@@ -1207,12 +1223,13 @@ public class SpotifyAuthService {
     
     
     public String getCurrentTrackDetails(String accessToken) throws IOException {
-        String url = "https://api.spotify.com/v1/me/player/currently-playing";
+        String url = "https://api.spotify.com/v1/me/player/currently-playing?market=JP&locale=ja_JP";
 
         HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Authorization", "Bearer " + accessToken);
-        
+        conn.setRequestProperty("Accept-Language", "ja"); // 日本語で取得
+
         int responseCode = conn.getResponseCode();
         if (responseCode != 200) {
             return "{\"error\": \"Failed to fetch track details from Spotify\"}";
@@ -1229,20 +1246,30 @@ public class SpotifyAuthService {
 
         // 必要な情報を取得
         String trackId = track.getString("id");
+        String trackName = track.getString("name");
         String albumName = album.getString("name");
         String albumImageUrl = album.getJSONArray("images").getJSONObject(0).getString("url");
         String releaseDate = album.getString("release_date");
 
+        // **アーティスト情報を取得**
+        JSONArray artists = track.getJSONArray("artists");
+        List<String> artistNames = new ArrayList<>();
+        for (int i = 0; i < artists.length(); i++) {
+            artistNames.add(artists.getJSONObject(i).getString("name"));
+        }
+        System.out.println("🎤 アーティスト名（APIレスポンス）: " + String.join(", ", artistNames));
         // JSONレスポンス作成
         JSONObject resultJson = new JSONObject();
         resultJson.put("trackId", trackId);
+        resultJson.put("trackName", trackName);
         resultJson.put("albumName", albumName);
         resultJson.put("albumImageUrl", albumImageUrl);
         resultJson.put("releaseDate", releaseDate);
+        resultJson.put("artistName", String.join(", ", artistNames)); // **日本語アーティスト名を返す**
 
         return resultJson.toString();
     }
-    
+
     
 
     

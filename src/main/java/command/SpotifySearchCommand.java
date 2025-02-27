@@ -269,7 +269,7 @@ public class SpotifySearchCommand extends AbstractCommand {
         System.out.println("?? Fetching album details for ID: " + albumId);
 
         // **アルバム情報の取得**
-        String urlString = "https://api.spotify.com/v1/albums/" + albumId;
+        String urlString = "https://api.spotify.com/v1/albums/" + albumId + "?market=JP&locale=ja_JP";
         JSONObject albumJson = new JSONObject(sendSpotifyRequest(urlString, accessToken));
 
         // **アルバムの基本情報を取得**
@@ -385,7 +385,7 @@ public class SpotifySearchCommand extends AbstractCommand {
         System.out.println("?? Fetching artist details for ID: " + artistId);
 
         // **アーティスト情報の取得**
-        String urlString = "https://api.spotify.com/v1/artists/" + artistId;
+        String urlString = "https://api.spotify.com/v1/artists/" + artistId + "?market=JP&locale=ja_JP";
         JSONObject artistJson;
         try {
             artistJson = new JSONObject(sendSpotifyRequest(urlString, accessToken));
@@ -417,7 +417,7 @@ public class SpotifySearchCommand extends AbstractCommand {
 
         // **人気曲の取得**
         System.out.println("?? Fetching top tracks for artist.");
-        String topTracksUrl = "https://api.spotify.com/v1/artists/" + artistId + "/top-tracks?market=JP";
+        String topTracksUrl = "https://api.spotify.com/v1/artists/" + artistId + "/top-tracks?market=JP&locale=ja_JP";
         JSONObject topTracksResponse;
         try {
             topTracksResponse = new JSONObject(sendSpotifyRequest(topTracksUrl, accessToken));
@@ -519,7 +519,7 @@ public class SpotifySearchCommand extends AbstractCommand {
         System.out.println("?? Fetching playlist details for ID: " + playlistId);
 
         // **プレイリスト情報の取得**
-        String urlString = "https://api.spotify.com/v1/playlists/" + playlistId;
+        String urlString = "https://api.spotify.com/v1/playlists/" + playlistId + "?market=JP&locale=ja_JP";
         JSONObject playlistJson;
         try {
             playlistJson = new JSONObject(sendSpotifyRequest(urlString, accessToken));
