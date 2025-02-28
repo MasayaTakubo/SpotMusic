@@ -16,12 +16,13 @@
 <!-- タブメニュー -->
 <c:set var="noImageUrl" value="${fn:escapeXml(pageContext.request.contextPath)}/img/no_image.png" />
 <div class="tab-menu">
-    <button class="active" onclick="showTab('all')">すべて</button>
-    <button class="track" onclick="showTab('tracks')">曲</button>
-    <button class="albums"onclick="showTab('albums')">アルバム</button>
-    <button class="artits"onclick="showTab('artists')">アーティスト</button>
-    <button class="playlists"onclick="showTab('playlists')">プレイリスト</button>
+    <button class="active" onclick="showTab(event, 'all')">すべて</button>
+    <button class="track" onclick="showTab(event, 'tracks')">曲</button>
+    <button class="albums" onclick="showTab(event, 'albums')">アルバム</button>
+    <button class="artists" onclick="showTab(event, 'artists')">アーティスト</button>
+    <button class="playlists" onclick="showTab(event, 'playlists')">プレイリスト</button>
 </div>
+
 
 <!-- すべての結果（デフォルト） -->
 <div id="all" class="tab-content active">
@@ -54,8 +55,8 @@
 				            <option value="${playlist.id}">${playlist.name}</option>
 				        </c:forEach>
 				    </select>
-				    <button class="add-button" >追加</button>
-				    <button onclick="playTrack('${track.id}', '${track.name}')">再生</button>
+				    <button type="submit" class="add-button">追加</button>
+    				<button type="button" onclick="playTrack('${track.id}', '${track.name}')">再生</button>
 				</form>
 
                 </div>
@@ -145,8 +146,8 @@
 				            <option value="${playlist.id}">${playlist.name}</option>
 				        </c:forEach>
 				    </select>
-				    <button type="submit">追加</button>
-				    <button type="button" onclick="playTrack('${track.id}', '${track.name}')">再生</button>
+				    <button type="submit" class="add-button">追加</button>
+    				<button type="button" onclick="playTrack('${track.id}', '${track.name}')">再生</button>
 				</form>
 
                 </div>
@@ -248,11 +249,11 @@
 </div>
 
 <script>
-function showTab(tabName) {
-/*     // すべてのタブコンテンツを非表示にする
+function showTab(event, tabName) {
+    // すべてのタブコンテンツを非表示
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.style.display = "none";
-    }); */
+    });
 
     // すべてのタブボタンのアクティブ状態を解除
     document.querySelectorAll('.tab-menu button').forEach(button => {
@@ -262,23 +263,26 @@ function showTab(tabName) {
     // タブが存在するかチェック
     let targetTab = document.getElementById(tabName);
     if (targetTab) {
-        targetTab.style.display = "block";
+        targetTab.style.display = "block"; // クリックしたタブを表示
     } else {
         console.error(`showTab: タブ '${tabName}' が見つかりません。`);
         return;
     }
 
     // クリックされたタブボタンをアクティブにする
-    let activeButton = document.querySelector(`[onclick="showTab('${tabName}')"]`);
-    if (activeButton) {
-        activeButton.classList.add('active');
-    }
+    event.target.classList.add('active');
 }
 
 // 初期表示（デフォルトで「すべて」を表示）
 document.addEventListener("DOMContentLoaded", function () {
-    showTab('all');
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.style.display = "none"; // 全タブを非表示
+    });
+    
+    document.getElementById('all').style.display = "block"; // "すべて" を表示
+    document.querySelector('.tab-menu button.active').classList.add('active');
 });
+
 
 function loadAlbumDetail(albumId) {
     console.log("loadAlbumDetail called with ID:", albumId); // デバッグ用
