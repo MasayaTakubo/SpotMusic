@@ -76,14 +76,12 @@ h2{
 }
 
 .content::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(222,222, 222, 0.3);
     border-radius: 10px;
     height: 40%;
 }
 
-.content::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.5);
-}
+
 
 
 .flAr {
@@ -598,7 +596,7 @@ hr{
 }
 
 .libList::-webkit-scrollbar-thumb {
-    background: rgba(0,0,0,0.3);
+    background: rgba(222,222, 222, 0.3);
     border-radius: 10px;
     height:40%;
 }
@@ -709,18 +707,18 @@ hr{
 }
 
 /* ホバー時に少し明るめの黒 */
-.track-list i:hover {
-    color: #222 !important;
-    border-color: #222;
-    transform: scale(1.05);
-}
-.track-list i{
-	font-size: 35px;
-}
-.playlistId{
-	width: 25px;
-	height: 8px;
-}
+/*.track-list i:hover {*/
+/*    color: #222 !important;*/
+/*    border-color: #222;*/
+/*    transform: scale(1.05);*/
+/*}*/
+/*.track-list i{*/
+/*	font-size: 35px;*/
+/*}*/
+/*.playlistId{*/
+/*	width: 25px;*/
+/*	height: 8px;*/
+/*}*/
 
 
 
@@ -791,77 +789,82 @@ hr{
 /* プレイリスト詳細ページの調整 */
 
 /* レスポンシブデザイン */
-/* スマホ用の固定幅を適用 */
 @media (max-width: 600px) {
-    body {
-        width: 375px; /* iPhone 標準サイズ */
-        max-width: 100%;
-        margin: 0 auto;
-        overflow-x: hidden; /* 横スクロール防止 */
-        overflow-y: hidden; /* 外側のスクロールを無効化 */
-        height: 100vh; /* 画面全体をカバー */
-    }
-
-    .content {
-        width: 100%;
-        max-width: 375px; /* スマホサイズに調整 */
-        height: 100vh; /* 画面全体をカバー */
-        overflow-y: auto; /* 内側のスクロールのみ有効 */
-        margin: 0 auto;
-        padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 130px); /* メニューバーの高さ + 余白 */
-    }
-
     li {
         width: 95%;
     }
 }
 
-
-
-
 /* 曲リストのデザイン */
 /* 曲リストのデザイン */
-/*.track-list {
-	background-color: rgba(0, 0, 0, 0.1);
-	border-radius: 20px;
-    padding: 10px 0 10px 0;
-    max-height: 500px;
-    display: flex;
-    flex-direction: column;
-  	align-items: center;
-    width: 95%;
-    overflow-y: hidden;
-    overflow-x: hidden;
-    transition: max-height 0.2s ease-in-out;
-    scrollbar-gutter: stable; 
-    box-shadow: 0 2px 4px rgba(222,222,222,0.2);
+/*.track-list {*/
+/*	background-color: rgba(0, 0, 0, 0.1);*/
+/*	border-radius: 20px;*/
+/*    padding: 10px 0 10px 0;*/
+/*    max-height: 500px;*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*  	align-items: center;*/
+/*    width: 95%;*/
+/*    overflow-y: hidden;*/
+/*    overflow-x: hidden;*/
+/*    transition: max-height 0.2s ease-in-out;*/
+/*    scrollbar-gutter: stable; */
+/*    box-shadow: 0 2px 4px rgba(222,222,222,0.2);*/
     
-}
-.track-list:hover{
-overflow-y: auto;	
-}
+/*}*/
+/*.track-list:hover{*/
+/*overflow-y: auto;	*/
+/*}*/
 
-.track-list::-webkit-scrollbar {
-    width: 20px;
-}
+/*.track-list::-webkit-scrollbar {*/
+/*    width: 20px;*/
+/*}*/
 
-.track-list::-webkit-scrollbar-track {
-    background: none;
-    border-radius: 10px;
-}
+/*.track-list::-webkit-scrollbar-track {*/
+/*    background: none;*/
+/*    border-radius: 10px;*/
+/*}*/
 
-.track-list::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 10px;
-    height: 40%;
-}
-.track-list img{
-	width: 75px;
-	height: 80px;
-	border-radius:10px ;
+/*.track-list::-webkit-scrollbar-thumb {*/
+/*    background: rgba(0, 0, 0, 0.3);*/
+/*    border-radius: 10px;*/
+/*    height: 40%;*/
+/*}*/
+/*.track-list img{*/
+/*	width: 75px;*/
+/*	height: 80px;*/
+/*	border-radius:10px ;*/
+	
+/*}*/
+/**/
+
+.add-track-form{
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 20%;
 	
 }
-*/
+
+
+.add-track-form select,
+.add-track-form button{
+	width: 100%;
+    margin-top: 5px;
+    padding: 8px;
+    border: none;
+    border-radius: 5px;
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+}
+.add-track-form button:hover{
+	background-color: rgba(222, 222,222, 0.3);
+}
+
+
+
 .track-item {
     background-color: rgba(34,34,34,0.5);
     padding: 10px;
@@ -1113,7 +1116,7 @@ overflow-y: auto;
 }
 
 .SearchPage::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.3); 
+    background: rgba(222, 222,222, 0.3); 
     border-radius: 10px;
     height: 40%;
 }
