@@ -16,11 +16,11 @@
     <link rel="stylesheet" type="text/css" href="<c:url value='/css/delete.css' />">
     <title>プレイリスト詳細</title>
     <style>
-/* 送信ボタンを黒白デザインに変更 */
+/* 送信ボタン */
 	#sendButton {
 	    width: 100%;
-	    background-color: #222 !important; /* ダークグレー */
-	    color: #fff !important; /* 白文字 */
+	    background-color: #222 !important;
+	    color: #fff !important;
 	    font-size: 16px !important;
 	    font-weight: bold !important;
 	    padding: 12px 20px !important;
@@ -31,29 +31,25 @@
 	    margin-top: 10px !important;
 	}
 	
-	/* ホバー時は少し明るいグレー */
 	#sendButton:hover {
 	    background-color: #444 !important;
 	}
 	
-	/* クリック時に縮小 */
 	#sendButton:active {
 	    transform: scale(0.95) !important;
 	}
 
-
-/* コメント*/
 /* コメントセクション全体 */
 .comment-section {
     display: flex;
     justify-content: space-between;
-    align-items: stretch; /* 高さを均等に揃える */
+    align-items: stretch;
     width: 70%;
     margin: 40px auto;
     gap: 20px;
 }
 
-/* コメント入力フォームとコメント一覧を同じ大きさに */
+/* コメント入力フォームとコメント一覧 */
 .comment-input-container,
 .comment-list-container {
     flex: 1;
@@ -63,44 +59,44 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 400px; /* 高さを統一 */
-    max-height: 400px; /* 必要に応じて調整 */
+    min-height: 400px;
+    max-height: 400px;
 }
 
 .comment-input-container {
-    width: 100%; /* 横幅を最大に */
-    max-width: 100%; /* 最大幅制限を解除 */
+    width: 100%;
+    max-width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: stretch; /* 中身をフル幅に */
+    align-items: stretch;
 }
 
-/* コメント入力エリアの高さを調整 */
+/* コメント入力エリア */
 #commentInput {
     width: 100%;
-    height: 250px; /* 高さをさらに広げる */
-    padding: 10px; /* 余白を少し減らす */
+    height: 250px;
+    padding: 10px;
     border-radius: 8px;
     border: 1px solid #ccc;
     resize: none;
-    font-size: 16px; /* 文字サイズを大きく */
-    flex-grow: 1; /* 上下いっぱいに広がる */
+    font-size: 16px;
+    flex-grow: 1;
     box-sizing: border-box;
 }
 
-/* 送信ボタンの配置 */
+/* 送信ボタン */
 #sendButton {
     width: 100%;
     background-color: #1DB954;
     color: white;
-    font-size: 18px; /* ボタンの文字を少し大きく */
+    font-size: 18px;
     font-weight: bold;
-    padding: 12px 20px; /* ボタンのサイズを調整 */
+    padding: 12px 20px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.1s;
-    margin-top: 15px; /* 入力欄との間の余白を調整 */
+    margin-top: 15px;
 }
 
 #sendButton:hover {
@@ -111,37 +107,37 @@
     transform: scale(0.95);
 }
 
-/* コメントリストを統一サイズにしてスクロールバーを1つに */
+/* コメント一覧 */
 .comment-list-container {
-    overflow: hidden; /* 二重スクロール防止 */
+    overflow: hidden;
+    width: 100%;
 }
 
 #commentList {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+    list-style: none; 
+    padding-left: 0; 
+    margin: 0; 
+    /* スクロールエリアの高さが必要なら指定 */
+    max-height: 330px; 
     overflow-y: auto;
-    flex-grow: 1;
-    width: 100%;
-    max-height: 330px; /* スクロールの最大高さ */
 }
 
-/* 各コメントのスタイル */
+/* LI の左パディングをなくし、左揃えに */
 #commentList li {
-    padding: 10px;
-    border-bottom: 1px solid #444;
+    padding: 0; 
+    margin-bottom: 10px; /* コメント同士の余白 */
+    text-align: left;
     color: #fff;
-    font-size: 14px;
+    border-bottom: 1px solid #444;
 }
 
-/* 最後のコメントの下線を削除 */
 #commentList li:last-child {
     border-bottom: none;
 }
 
-/* ユーザー名を強調 */
+/* ユーザー名 */
 #commentList li strong {
-    color: #fff; /* 白色で統一 */
+    color: #fff;
     font-size: 16px;
 }
 
@@ -156,7 +152,7 @@
 }
 
 #commentList::-webkit-scrollbar-thumb {
-    background: #888; 
+    background: #888;
     border-radius: 10px;
 }
 
@@ -164,53 +160,43 @@
     background: #bbb;
 }
 
-
+#commentList li .comment-text {
+        max-width: 20ch;         
+        white-space: pre-wrap;
+}
 
     </style>
 </head>
 <body>
     <%
-	  	//セッションからuserIdを取得
-		String userId = (String) session.getAttribute("userId");
-    	//セッションからuser_nameを取得
-    	//String userName = (String) session.getAttribute("user_name");
+        // セッションからuserIdを取得
+        String userId = (String) session.getAttribute("userId");
         // セッションスコープからトラック情報を取得
         List<TrackBean> trackList = (List<TrackBean>) session.getAttribute("trackList");
     %>
 
 <c:if test="${not empty trackList}">
-<ul class="track-list">
+    <ul class="track-list">
 	    <h4>プレイリストのトラック一覧</h4>
-    <c:forEach var="track" items="${trackList}" varStatus="status">
-        <li>
-            <!-- トラック画像 -->
-            <c:if test="${not empty track.trackImageUrl}">
-                <img src="${track.trackImageUrl}" alt="${fn:escapeXml(track.trackName)}">
-            </c:if>
-
-            <!-- トラック情報 -->
-            <div class="track-info">
-                <strong>${fn:escapeXml(track.trackName)}</strong>
-                <span>${fn:escapeXml(track.artistName)}</span>
-            </div>
+        <c:forEach var="track" items="${trackList}" varStatus="status">
+            <li>
+                <c:if test="${not empty track.trackImageUrl}">
+                    <img src="${track.trackImageUrl}" alt="${fn:escapeXml(track.trackName)}">
+                </c:if>
+                <div class="track-info">
+                    <strong>${fn:escapeXml(track.trackName)}</strong>
+                    <span>${fn:escapeXml(track.artistName)}</span>
+                </div>
                 <button onclick="console.log('クリック: trackIndex=', ${status.index}); playTrack('${track.trackId}', '${track.trackName}', '${param.playlistId}', ${status.index})">再生</button>
-        
-                <button class="delete-btn" onclick="removeTrack('${param.playlistId}', '${track.trackId}', this)">
-                    🗑️
-                </button>
-        </li>
-    </c:forEach>
-</ul>
-
-
+                <button class="delete-btn" onclick="removeTrack('${param.playlistId}', '${track.trackId}', this)">🗑️</button>
+            </li>
+        </c:forEach>
+    </ul>
 </c:if>
 
-
-						
-
-    <c:if test="${empty trackList}">
-        <p>トラック情報が見つかりません。</p>
-    </c:if>
+<c:if test="${empty trackList}">
+    <p>トラック情報が見つかりません。</p>
+</c:if>
 
 <div class="comment-section">
     <!-- 左側：コメント入力フォーム -->
@@ -226,47 +212,48 @@
         </form>
     </div>
     
-    
-
     <!-- 右側：コメント一覧 -->
-    <div class="comment-list-container">
-        <h6>コメント一覧</h6>
-        <c:if test="${not empty comments}">
-            <ul id="commentList">
-                <c:forEach var="comment" items="${comments}">
-                    <li>
-                        <strong>${fn:escapeXml(comment.userName)}</strong>: ${fn:escapeXml(comment.sendComment)}<br>
-                        <small>${comment.sendTime}</small>
-                    </li>
-                </c:forEach>
-            </ul>
-        </c:if>
-        
-        <c:if test="${empty comments}">
-            <p>まだコメントがありません。</p>
-        </c:if>
-    </div>
+	<div class="comment-list-container">
+	    <h6>コメント一覧</h6>
+	    <c:if test="${not empty comments}">
+	        <ul id="commentList">
+	            <c:forEach var="cmt" items="${comments}">
+	                <li class="commentText">
+	                    <strong>${fn:escapeXml(cmt.userName)}</strong>&nbsp;
+	                    <small>${fn:escapeXml(cmt.sendTime)}</small><br>
+	                    <span style="white-space: pre-wrap;">${fn:escapeXml(cmt.sendComment)}</span>
+	                </li>
+	            </c:forEach>
+	        </ul>
+	    </c:if>
+	    <c:if test="${empty comments}">
+	        <p>まだコメントがありません。</p>
+	    </c:if>
+	</div>
 </div>
-
-
-
-
-
-
 <script>
 $(document).ready(function(){
     $("#commentForm").submit(function(event){
-        event.preventDefault(); // デフォルトのフォーム送信を防ぐ
+
+    	// コメント入力がスペースまたは改行のみかどうかをチェック
+        
+        if ($("#commentInput").val().trim() === "" || commentInput.match(/^(\n|\s)*$/)) {
+            // 空または改行のみのコメントの場合、送信を防ぐ
+            alert("コメントを入力してください。");
+            return false;  // フォームの送信をキャンセル
+        }
+        
+        event.preventDefault();
 
         $.ajax({
             type: "POST",
             url: "FrontServlet",
             data: $(this).serialize(),
-            dataType: "json", // JSONを期待する
+            dataType: "json",
             success: function(response) {
-                console.log("レスポンス:", response); // デバッグ用
-                $("#commentInput").val(""); // 入力欄をクリア
-                updateComments(response);  // コメントを画面更新
+                console.log("レスポンス:", response);
+                $("#commentInput").val("");
+                updateComments(response);
             },
             error: function(xhr, status, error) {
                 console.error("エラー:", xhr.responseText);
@@ -277,7 +264,7 @@ $(document).ready(function(){
 
     function updateComments(comments) {
         let commentList = $("#commentList");
-        commentList.empty(); // 一旦リストをクリア
+        commentList.empty();
 
         if (comments.length === 0) {
             commentList.append("<p>まだコメントがありません。</p>");
@@ -285,19 +272,17 @@ $(document).ready(function(){
         }
 
         comments.forEach(comment => {
-            commentList.append(`
+            commentList.append(
                 <li>
-                    <strong>${comment.userName}</strong>: ${comment.sendComment}<br>
-                    <small>${comment.sendTime}</small>
-                    </li>
-                    `);
-                });
-            }
+                    <strong>${comment.userName}</strong>&nbsp;<small>${comment.sendTime}</small><br>
+                    <span style="white-space: pre-wrap;">${comment.sendComment}</span>
+                </li>
+            );
         });
-        
+    }
+});
 </script>
 <script>
-//main.jspでの処理を呼び出される側でも記述(JSが動かない)
 function loadPlaylistPage(playlistId) {
     if (!playlistId) {
         console.error('playlistId が指定されていません');
@@ -317,14 +302,11 @@ function loadPlaylistPage(playlistId) {
         .then(data => {
             contentDiv.innerHTML = data;
             console.log("プレイリストページがロードされました！");
-
-            // **イベントリスナーを再適用**
             document.querySelectorAll(".menu-btn").forEach(button => {
                 button.addEventListener("click", function() {
                     toggleMenu(this);
                 });
             });
-
             console.log("toggleMenu イベントを再適用しました");
         })
         .catch(error => {
@@ -332,8 +314,6 @@ function loadPlaylistPage(playlistId) {
             contentDiv.innerHTML = '<p>プレイリスト情報の取得に失敗しました。</p>';
         });
 }
-
-
 </script>
 
 </body>
