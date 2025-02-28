@@ -4,10 +4,123 @@
 <html>
 <head>
     <title>アーティスト詳細</title>
-    <link rel="stylesheet" type="text/css" href="<c:url value='/css/searchArtist.css' />">
+    
+    <style>
+		.artist-container {
+    display: flex;
+    align-items: center;
+    gap: 20px; 
+}
+
+.artist-image img {
+    width: 300px;
+    height: 300px;
+    border-radius:50% ;
+    box-shadow: 0 0 10px rgba(255,255,255,0.8);
+    margin-left:20px;
+}
+.artist-info{
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	
+}
+
+.artist-info h2 {
+    margin: 0;
+    font-size: 80px;
+    font-weight: bold;
+}
+
+.artist-info p {
+    margin: 5px 0;
+    font-size: 25px;
+    font-weight: bold;
+}
+
+#followForm {
+    margin-top: 10px;
+}
+
+#followButton {
+    background-color: rgb(222,222,222);
+    color: rgb(34,34,34);
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 20px;
+   font-weight: bold;
+}
+
+#followButton:hover {
+    background-color:white;
+}
+
+.track-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+    list-style: none;
+    justify-content: flex-start;
+}
+
+.track-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 150px;
+    background: #333;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    color: white;
+}
+
+.track-box img {
+    width: 130px;
+    height: 130px;
+    border-radius: 5px;
+}
+
+.track-box p {
+    font-size: 12px;
+    margin: 5px 0 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+.ttrack-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.ttrack-form select,
+.ttrack-form button {
+    width: 100%;
+    margin-top: 5px;
+    padding: 8px;
+    border: none;
+    border-radius: 5px;
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+}
+
+.ttrack-form button:hover {
+    background-color: #666;
+}
+
+
+		    
+    </style>
 </head>
 <body>
-    
+     <h1>アーティスト詳細情報</h1>
 
     <c:if test="${not empty artist}">
         <div class="artist-container">
@@ -24,7 +137,7 @@
        
         <div class="artist-info">
             <h2>${artist.name}</h2>
-            <p>フォロワー: ${artist.followers}</p>
+            <p><i class='bx bxs-heart'></i> ${artist.followers}</p>
 
            
             <form id="followForm" action="FrontServlet" method="post" target="hidden_iframe">
@@ -40,7 +153,7 @@
 
     <iframe name="hidden_iframe" style="display:none;"></iframe>
 
-		<h4>人気曲</h4>
+		<h1>人気曲</h1>
 		<c:if test="${not empty top_tracks}">
     <ul class="track-container">
         <c:forEach var="track" items="${top_tracks}">
@@ -58,7 +171,7 @@
                 <p>${track.name}</p>
 
                 <!-- プレイリスト追加フォーム  -->
-                <form class="track-form" action="FrontServlet" method="post" target="hidden_iframe">
+                <form class="ttrack-form" action="FrontServlet" method="post" target="hidden_iframe">
                     <input type="hidden" name="command" value="addTrack">
                     <input type="hidden" name="trackId" value="${track.id}">
                     <select name="playlistId">
@@ -66,8 +179,8 @@
                             <option value="${playlist.id}">${playlist.name}</option>
                         </c:forEach>
                     </select>
-                    <button class="track-add-button" type="submit">追加</button>
-                    <button class="track-play-button" type="button" onclick="playTrack('${track.id}', '${track.name}')">再生</button>
+                    <button  type="submit">追加</button>
+                    <button  type="button" onclick="playTrack('${track.id}', '${track.name}')">再生</button>
                 </form>
             </li>
         </c:forEach>

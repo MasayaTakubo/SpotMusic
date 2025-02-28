@@ -16,7 +16,7 @@
 }
 .loginButton{
 	
-	font-size: 43px;
+	font-size: 38px;
 	border:none;
 	display: flex;
     align-items: center;
@@ -43,13 +43,13 @@
 .signup{
 	display: flex;
     justify-content: center;
-    margin-top:50px;
+    margin-top:25px;
 }
 .signup p{
 	font-size: 27px;
 	font-weight: bold;
 	color: white;
-	margin-left: 4.5cm;
+	margin-left:1cm;
 	display: inline-block;
     border-bottom: 2px solid white ;
     padding-bottom: 0.5px;
@@ -57,7 +57,8 @@
 }
 
 .signup button{
-	font-size: 30px;
+	margin-left:20px;
+	font-size: 25px;
 	border:none;
 	background: none;
 	color:#1DB954;
@@ -67,7 +68,7 @@
 	
 }
 .signup button:hover{
-	transform: scale(1.2);
+	transform: scale(1.1);
 	color: white;
 }
 
@@ -77,8 +78,7 @@
 	width: 80%;
 	background-color:rgba(255,255,255,0.2);
 	height: 2px;
-	margin: 100px;
-	
+	margin: 30px;
 	box-shadow: 0 0 10px rgba(255,255,255,0.4);
 	
 }
@@ -89,8 +89,8 @@
 	flex-direction: column;
 	align-items: center;
 	border-radius: 2%;
-	width: 21cm;
-	height: 24cm;
+	width: 18cm;
+	height: 22cm;
 	margin-top: 1cm;
 	animation:glowing 1.5s infinite alternate;
 	

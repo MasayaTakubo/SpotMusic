@@ -3,8 +3,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html>
+<link rel="stylesheet" type="text/css" href="<c:url value='/css/styles.css' />">
 <head>
     <title>検索結果</title>
+    
 
 	
 </head>
@@ -52,8 +54,8 @@
 				            <option value="${playlist.id}">${playlist.name}</option>
 				        </c:forEach>
 				    </select>
-				    <button class="add-button" type="submit"><i class='bx bxs-folder-plus'></i></button>
-				    <button type="button" onclick="playTrack('${track.id}', '${track.name}')"><i class='bx bx-play-circle' ></i></button>
+				    <button class="add-button" >追加</button>
+				    <button onclick="playTrack('${track.id}', '${track.name}')">再生</button>
 				</form>
 
                 </div>
@@ -143,8 +145,8 @@
 				            <option value="${playlist.id}">${playlist.name}</option>
 				        </c:forEach>
 				    </select>
-				    <button class="add-button" type="submit"><i class='bx bxs-folder-plus'></i></button>
-				    <button type="button" onclick="playTrack('${track.id}', '${track.name}')"><i class='bx bx-play-circle' ></i></button>
+				    <button type="submit">追加</button>
+				    <button type="button" onclick="playTrack('${track.id}', '${track.name}')">再生</button>
 				</form>
 
                 </div>

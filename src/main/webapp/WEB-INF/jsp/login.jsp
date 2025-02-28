@@ -41,7 +41,7 @@
 
         <div class="signup">
             <p>アカウントがありませんか？</p>
-            <button type="button" onclick="window.open('https://www.spotify.com/signup/', '_blank')">SignUp</button>
+            <button type="button" onclick="window.open('https://www.spotify.com/signup/', '_blank')">サインアップ</button>
         </div>
     </div>
 
