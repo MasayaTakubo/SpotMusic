@@ -93,7 +93,7 @@
 			<label for="playlistName"></label> 
 			
 			<input type="text"
-				id="playlistName"placeholder="新しプレイリスト名" name="playlistName" required  >
+				id="playlistName"placeholder="新しいプレイリスト名" name="playlistName" required  >
 			<button type="submit">作成</button>
 			</div>
 			
@@ -1443,8 +1443,8 @@ function deletePlaylist(playlistId) {
 }
 
 
-function showTab(tabName) {
-    // すべてのタブコンテンツを非表示にする
+function showTab(event, tabName) {
+    // すべてのタブコンテンツを非表示
     document.querySelectorAll('.tab-content').forEach(tab => {
         tab.style.display = "none";
     });
@@ -1457,22 +1457,24 @@ function showTab(tabName) {
     // タブが存在するかチェック
     let targetTab = document.getElementById(tabName);
     if (targetTab) {
-        targetTab.style.display = "block";
+        targetTab.style.display = "block"; // クリックしたタブを表示
     } else {
         console.error(`showTab: タブ '${tabName}' が見つかりません。`);
         return;
     }
 
     // クリックされたタブボタンをアクティブにする
-    let activeButton = document.querySelector(`[onclick="showTab('${tabName}')"]`);
-    if (activeButton) {
-        activeButton.classList.add('active');
-    }
+    event.target.classList.add('active');
 }
 
 // 初期表示（デフォルトで「すべて」を表示）
 document.addEventListener("DOMContentLoaded", function () {
-    showTab('all');
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.style.display = "none"; // 全タブを非表示
+    });
+    
+    document.getElementById('all').style.display = "block"; // "すべて" を表示
+    document.querySelector('.tab-menu button.active').classList.add('active');
 });
 
 
