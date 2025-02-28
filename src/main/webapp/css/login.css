@@ -41,15 +41,15 @@
 	font-size: 50px;
 }
 .signup{
-	display: flex;
+	text-align: left;
     justify-content: center;
-    margin-top:50px;
+
 }
 .signup p{
 	font-size: 27px;
 	font-weight: bold;
 	color: white;
-	margin-left: 4.5cm;
+	margin-left: 1.5cm;
 	display: inline-block;
     border-bottom: 2px solid white ;
     padding-bottom: 0.5px;
