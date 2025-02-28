@@ -24,7 +24,7 @@
                 <li>
                     <div class="track-info">
                         <strong>${track.trackName}</strong>  
-                        <span> - ${track.artistName}</span>
+                        <span>${track.artistName}</span>
                     </div>
 
                     <button onclick="playTrack('${track.trackId}', '${track.trackName}')">再生</button>

@@ -47,8 +47,8 @@
             </c:choose>
             <p class="track-name">
 			    <c:choose>
-			        <c:when test="${fn:length(track['name']) > 8}">
-			            ${fn:substring(track['name'], 0, 8)}..
+			        <c:when test="${fn:length(track['name']) > 30}">
+			            ${fn:substring(track['name'], 0, 30)}..
 			        </c:when>
 			        <c:otherwise>
 			            ${track['name']}

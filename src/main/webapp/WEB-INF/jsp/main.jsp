@@ -593,16 +593,21 @@ function updateCurrentTrackImages() {
         .then(response => response.json())
         .then(data => {
             if (data.imageUrl) {
-                // 1つ目の画像を更新
+                // 画像の更新
                 document.getElementById('current-track-image').src = data.imageUrl;
                 document.getElementById('current-track-image').style.display = "block"; 
-
-                // 2つ目の画像を更新
                 document.getElementById('current-track-image-2').src = data.imageUrl;
                 document.getElementById('current-track-image-2').style.display = "block"; 
             } else {
                 document.getElementById('current-track-image').style.display = "none";
                 document.getElementById('current-track-image-2').style.display = "none";
+            }
+
+            // **アーティスト名の更新**
+            if (data.artistName) {
+                document.getElementById('artist-name').innerText = data.artistName;
+            } else {
+                document.getElementById('artist-name').innerText = "アーティスト情報なし";
             }
         })
         .catch(error => console.error("現在のトラック画像取得エラー:", error));
@@ -663,11 +668,21 @@ function updateCurrentTrackImages() {
                 const track = state.track_window.current_track;
                 nowPlaying.innerText = track.name || "なし";
                 nowPlaying2.innerText = track.name || "なし";
-                artistName.innerText = track.artists.map(artist => artist.name).join(", ") || "アーティスト情報なし";
                 albumName.innerText = track.album.name || "アルバム情報なし";
                 trackDuration.innerText = formatDuration(track.duration_ms) || "0:00";
                 releaseDate.innerText = track.album.release_date || ""; // 追加: リリース日を設定
 
+                // 🎯 APIから正しい日本語データを取得する
+                fetch("/SpotMusic/spotifyControl?action=getCurrentTrackImage")
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("APIから取得したアーティスト名:", data.artistName);
+                        if (data.artistName) {
+                            document.getElementById('artist-name').innerText = data.artistName;
+                        } else {
+                            document.getElementById('artist-name').innerText = "アーティスト情報なし";
+                        }
+                    })
                 // 再生/停止ボタンのアイコンを更新
                 if (state.paused) {
                     playPauseButton.innerHTML = `<i class="fas fa-play"></i>`; // 一時停止状態なら再生ボタンを表示
@@ -2028,10 +2043,20 @@ function sendMessage(relationId, userId) {
             const track = state.track_window.current_track;
             nowPlaying.innerText = track.name || "なし";
             nowPlaying2.innerText = track.name || "なし";
-            artistName.innerText = track.artists.map(artist => artist.name).join(", ") || "アーティスト情報なし";
             albumName.innerText = track.album.name || "アルバム情報なし";
             trackDuration.innerText = formatDuration(track.duration_ms) || "0:00";
 
+            // 🎯 APIから正しい日本語データを取得する
+            fetch("/SpotMusic/spotifyControl?action=getCurrentTrackImage")
+                .then(response => response.json())
+                .then(data => {
+                    console.log("APIから取得したアーティスト名:", data.artistName);
+                    if (data.artistName) {
+                        document.getElementById('artist-name').innerText = data.artistName;
+                    } else {
+                        document.getElementById('artist-name').innerText = "アーティスト情報なし";
+                    }
+                })
             // **リリース日を更新**
             if (track.album.id !== lastAlbumId) {
                 lastAlbumId = track.album.id; // アルバムIDを更新
