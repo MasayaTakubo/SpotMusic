@@ -125,3 +125,50 @@
     font-weight: bold;
     font-size: 18px;
 }
+
+
+@media screen and (max-width: 768px) {
+    .logo {
+        width: 3cm;
+        height: 3cm;
+        margin-top: 0.5cm;
+    }
+
+    .login {
+        margin-top: 1cm;
+    }
+
+    .loginButton {
+        font-size: 30px;
+    }
+
+    .loginButton i {
+        font-size: 35px;
+    }
+
+    .signup p {
+        font-size: 20px;
+        margin-left: 0.5cm;
+    }
+
+    .signup button {
+        font-size: 22px;
+    }
+
+    .formLogin {
+        width: 90%;
+        height: auto;
+        padding: 20px;
+        margin-top: 0.5cm;
+    }
+
+    #progressContainer {
+        width: 90%;
+        height: 40px;
+    }
+
+    #progressText {
+        font-size: 16px;
+        line-height: 40px;
+    }
+}
