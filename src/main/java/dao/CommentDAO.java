@@ -14,7 +14,7 @@ import connector.MySQLConnector;
 public class CommentDAO {
 	
 	public void addComment(CommentBean commentBean) {
-		String sql = "INSERT INTO COMMENT (PLAYLIST_ID, USER_ID, USER_NAME, SEND_COMMENT, SEND_TIME) VALUES (?,?,?,?,?)";
+		String sql = "insert into comment (playlist_id, user_id, user_name, send_comment, send_time) values (?,?,?,?,?)";
 		try (Connection conn = MySQLConnector.getConn();
 			PreparedStatement stmt = conn.prepareStatement(sql)) {
 			
@@ -36,19 +36,19 @@ public class CommentDAO {
 	
 	public List<CommentBean> getComment(String playlistId) {
         List<CommentBean> comments = new ArrayList<>();
-        String sql = "SELECT * FROM COMMENT WHERE PLAYLIST_ID = ? ORDER BY SEND_TIME DESC";
+        String sql = "select * from comment where playlist_id = ? order by send_time desc";
         try (Connection conn = MySQLConnector.getConn();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, playlistId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
             	CommentBean commentBean = new CommentBean(
-                        rs.getInt("COMMENT_ID"),
-                        rs.getString("PLAYLIST_ID"),
-                        rs.getString("USER_ID"),
-                        rs.getString("USER_NAME"),
-                        rs.getTimestamp("SEND_TIME"),
-                        rs.getString("SEND_COMMENT")
+                        rs.getInt("comment_id"),
+                        rs.getString("playlist_id"),
+                        rs.getString("user_id"),
+                        rs.getString("user_name"),
+                        rs.getTimestamp("send_time"),
+                        rs.getString("send_comment")
                 );
                 comments.add(commentBean);  // メッセージをリストに追加
             }
@@ -59,7 +59,7 @@ public class CommentDAO {
     }
 	
 	public void updateComment(CommentBean commentBean) {
-		String sql = "UPDATE COMMENT SET SEND_COMMENT = ? WHERE COMMENT_ID = ?";
+		String sql = "UPDATE comment SET send_comment = ? WHERE comment_id = ?";
 		try (Connection conn = MySQLConnector.getConn();
 			 PreparedStatement stmt = conn.prepareStatement(sql)) {
 			stmt.setString(1, commentBean.getSendComment());
@@ -71,7 +71,7 @@ public class CommentDAO {
 	}
 	
 	public void removeComment(int commentId) {
-		String sql = "DELETE FROM COMMENT WHERE COMMENT_ID  = ?";
+		String sql = "DELETE FROM comment WHERE comment_id  = ?";
 		try (Connection conn = MySQLConnector.getConn();
 				 PreparedStatement stmt = conn.prepareStatement(sql)) {
 			stmt.setInt(1, commentId);

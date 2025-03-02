@@ -13,7 +13,7 @@ import connector.MySQLConnector;
 public class RelationDAO {
 
     public void addRelation(relationBean relationBean) {
-        String sql = "INSERT INTO Relation (USER1_ID, USER2_ID) VALUES ( ?, ?)";
+        String sql = "INSERT INTO relation (USER1_ID, USER2_ID) VALUES ( ?, ?)";
         try (Connection conn = MySQLConnector.getConn();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, relationBean.getUser1Id()); 
@@ -26,7 +26,7 @@ public class RelationDAO {
 
     public List<relationBean> getRelation(String userId) {
         List<relationBean> Relations = new ArrayList<>();
-        String sql = "SELECT * FROM Relation WHERE User1_Id = ? OR User2_Id = ?";
+        String sql = "SELECT * FROM relation WHERE User1_Id = ? OR User2_Id = ?";
         try (Connection conn = MySQLConnector.getConn();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, userId);
@@ -48,7 +48,7 @@ public class RelationDAO {
     }
 
     public void acceptRelation(relationBean relationBean) {
-        String sql = "UPDATE Relation SET status = ? WHERE Relation_ID = ?";
+        String sql = "UPDATE relation SET status = ? WHERE Relation_ID = ?";
         try (Connection conn = MySQLConnector.getConn();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, relationBean.getStatus());
@@ -60,7 +60,7 @@ public class RelationDAO {
     }
 
     public void cancelRelation(relationBean relationBean) {
-        String sql = "UPDATE Relation SET status = ? WHERE Relation_ID = ?";
+        String sql = "UPDATE relation SET status = ? WHERE Relation_ID = ?";
         try (Connection conn = MySQLConnector.getConn();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, relationBean.getStatus());

@@ -15,7 +15,7 @@ import connector.MySQLConnector;
 public class MessageDAO {
 
     public void addMessage(MessageBean messageBean) {
-        String sql = "INSERT INTO MESSAGE (RELATION_ID, USER_ID, SEND_MESSAGE) VALUES (?, ?, ?)";
+        String sql = "insert into message (relation_id, user_id, send_message) values (?, ?, ?)";
         try (Connection conn = MySQLConnector.getConn();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -34,18 +34,18 @@ public class MessageDAO {
 
     public List<MessageBean> getMessages(int relationId) {
         List<MessageBean> messages = new ArrayList<>();
-        String sql = "SELECT * FROM MESSAGE WHERE RELATION_ID = ? ORDER BY SEND_TIME DESC";
+        String sql = "select * from message where relation_id = ? order by send_time desc";
         try (Connection conn = MySQLConnector.getConn();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, relationId);  // relationIdはint型
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 MessageBean message = new MessageBean(
-                        rs.getInt("MESSAGE_ID"),
-                        rs.getInt("RELATION_ID"),
-                        rs.getString("USER_ID"),
-                        rs.getTimestamp("SEND_TIME"),
-                        rs.getString("SEND_MESSAGE")
+                        rs.getInt("message_id"),
+                        rs.getInt("relation_id"),
+                        rs.getString("user_id"),
+                        rs.getTimestamp("send_time"),
+                        rs.getString("send_message")
                 );
                 messages.add(message);  // メッセージをリストに追加
             }
@@ -56,7 +56,7 @@ public class MessageDAO {
     }
 
     public void updateMessage(MessageBean messageBean) {
-        String sql = "UPDATE MESSAGE SET SEND_MESSAGE = ? WHERE MESSAGE_ID = ?";
+        String sql = "update message set send_message = ? where message_id = ?";
         try (Connection conn = MySQLConnector.getConn();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, messageBean.getSendMessage());
@@ -68,7 +68,7 @@ public class MessageDAO {
     }
 
     public void removeMessage(int messageId) {
-        String sql = "DELETE FROM MESSAGE WHERE MESSAGE_ID = ?";
+        String sql = "delete from message where message_id = ?";
         try (Connection conn = MySQLConnector.getConn();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, messageId);  // messageIdはint型
