@@ -32,7 +32,11 @@ import dao.PlayListDAO;
 import dao.UsersDAO;
 
 public class SpotifyAuthService {
-
+	//AWS用
+    //static final String CLIENT_ID = "47d25dfe57a84365a5560a0d4d5b904c";
+    //private static final String CLIENT_SECRET = "85177e25506d47c4b8b2b8de65e68d3b";
+    //static final String REDIRECT_URI = "http://44.193.237.107:8080/SpotMusic/auth";
+    //ローカル用
     static final String CLIENT_ID = "277b350dfbe146e8b5b48171bc6ceaed";
     private static final String CLIENT_SECRET = "5cdda2ff3df040de9b8ba8cbf0122885";
     static final String REDIRECT_URI = "http://localhost:8080/SpotMusic/auth";
